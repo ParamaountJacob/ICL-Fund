@@ -464,11 +464,15 @@ export const get_investment_application_by_id = async (applicationId: string): P
 
 export const update_application_onboarding_status = async (
   applicationId: string,
-  newStatus: string
+  newStatus: string,
+  stepName: string = 'current',
+  metadata: any = {}
 ): Promise<void> => {
-  const { error } = await supabase.rpc('update_application_onboarding_status', {
-    p_application_id: applicationId,
-    p_new_status: newStatus
+  const { error } = await supabase.rpc('update_onboarding_step', {
+    application_id: applicationId,
+    step_name: stepName,
+    status: newStatus,
+    metadata: metadata
   });
 
   if (error) throw error;
@@ -641,9 +645,11 @@ export const moveToNextStageAutomatically = async (
 ): Promise<void> => {
   try {
     // Simply update the application status directly
-    const { error } = await supabase.rpc('update_application_onboarding_status', {
-      p_application_id: applicationId,
-      p_new_status: newStatus
+    const { error } = await supabase.rpc('update_onboarding_step', {
+      application_id: applicationId,
+      step_name: 'current',
+      status: newStatus,
+      metadata: {}
     });
 
     if (error) throw error;
