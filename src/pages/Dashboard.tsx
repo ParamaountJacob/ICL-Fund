@@ -261,16 +261,28 @@ const Dashboard: React.FC = () => {
         p_user_id: userId
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error in get_user_investments_with_applications:', error);
+        throw error;
+      }
+
+      // Debug logging to help troubleshoot
+      console.log('User investments from database:', data);
+      console.log('User ID being queried:', userId);
+
       setUserInvestments(data || []);
 
       // If we have investments but none are active, we still want to show them in history
       if (data && data.length > 0) {
+        console.log('Found investments, statuses:', data.map(inv => inv.status).join(', '));
         // Check if any are active
         const activeInvestments = data.filter(inv => inv.status === 'active');
+        console.log('Active investments count:', activeInvestments.length);
         if (activeInvestments.length > 0) {
           setHasActiveInvestments(true);
         }
+      } else {
+        console.log('No investments found for user');
       }
 
       return data && data.length > 0;
