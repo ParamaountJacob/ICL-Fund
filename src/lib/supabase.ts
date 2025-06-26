@@ -468,10 +468,12 @@ export const update_application_onboarding_status = async (
   stepName: string = 'current',
   metadata: any = {}
 ): Promise<void> => {
+  // Note: The stepName and metadata params are being sent but not used by the backend
+  // We're keeping them for API compatibility
   const { error } = await supabase.rpc('update_onboarding_step', {
     application_id: applicationId,
     step_name: stepName,
-    p_status: newStatus,  // Updated to match the renamed parameter in the database function
+    p_status: newStatus,  // This is the only parameter actually used by the function
     metadata: metadata
   });
 
@@ -647,9 +649,9 @@ export const moveToNextStageAutomatically = async (
     // Simply update the application status directly
     const { error } = await supabase.rpc('update_onboarding_step', {
       application_id: applicationId,
-      step_name: 'current',
-      p_status: newStatus,  // Updated parameter name to match the database function
-      metadata: {}
+      step_name: 'current',  // Not used by the backend function
+      p_status: newStatus,  // This is the only parameter actually used by the function
+      metadata: {}  // Not used by the backend function
     });
 
     if (error) throw error;
