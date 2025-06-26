@@ -53,20 +53,18 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Drop the function first to allow parameter name changes
 DROP FUNCTION IF EXISTS public.update_onboarding_step(uuid, text, text, jsonb);
 
--- Create the function with renamed parameter
+-- Create the function with renamed parameter and using only columns that exist
 CREATE FUNCTION public.update_onboarding_step(
     application_id uuid,
-    step_name text,
-    p_status text,  -- Renamed parameter to avoid ambiguity
-    metadata jsonb DEFAULT '{}'::jsonb
+    step_name text,  -- We'll ignore this parameter since there's no column for it
+    p_status text,   -- This will be used for the status column
+    metadata jsonb DEFAULT '{}'::jsonb  -- We'll ignore this parameter since there's no column for it
 )
 RETURNS void AS $$
 BEGIN
     UPDATE investment_applications
     SET 
-        current_step = step_name,
-        step_status = p_status,  -- Use the renamed parameter
-        step_metadata = metadata,
+        status = p_status,  -- Just update the status column
         updated_at = NOW()
     WHERE id = application_id;
 END;
