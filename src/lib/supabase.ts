@@ -471,7 +471,7 @@ export const update_application_onboarding_status = async (
   const { error } = await supabase.rpc('update_onboarding_step', {
     application_id: applicationId,
     step_name: stepName,
-    status: newStatus,
+    p_status: newStatus,  // Updated to match the renamed parameter in the database function
     metadata: metadata
   });
 
@@ -648,7 +648,7 @@ export const moveToNextStageAutomatically = async (
     const { error } = await supabase.rpc('update_onboarding_step', {
       application_id: applicationId,
       step_name: 'current',
-      status: newStatus,
+      p_status: newStatus,  // Updated parameter name to match the database function
       metadata: {}
     });
 
