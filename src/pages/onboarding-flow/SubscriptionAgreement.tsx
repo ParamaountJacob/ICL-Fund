@@ -272,14 +272,49 @@ const SubscriptionAgreement: React.FC = () => {
 
         setLoading(true);
         try {
-            // Use the client-side function that properly handles upserts
+            // First create the document signature
             await createOrUpdateDocumentSignature(
                 applicationId,
                 'subscription_agreement',
                 'investor_signed',
                 true, // sendAdminNotification
-                true  // autoComplete
+                false  // Don't auto-complete, we'll do it explicitly below
             );
+
+            console.log("Document signature created, updating application status...");
+
+            // Explicitly update the application status to documents_signed
+            await update_application_onboarding_status(
+                applicationId,
+                'documents_signed',  // Critical status update that triggers the dashboard change
+                'document_signing',
+                { document_type: 'subscription_agreement' }
+            );
+
+            console.log("Application status updated to documents_signed");
+
+            // Try to create a direct notification
+            try {
+                await fetch(
+                    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-admin-notification`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            applicationId,
+                            notificationType: 'subscription_agreement_signed',
+                            message: `Investor has signed the subscription agreement for application ${applicationId}`
+                        }),
+                    }
+                );
+                console.log("Admin notification sent");
+            } catch (notifError) {
+                console.error("Error sending admin notification:", notifError);
+                // Continue with the flow even if notification fails
+            }
 
             setShowSuccessModal(true);
 

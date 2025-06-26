@@ -329,26 +329,58 @@ const Dashboard: React.FC = () => {
 
   const fetchActiveApplication = async () => {
     try {
-      // Check for ANY active application that's in progress
-      const application = await getUserLatestPendingApplication();
-      setActiveApplication(application);
-      setLatestApplication(application);
+      console.log("Fetching active application...");
+
+      // Important - Force a direct DB query to bypass any caching issues
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get the latest application directly from the database
+      const { data: application, error } = await supabase
+        .from('investment_applications')
+        .select('*')
+        .eq('user_id', user.id)
+        .not('status', 'in', '(active,rejected,cancelled)')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error("Error fetching application:", error);
+        return;
+      }
+
+      console.log("Latest application found:", application);
+
+      setActiveApplication(application || null);
+      setLatestApplication(application || null);
 
       // Don't show any notifications if we have an actively cancelled investment
       const hasActivelyCancelledInvestment = userInvestments.some(inv =>
         inv.status === 'cancelled' && inv.application_id === application?.id
       );
 
-      if (!hasActivelyCancelledInvestment && (application?.status === 'promissory_note_pending' ||
-        application?.status === 'bank_details_pending' ||
-        application?.status === 'plaid_pending' ||
-        application?.status === 'funds_pending')) {
-        setShowOnboardingNotification(true);
-      }
+      // Handle various application statuses
+      if (application) {
+        console.log("Application status:", application.status);
 
-      // Check if application is in documents_signed status (pending admin approval)
-      if (!hasActivelyCancelledInvestment && application?.status === 'documents_signed') {
-        setShowPendingApprovalNotification(true);
+        if (!hasActivelyCancelledInvestment) {
+          // Show onboarding notification for these statuses
+          if (application.status === 'promissory_note_pending' ||
+            application.status === 'bank_details_pending' ||
+            application.status === 'plaid_pending' ||
+            application.status === 'funds_pending') {
+            console.log("Showing onboarding notification");
+            setShowOnboardingNotification(true);
+          }
+
+          // Check if application is in documents_signed status (pending admin approval)
+          if (application.status === 'documents_signed' ||
+            application.status === 'pending_approval') {
+            console.log("Showing pending approval notification");
+            setShowPendingApprovalNotification(true);
+          }
+        }
       }
 
       // If we have application data and no active investments, use it to populate the investment data

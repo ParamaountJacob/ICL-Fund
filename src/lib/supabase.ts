@@ -466,6 +466,9 @@ export const update_application_onboarding_status = async (
   // Note: The stepName and metadata params are being sent but not used by the backend
   // We're keeping them for API compatibility
   try {
+    console.log(`Updating application ${applicationId} status to ${newStatus}`);
+
+    // Try the RPC function first
     const { error } = await supabase.rpc('update_onboarding_step', {
       application_id: applicationId,
       step_name: stepName,
@@ -487,6 +490,49 @@ export const update_application_onboarding_status = async (
 
       if (updateError) throw updateError;
     }
+
+    // Always create an admin notification for important status changes regardless of whether RPC worked
+    if (newStatus === 'documents_signed' ||
+      newStatus === 'pending_approval' ||
+      newStatus === 'bank_details_pending' ||
+      newStatus === 'plaid_pending' ||
+      newStatus === 'investor_onboarding_complete') {
+
+      // First get the user information to include in notification
+      const { data: appData } = await supabase
+        .from('investment_applications')
+        .select('user_id, investment_amount')
+        .eq('id', applicationId)
+        .single();
+
+      if (appData) {
+        // Get user email
+        const { data: userData } = await supabase
+          .from('users')
+          .select('email, first_name, last_name')
+          .eq('id', appData.user_id)
+          .single();
+
+        // Create admin notification
+        const { error: notifError } = await supabase
+          .from('admin_notifications')
+          .insert({
+            application_id: applicationId,
+            user_id: appData.user_id,
+            user_email: userData?.email || 'unknown',
+            notification_type: 'status_update',
+            message: `Investment application (${appData.investment_amount}) status updated to: ${newStatus}`,
+            is_read: false
+          });
+
+        if (notifError) {
+          console.error('Error creating admin notification:', notifError);
+        } else {
+          console.log('Created admin notification for status update:', newStatus);
+        }
+      }
+    }
+
   } catch (error) {
     console.error('Error updating application status:', error);
     throw error;
