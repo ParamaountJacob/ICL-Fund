@@ -53,7 +53,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.update_onboarding_step(
     application_id uuid,
     step_name text,
-    status text,
+    p_status text,  -- Renamed parameter to avoid ambiguity
     metadata jsonb DEFAULT '{}'::jsonb
 )
 RETURNS void AS $$
@@ -61,7 +61,7 @@ BEGIN
     UPDATE investment_applications
     SET 
         current_step = step_name,
-        step_status = status,
+        step_status = p_status,  -- Use the renamed parameter
         step_metadata = metadata,
         updated_at = NOW()
     WHERE id = application_id;
