@@ -2,25 +2,30 @@
 
 To fix the investment display issues, please apply the migrations in the following order:
 
-1. **20250626171500_fix_investment_triggers.sql**
+1. **20250626171900_fix_constraints.sql** (Apply this FIRST)
+   - Fixes issues with the annual_percentage constraint
+   - Updates existing data to meet constraints
+   - Creates validation triggers to prevent future issues
+
+2. **20250626171800_final_function_fix.sql** 
+   - Cleans up any existing functions before recreating them
+   - Grants necessary permissions
+   - Fixes remaining NULL value issues
+
+3. **20250626171500_fix_investment_triggers.sql**
    - Fixes the trigger that creates investments from applications
-   - Handles NULL values in required fields
+   - Handles NULL values with realistic defaults (1000 for amount, 5% for interest)
    - Adds data validation
 
-2. **20250626171700_fix_null_investments.sql**
+4. **20250626171700_fix_null_investments.sql**
    - Updates existing records with NULL values
-   - Sets default values for required fields
-   - Prevents constraint violations
+   - Sets default values that satisfy constraints
+   - Ensures data integrity
 
-3. **20250626171600_improve_investment_queries.sql**
+5. **20250626171600_improve_investment_queries.sql**
    - Enhances the query functions
    - Shows both investments and applications
    - Adds better data retrieval for admin and user views
-
-4. **20250626171800_final_function_fix.sql**
-   - Final cleanup and permission grants
-   - Fixes any remaining issues
-   - Ensures proper order of drops and creates
 
 ## Troubleshooting
 

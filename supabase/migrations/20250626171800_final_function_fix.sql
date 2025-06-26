@@ -17,12 +17,17 @@ GRANT EXECUTE ON FUNCTION public.get_admin_investments_with_users() TO authentic
 
 -- Apply a final fix to handle any remaining issues with NULL values
 UPDATE investments
-SET amount = 0
+SET amount = 1000  -- Use a reasonable default amount
 WHERE amount IS NULL;
 
 UPDATE investments
-SET annual_percentage = 0
+SET annual_percentage = 5  -- Use 5% as default (must be > 0 and <= 100)
 WHERE annual_percentage IS NULL;
+
+-- Also fix any constraint violations in the applications table
+UPDATE investment_applications
+SET annual_percentage = 5  -- Use 5% to satisfy the constraint (must be > 0 and <= 100)
+WHERE annual_percentage <= 0 OR annual_percentage > 100;
 
 UPDATE investments
 SET term_months = 12

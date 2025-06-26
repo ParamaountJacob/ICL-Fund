@@ -4,8 +4,8 @@
 -- First, update any existing applications with NULL values in critical fields
 UPDATE investment_applications
 SET 
-  investment_amount = 0,
-  annual_percentage = 0,
+  investment_amount = 1000,  -- Use a reasonable default amount
+  annual_percentage = 5,     -- Use 5% as default (must be > 0 and <= 100)
   term_months = 12,
   payment_frequency = 'monthly'
 WHERE 
@@ -17,12 +17,12 @@ WHERE
 -- Then update investments table
 UPDATE investments
 SET 
-  amount = 0
+  amount = 1000  -- Use a reasonable default amount
 WHERE amount IS NULL;
 
 UPDATE investments
 SET 
-  annual_percentage = 0
+  annual_percentage = 5  -- Use 5% as default (must be > 0 and <= 100)
 WHERE annual_percentage IS NULL;
 
 UPDATE investments

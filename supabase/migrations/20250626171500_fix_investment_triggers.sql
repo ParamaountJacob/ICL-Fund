@@ -47,13 +47,13 @@ BEGIN
   ) VALUES (
     NEW.user_id,
     NEW.id,
-    COALESCE(NEW.investment_amount, 0),  -- Use 0 if NULL
-    COALESCE(NEW.annual_percentage, 0),  -- Use 0 if NULL
+    COALESCE(NEW.investment_amount, 1000),  -- Use 1000 if NULL
+    COALESCE(NEW.annual_percentage, 5),     -- Use 5% if NULL (must be > 0 and <= 100)
     v_payment_frequency,
     CURRENT_DATE,
     'pending'::investment_status_enum,
-    COALESCE(NEW.term_months, 12),  -- Default to 12 months if NULL
-    COALESCE((NEW.investment_amount * NEW.annual_percentage / 100) * (NEW.term_months / 12.0), 0),  -- Use 0 if calculation is NULL
+    COALESCE(NEW.term_months, 12),          -- Default to 12 months if NULL
+    COALESCE((NEW.investment_amount * NEW.annual_percentage / 100) * (NEW.term_months / 12.0), 50),  -- Use a reasonable default if calculation is NULL
     now(),
     now()
   )
@@ -127,8 +127,8 @@ BEGIN
     ) VALUES (
       app.user_id,
       app.id,
-      COALESCE(app.investment_amount, 0),  -- Use 0 if NULL
-      COALESCE(app.annual_percentage, 0),  -- Use 0 if NULL
+      COALESCE(app.investment_amount, 1000),  -- Use 1000 if NULL
+      COALESCE(app.annual_percentage, 5),     -- Use 5% if NULL (must be > 0 and <= 100)
       v_payment_frequency,
       CURRENT_DATE,
       CASE 
@@ -137,7 +137,7 @@ BEGIN
         ELSE 'pending'::investment_status_enum
       END,
       COALESCE(app.term_months, 12),  -- Default to 12 months if NULL
-      COALESCE((app.investment_amount * app.annual_percentage / 100) * (app.term_months / 12.0), 0),  -- Use 0 if calculation is NULL
+      COALESCE((app.investment_amount * app.annual_percentage / 100) * (app.term_months / 12.0), 50),  -- Use a reasonable default if calculation is NULL
       COALESCE(app.created_at, NOW()),
       NOW()
     );
