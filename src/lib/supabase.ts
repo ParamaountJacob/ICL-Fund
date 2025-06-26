@@ -85,6 +85,7 @@ export const createOrUpdateDocumentSignature = async (
           updated_at: new Date().toISOString()
         })
         .select()
+    }
     // Auto-complete application status update if requested
     if (autoComplete && status === 'investor_signed') {
       if (documentType === 'subscription_agreement') {
