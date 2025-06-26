@@ -1,8 +1,12 @@
 -- Improve investment retrieval functions
 -- This migration enhances the function to get all user investments with applications
 
+-- First drop existing functions
+DROP FUNCTION IF EXISTS public.get_user_investments_with_applications(uuid);
+DROP FUNCTION IF EXISTS public.get_admin_investments_with_users();
+
 -- Improved function to get user investments with applications
-CREATE OR REPLACE FUNCTION public.get_user_investments_with_applications(p_user_id uuid)
+CREATE FUNCTION public.get_user_investments_with_applications(p_user_id uuid)
 RETURNS TABLE (
   id uuid,
   user_id uuid,
@@ -87,7 +91,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Also improve the admin version of the function
-CREATE OR REPLACE FUNCTION public.get_admin_investments_with_users()
+CREATE FUNCTION public.get_admin_investments_with_users()
 RETURNS TABLE (
   id uuid,
   user_id uuid,
@@ -168,5 +172,9 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Grant execute permissions
-GRANT EXECUTE ON FUNCTION public.get_user_investments_with_applications(uuid) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.get_admin_investments_with_users() TO authenticated;
+-- Grant permissions after creating the functions
+DO $$ 
+BEGIN
+  EXECUTE 'GRANT EXECUTE ON FUNCTION public.get_user_investments_with_applications(uuid) TO authenticated';
+  EXECUTE 'GRANT EXECUTE ON FUNCTION public.get_admin_investments_with_users() TO authenticated';
+END $$;

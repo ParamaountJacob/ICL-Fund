@@ -4,8 +4,11 @@
 -- Drop existing trigger first
 DROP TRIGGER IF EXISTS create_investment_on_application_submit_trigger ON investment_applications;
 
+-- Drop the function before recreating
+DROP FUNCTION IF EXISTS create_investment_on_application_submit() CASCADE;
+
 -- Recreate the trigger function
-CREATE OR REPLACE FUNCTION create_investment_on_application_submit()
+CREATE FUNCTION create_investment_on_application_submit()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -73,9 +76,12 @@ FOR EACH ROW
 EXECUTE FUNCTION create_investment_on_application_submit();
 
 -- Ensure proper permissions for authenticated users
-GRANT SELECT ON investments TO authenticated;
-GRANT SELECT ON investment_applications TO authenticated;
-GRANT EXECUTE ON FUNCTION get_user_investments_with_applications(uuid) TO authenticated;
+DO $$ 
+BEGIN
+  EXECUTE 'GRANT SELECT ON investments TO authenticated';
+  EXECUTE 'GRANT SELECT ON investment_applications TO authenticated';
+  -- No need to grant execute here since it will be done in the query migration
+END $$;
 
 -- Also run a fix to ensure existing applications have corresponding investments
 DO $$
