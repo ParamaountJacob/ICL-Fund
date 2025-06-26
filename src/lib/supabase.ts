@@ -46,152 +46,90 @@ export const createOrUpdateDocumentSignature = async (
     // Check if a document signature record already exists
     const { data: existingSignature, error: checkError } = await supabase
       .from('document_signatures')
-      .select('*')
+      .select('id')
       .eq('application_id', applicationId)
       .eq('document_type', documentType)
-      .single();
+      .maybeSingle();
 
-    if (checkError && checkError.code !== 'PGRST116') {
-      throw checkError;
-    }
+    if (checkError && checkError.code !== 'PGRST116') throw checkError;
+
+    let signatureData;
 
     if (existingSignature) {
-      // Update existing signature
-      const { error: updateError } = await supabase
+      // Update existing signature record
+      const { data, error } = await supabase
         .from('document_signatures')
         .update({
-          status,
+          status: status,
+          signed_at: status.includes('signed') ? new Date().toISOString() : null,
           updated_at: new Date().toISOString()
         })
-        .eq('id', existingSignature.id);
+        .eq('id', existingSignature.id)
+        .select()
+        .single();
 
-      if (updateError) throw updateError;
-
-      if (sendAdminNotification) {
-        await fetch('/api/send-admin-notification', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: `Document ${status}`,
-            message: `Document ${documentType} for application ${applicationId} has been ${status}`
-          })
-        });
-      }
-
-      return existingSignature;
-    }
-
-    // Create new signature
-    const { data: newSignature, error: insertError } = await supabase
-      .from('document_signatures')
-      .insert({
-        application_id: applicationId,
-        document_type: documentType,
-        status,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single();
-
-    if (insertError) throw insertError;
-
-    if (sendAdminNotification) {
-      await fetch('/api/send-admin-notification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: `New Document Signature`,
-          message: `New ${documentType} signature created for application ${applicationId}`
-        })
-      });
-    }
-
-    return newSignature;
-      .select('id')
-  .eq('application_id', applicationId)
-  .eq('document_type', documentType)
-  .maybeSingle();
-
-if (checkError && checkError.code !== 'PGRST116') throw checkError;
-
-let signatureData;
-
-if (existingSignature) {
-  // Update existing signature record
-  const { data, error } = await supabase
-    .from('document_signatures')
-    .update({
-      status: status,
-      signed_at: status.includes('signed') ? new Date().toISOString() : null,
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', existingSignature.id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  signatureData = data;
-} else {
-  // Create new signature record
-  const { data, error } = await supabase
-    .from('document_signatures')
-    .insert({
-      application_id: applicationId,
-      document_type: documentType,
-      status: status,
-      signed_at: status.includes('signed') ? new Date().toISOString() : null,
-      document_url: null, // Will be populated by SignRequest integration
-      signing_url: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  signatureData = data;
-}
-
-// Auto-complete application status update if requested
-if (autoComplete && status === 'investor_signed') {
-  if (documentType === 'subscription_agreement') {
-    await update_application_onboarding_status(applicationId, 'documents_signed');
-  } else if (documentType === 'promissory_note') {
-    await update_application_onboarding_status(applicationId, 'bank_details_pending');
-  }
-}
-
-// Send notification to admin if requested
-if (sendAdminNotification && status === 'investor_signed') {
-  try {
-    await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-admin-notification`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          applicationId,
+      if (error) throw error;
+      signatureData = data;
+    } else {
+      // Create new signature record
+      const { data, error } = await supabase
+        .from('document_signatures')
+        .insert({
+          application_id: applicationId,
           document_type: documentType,
-          notificationType: `${documentType}_signed`,
-          message: `Investor has signed the ${documentType.replace('_', ' ')} for application ${applicationId}`
-        }),
-      }
-    );
-  } catch (error) {
-    console.error('Error sending admin notification:', error);
-    // Don't fail the whole operation if notification sending fails
-  }
-}
+          status: status,
+          signed_at: status.includes('signed') ? new Date().toISOString() : null,
+          document_url: null, // Will be populated by SignRequest integration
+          signing_url: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
 
-return signatureData;
+      if (error) throw error;
+      signatureData = data;
+    }
+
+    // Auto-complete application status update if requested
+    if (autoComplete && status === 'investor_signed') {
+      if (documentType === 'subscription_agreement') {
+        await update_application_onboarding_status(applicationId, 'documents_signed');
+      } else if (documentType === 'promissory_note') {
+        await update_application_onboarding_status(applicationId, 'bank_details_pending');
+      }
+    }
+
+    // Send notification to admin if requested
+    if (sendAdminNotification && status === 'investor_signed') {
+      try {
+        await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-admin-notification`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              applicationId,
+              document_type: documentType,
+              notificationType: `${documentType}_signed`,
+              message: `Investor has signed the ${documentType.replace('_', ' ')} for application ${applicationId}`
+            }),
+          }
+        );
+      } catch (error) {
+        console.error('Error sending admin notification:', error);
+        // Don't fail the whole operation if notification sending fails
+      }
+    }
+
+    return signatureData;
   } catch (error) {
-  console.error('Error creating/updating document signature:', error);
-  throw error;
-}
+    console.error('Error creating/updating document signature:', error);
+    throw error;
+  }
 };
 
 // Add a simple wrapper for legacy code
