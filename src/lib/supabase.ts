@@ -1,6 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 import { InvestmentStatus } from '../types';
 
+declare global {
+  interface ImportMeta {
+    env: {
+      VITE_SUPABASE_URL: string;
+      VITE_SUPABASE_ANON_KEY: string;
+    };
+  }
+}
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -14,104 +23,175 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 export type DocumentType = 'pitch_deck' | 'ppm' | 'wire_instructions' | 'subscription_agreement' | 'promissory_note';
 export type VerificationStatus = 'pending' | 'verified';
-export type UserRole = 'user' | 'sub_admin' | 'admin'; 
+export type UserRole = 'user' | 'sub_admin' | 'admin';
 
 // Fix circular reference by implementing the function here
+interface DocumentSignature {
+  id: string;
+  application_id: string;
+  document_type: DocumentType;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export const createOrUpdateDocumentSignature = async (
   applicationId: string,
-  documentType: string,
+  documentType: DocumentType,
   status: string = 'pending',
   sendAdminNotification: boolean = true,
   autoComplete: boolean = true
-): Promise<any> => {
+): Promise<DocumentSignature> => {
   try {
     // Check if a document signature record already exists
     const { data: existingSignature, error: checkError } = await supabase
       .from('document_signatures')
-      .select('id')
+      .select('*')
       .eq('application_id', applicationId)
       .eq('document_type', documentType)
-      .maybeSingle();
-      
-    if (checkError && checkError.code !== 'PGRST116') throw checkError;
-    
-    let signatureData;
-    
+      .single();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      throw checkError;
+    }
+
     if (existingSignature) {
-      // Update existing signature record
-      const { data, error } = await supabase
+      // Update existing signature
+      const { error: updateError } = await supabase
         .from('document_signatures')
         .update({
-          status: status,
-          signed_at: status.includes('signed') ? new Date().toISOString() : null,
+          status,
           updated_at: new Date().toISOString()
         })
-        .eq('id', existingSignature.id)
-        .select()
-        .single();
-        
-      if (error) throw error;
-      signatureData = data;
-    } else {
-      // Create new signature record
-      const { data, error } = await supabase
-        .from('document_signatures')
-        .insert({
-          application_id: applicationId,
-          document_type: documentType,
-          status: status,
-          signed_at: status.includes('signed') ? new Date().toISOString() : null,
-          document_url: null, // Will be populated by SignRequest integration
-          signing_url: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+        .eq('id', existingSignature.id);
+
+      if (updateError) throw updateError;
+
+      if (sendAdminNotification) {
+        await fetch('/api/send-admin-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: `Document ${status}`,
+            message: `Document ${documentType} for application ${applicationId} has been ${status}`
+          })
+        });
+      }
+
+      return existingSignature;
+    }
+
+    // Create new signature
+    const { data: newSignature, error: insertError } = await supabase
+      .from('document_signatures')
+      .insert({
+        application_id: applicationId,
+        document_type: documentType,
+        status,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+
+    if (sendAdminNotification) {
+      await fetch('/api/send-admin-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `New Document Signature`,
+          message: `New ${documentType} signature created for application ${applicationId}`
         })
-        .select()
-        .single();
-        
-      if (error) throw error;
-      signatureData = data;
+      });
     }
-    
-    // Auto-complete application status update if requested
-    if (autoComplete && status === 'investor_signed') {
-      if (documentType === 'subscription_agreement') {
-        await update_application_onboarding_status(applicationId, 'documents_signed');
-      } else if (documentType === 'promissory_note') {
-        await update_application_onboarding_status(applicationId, 'bank_details_pending');
-      }
-    }
-    
-    // Send notification to admin if requested
-    if (sendAdminNotification && status === 'investor_signed') {
-      try {
-        await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-admin-notification`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              applicationId,
-              document_type: documentType,
-              notificationType: `${documentType}_signed`,
-              message: `Investor has signed the ${documentType.replace('_', ' ')} for application ${applicationId}`
-            }),
-          }
-        );
-      } catch (error) {
-        console.error('Error sending admin notification:', error);
-        // Don't fail the whole operation if notification sending fails
-      }
-    }
-    
-    return signatureData;
-  } catch (error) {
-    console.error('Error creating/updating document signature:', error);
-    throw error;
+
+    return newSignature;
+      .select('id')
+  .eq('application_id', applicationId)
+  .eq('document_type', documentType)
+  .maybeSingle();
+
+if (checkError && checkError.code !== 'PGRST116') throw checkError;
+
+let signatureData;
+
+if (existingSignature) {
+  // Update existing signature record
+  const { data, error } = await supabase
+    .from('document_signatures')
+    .update({
+      status: status,
+      signed_at: status.includes('signed') ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', existingSignature.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  signatureData = data;
+} else {
+  // Create new signature record
+  const { data, error } = await supabase
+    .from('document_signatures')
+    .insert({
+      application_id: applicationId,
+      document_type: documentType,
+      status: status,
+      signed_at: status.includes('signed') ? new Date().toISOString() : null,
+      document_url: null, // Will be populated by SignRequest integration
+      signing_url: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  signatureData = data;
+}
+
+// Auto-complete application status update if requested
+if (autoComplete && status === 'investor_signed') {
+  if (documentType === 'subscription_agreement') {
+    await update_application_onboarding_status(applicationId, 'documents_signed');
+  } else if (documentType === 'promissory_note') {
+    await update_application_onboarding_status(applicationId, 'bank_details_pending');
   }
+}
+
+// Send notification to admin if requested
+if (sendAdminNotification && status === 'investor_signed') {
+  try {
+    await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-admin-notification`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          applicationId,
+          document_type: documentType,
+          notificationType: `${documentType}_signed`,
+          message: `Investor has signed the ${documentType.replace('_', ' ')} for application ${applicationId}`
+        }),
+      }
+    );
+  } catch (error) {
+    console.error('Error sending admin notification:', error);
+    // Don't fail the whole operation if notification sending fails
+  }
+}
+
+return signatureData;
+  } catch (error) {
+  console.error('Error creating/updating document signature:', error);
+  throw error;
+}
 };
 
 // Add a simple wrapper for legacy code
@@ -122,8 +202,8 @@ export const createDocumentSignature = async (
 ) => {
   return createOrUpdateDocumentSignature(applicationId, documentType, status);
 };
-export type InvestmentStatus = 'pending' | 'pending_approval' | 'pending_activation' | 'plaid_pending' | 
-  'investor_onboarding_complete' | 'active' | 'completed' | 'cancelled' | 'promissory_note_pending' | 
+export type InvestmentStatus = 'pending' | 'pending_approval' | 'pending_activation' | 'plaid_pending' |
+  'investor_onboarding_complete' | 'active' | 'completed' | 'cancelled' | 'promissory_note_pending' |
   'promissory_note_sent' | 'funds_pending' | 'bank_details_pending';
 
 export interface DocumentRequest {
@@ -221,7 +301,7 @@ export const checkVerificationStatus = async () => {
 
 export const requestDocument = async (documentType: DocumentType) => {
   const { data: { user } } = await supabase.auth.getUser();
-  
+
   if (!user) {
     throw new Error('User not authenticated');
   }
@@ -242,7 +322,7 @@ export const requestDocument = async (documentType: DocumentType) => {
   if (existingRequest) {
     return {
       status: existingRequest.status,
-      message: existingRequest.status === 'approved' 
+      message: existingRequest.status === 'approved'
         ? 'You already have access to this document.'
         : 'You have a pending request for this document.'
     };
@@ -330,7 +410,7 @@ export const updateUserProfile = async (profile: Partial<UserProfile>): Promise<
     });
 
     if (error) throw error;
-    
+
     return await getUserProfile();
   } catch (error) {
     console.error('Error updating user profile:', error);
@@ -340,7 +420,7 @@ export const updateUserProfile = async (profile: Partial<UserProfile>): Promise<
 
 export const getAllUsers = async (): Promise<User[]> => {
   const { data, error } = await supabase.rpc('get_all_users');
-  
+
   if (error) throw error;
   return data || [];
 };
@@ -350,7 +430,7 @@ export const setUserRole = async (userId: string, role: UserRole): Promise<void>
     target_user_id: userId,
     new_role: role
   });
-  
+
   if (error) throw error;
 };
 
@@ -359,7 +439,7 @@ export const updateUserVerification = async (userId: string, status: Verificatio
     p_user_id: userId,
     p_status: status
   });
-  
+
   if (error) throw error;
 };
 
@@ -395,7 +475,7 @@ export const createInvestmentApplication = async () => {
   if (!user) throw new Error('User not authenticated');
 
   const { data, error } = await supabase.rpc('create_investment_application');
-  
+
   if (error) throw error;
   return data;
 };
@@ -415,7 +495,7 @@ export const createInvestmentApplicationWithDetails = async (
     p_payment_frequency: paymentFrequency,
     p_term_months: termMonths
   });
-  
+
   if (error) throw error;
   return data;
 };
@@ -427,7 +507,7 @@ export const move_investment_to_bank_details_stage = async (
     const { error } = await supabase.rpc('move_investment_to_bank_details_stage', {
       p_investment_id: investmentId
     });
-    
+
     if (error) throw error;
   } catch (error) {
     console.error('Error moving investment to bank details stage:', error);
@@ -439,7 +519,7 @@ export const get_investment_application_by_id = async (applicationId: string): P
   const { data, error } = await supabase.rpc('get_investment_application_by_id', {
     p_application_id: applicationId
   });
-  
+
   if (error) throw error;
   return data?.[0] || null;
 };
@@ -452,7 +532,7 @@ export const update_application_onboarding_status = async (
     p_application_id: applicationId,
     p_new_status: newStatus
   });
-  
+
   if (error) throw error;
 };
 
@@ -461,7 +541,7 @@ export const getUserActiveApplication = async () => {
   if (!user) throw new Error('User not authenticated');
 
   const { data, error } = await supabase.rpc('get_user_active_application');
-  
+
   if (error) throw error;
   return data?.[0] || null;
 };
@@ -479,7 +559,7 @@ export const getUserLatestPendingApplication = async () => {
     .order('created_at', { ascending: false })
     .limit(1)
     .single();
-  
+
   if (error && error.code !== 'PGRST116') throw error;
   return data || null;
 };
@@ -505,7 +585,7 @@ export const getAllConsultationRequests = async (): Promise<ConsultationRequest[
     .from('consultation_requests')
     .select('*')
     .order('created_at', { ascending: false });
-  
+
   if (error) throw error;
   return data || [];
 };
@@ -515,7 +595,7 @@ export const getAllNewsletterSubscribers = async (): Promise<NewsletterSubscribe
     .from('newsletter_subscribers')
     .select('*')
     .order('created_at', { ascending: false });
-  
+
   if (error) throw error;
   return data || [];
 };
@@ -523,12 +603,12 @@ export const getAllNewsletterSubscribers = async (): Promise<NewsletterSubscribe
 export const getUserSignedDocuments = async (): Promise<SignedDocument[]> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
-  
+
   // Call get_latest_user_documents to only get the latest version of each document type
   const { data, error } = await supabase.rpc('get_latest_user_documents', {
     p_user_id: user.id
-  }); 
-  
+  });
+
   if (error) throw error;
   return data || [];
 };
@@ -540,41 +620,41 @@ export const user_has_active_investments = async (userId: string): Promise<boole
       .from('investments')
       .select('status, application_id')
       .eq('user_id', userId);
-      
+
     if (invError) throw invError;
-    
+
     if (investments && investments.length > 0) {
       // Check if any investment is in an active state
-      const activeInvestment = investments.find(inv => 
+      const activeInvestment = investments.find(inv =>
         !['cancelled', 'deleted'].includes(inv.status)
       );
-      
+
       if (activeInvestment) {
         return true;
       }
     }
-    
+
     // If no active investments directly, check applications
     const { data: applications, error: appError } = await supabase
       .from('investment_applications')
       .select('id, status')
       .eq('user_id', userId);
-      
+
     if (appError) throw appError;
-    
+
     if (applications && applications.length > 0) {
       // Check if any application is in an active state
-      const activeApp = applications.find(app => 
+      const activeApp = applications.find(app =>
         ![
-          'rejected', 
-          'deleted', 
+          'rejected',
+          'deleted',
           'cancelled'
         ].includes(app.status)
       );
-      
+
       return !!activeApp;
     }
-    
+
     return false;
   } catch (error) {
     console.error('Error checking active investments:', error);
@@ -586,14 +666,14 @@ export const get_user_investments_with_applications = async (userId: string): Pr
   const { data, error } = await supabase.rpc('get_user_investments_with_applications', {
     p_user_id: userId
   });
-  
+
   if (error) throw error;
   return data || [];
 };
 
 export const get_admin_investments_with_users = async (): Promise<any[]> => {
   const { data, error } = await supabase.rpc('get_admin_investments_with_users');
-  
+
   if (error) throw error;
   return data || [];
 };
@@ -605,9 +685,9 @@ export const adminSendPromissoryNote = async (
   try {
     // Directly create document signature with auto-complete=true
     const { data, error } = await supabase.rpc('get_user_active_application');
-      
+
     if (error) throw error;
-    
+
     // No need to manually update status - the function handles it
     return data;
   } catch (error) {
@@ -627,7 +707,7 @@ export const moveToNextStageAutomatically = async (
       p_application_id: applicationId,
       p_new_status: newStatus
     });
-    
+
     if (error) throw error;
   } catch (error) {
     console.error('Error moving to next stage:', error);
@@ -640,14 +720,14 @@ export const getAdminNotifications = async (limit = 10, offset = 0): Promise<Adm
     p_limit: limit,
     p_offset: offset
   });
-  
+
   if (error) throw error;
   return data || [];
 };
 
 export const getUnreadNotificationCount = async (): Promise<number> => {
   const { data, error } = await supabase.rpc('get_unread_notification_count');
-  
+
   if (error) throw error;
   return data || 0;
 };
@@ -655,14 +735,14 @@ export const getUnreadNotificationCount = async (): Promise<number> => {
 export const claimUserByAdmin = async (userId: string, adminId?: string): Promise<void> => {
   const { data: { user } } = await supabase.auth.getUser();
   const adminIdToUse = adminId || user?.id;
-  
+
   if (!adminIdToUse) throw new Error('No admin ID provided and no user logged in');
-  
+
   const { error } = await supabase.rpc('claim_user_by_admin', {
     p_user_id: userId,
     p_admin_id: adminIdToUse
   });
-  
+
   if (error) throw error;
 };
 
@@ -670,7 +750,7 @@ export const unclaim_user = async (userId: string): Promise<void> => {
   const { error } = await supabase.rpc('unclaim_user', {
     p_user_id: userId
   });
-  
+
   if (error) throw error;
 };
 
@@ -679,13 +759,13 @@ export const assignUserToAdmin = async (userId: string, adminId: string): Promis
     p_user_id: userId,
     p_admin_id: adminId
   });
-  
+
   if (error) throw error;
 };
 
-export const getAllAdmins = async (): Promise<{id: string, email: string, first_name: string, last_name: string, role: string}[]> => {
+export const getAllAdmins = async (): Promise<{ id: string, email: string, first_name: string, last_name: string, role: string }[]> => {
   const { data, error } = await supabase.rpc('get_all_admins');
-  
+
   if (error) throw error;
   return data || [];
 };
@@ -694,7 +774,7 @@ export const markNotificationRead = async (notificationId: string): Promise<void
   const { error } = await supabase.rpc('mark_notification_read', {
     p_notification_id: notificationId
   });
-  
+
   if (error) throw error;
 };
 
@@ -702,7 +782,7 @@ export const getAdminSigningUrl = async (signatureId: string): Promise<string> =
   const { data, error } = await supabase.rpc('get_admin_signing_url', {
     p_signature_id: signatureId
   });
-  
+
   if (error) throw error;
   return data;
 };
@@ -734,9 +814,9 @@ export const getAdminDocumentSignatures = async (): Promise<DocumentRequest[]> =
     `)
     .eq('status', 'investor_signed')
     .order('created_at', { ascending: false });
-  
+
   if (error) throw error;
-  
+
   // Format the data for the admin dashboard
   return data.map((doc: any) => ({
     id: doc.id,
@@ -763,7 +843,7 @@ export const handleInvestorSignedDocument = async (signatureId: string): Promise
   const { error } = await supabase.rpc('handle_investor_signed_document', {
     p_signature_id: signatureId
   });
-  
+
   if (error) throw error;
 };
 
@@ -772,7 +852,7 @@ export const assignDocumentToAdmin = async (signatureId: string, adminId?: strin
     p_signature_id: signatureId,
     p_admin_id: adminId
   });
-  
+
   if (error) throw error;
 };
 
@@ -781,7 +861,7 @@ export const updateConsultationStatus = async (id: string, status: ConsultationS
     .from('consultation_requests')
     .update({ status })
     .eq('id', id);
-  
+
   if (error) throw error;
 };
 
@@ -798,16 +878,16 @@ export const updateInvestmentStatus = async (
         updated_at: new Date().toISOString()
       })
       .eq('id', investmentId);
-    
+
     if (error) throw error;
-    
+
     // Then get the investment to check if it has an application_id
     const { data: investment } = await supabase
       .from('investments')
       .select('application_id, user_id')
       .eq('id', investmentId)
       .single();
-      
+
     // If it has an application_id, update the application status too
     if (investment?.application_id) {
       let appStatus;
@@ -822,12 +902,12 @@ export const updateInvestmentStatus = async (
       } else {
         appStatus = 'documents_signed'; // Default fallback
       }
-      
+
       const { error: appError } = await supabase
         .from('investment_applications')
         .update({ status: appStatus })
         .eq('id', investment.application_id);
-        
+
       if (appError) {
         console.error('Error updating application status:', appError);
         // Don't throw here, as the investment was already updated
@@ -856,7 +936,7 @@ export const updateInvestmentDetails = async (
       updated_at: new Date().toISOString()
     })
     .eq('id', investmentId);
-  
+
   if (error) throw error;
 };
 
@@ -866,7 +946,7 @@ export const createPromissoryNoteSignatureRecord = async (
   const { data, error } = await supabase.rpc('create_promissory_note_signature_record', {
     p_application_id: applicationId
   });
-  
+
   if (error) throw error;
   return data;
 };
@@ -881,7 +961,7 @@ export const sendSystemNotificationToUser = async (
     p_subject: subject,
     p_content: content
   });
-  
+
   if (error) throw error;
   return data;
 };
@@ -892,7 +972,7 @@ export const getUserInvestments = async (userId: string): Promise<any[]> => {
     .select('*, investment_applications(id, status)')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
-  
+
   if (error) throw error;
   return data || [];
 };
@@ -902,7 +982,7 @@ export const addAdminNote = async (userId: string, note: string): Promise<void> 
     p_user_id: userId,
     p_note: note
   });
-  
+
   if (error) throw error;
 };
 
@@ -911,7 +991,7 @@ export const deleteConsultationRequest = async (requestId: string): Promise<void
     .from('consultation_requests')
     .delete()
     .eq('id', requestId);
-  
+
   if (error) throw error;
 };
 
@@ -920,7 +1000,7 @@ export const deleteAdminNotification = async (notificationId: string): Promise<v
     .from('admin_notifications')
     .delete()
     .eq('id', notificationId);
-  
+
   if (error) throw error;
 };
 
@@ -928,7 +1008,7 @@ export const deleteUserAndAllData = async (userId: string): Promise<void> => {
   const { error } = await supabase.rpc('delete_user_and_all_data', {
     p_user_id: userId
   });
-  
+
   if (error) throw error;
 };
 
@@ -940,44 +1020,44 @@ export const areAllUserInvestmentsCancelled = async (userId: string): Promise<bo
       .from('investments')
       .select('status, application_id')
       .eq('user_id', userId);
-      
+
     if (invError) throw invError;
-    
+
     // If no investments, technically "all are cancelled"
     if (!investments || investments.length === 0) {
       return true;
     }
-    
+
     // Check if all investments are cancelled/deleted
-    const allCancelled = investments.every(inv => 
+    const allCancelled = investments.every(inv =>
       ['cancelled', 'deleted'].includes(inv.status)
     );
-    
+
     if (!allCancelled) {
       return false;
     }
-    
+
     // Also check applications
     const appIds = investments
       .filter(inv => inv.application_id)
       .map(inv => inv.application_id);
-      
+
     if (appIds.length > 0) {
       const { data: applications, error: appError } = await supabase
         .from('investment_applications')
         .select('status')
         .in('id', appIds);
-        
+
       if (appError) throw appError;
-      
+
       // Make sure all applications are also in terminal states
       if (applications && applications.length > 0) {
-        return applications.every(app => 
+        return applications.every(app =>
           ['rejected', 'deleted', 'cancelled'].includes(app.status)
         );
       }
     }
-    
+
     return true;
   } catch (error) {
     console.error('Error checking if investments are cancelled:', error);
@@ -992,29 +1072,29 @@ export const moveInvestmentToPromissoryNoteStage = async (
   try {
     // Update the investment status to promissory_note_sent instead of promissory_note_pending
     await updateInvestmentStatus(investmentId, 'promissory_note_sent' as InvestmentStatus);
-    
+
     // Get application ID and user ID from the investment
     const { data: investment } = await supabase
       .from('investments')
       .select('application_id, user_id')
       .eq('id', investmentId)
       .single();
-      
+
     if (investment?.application_id && investment?.user_id) {
       // Update application status
       const { error: appError } = await supabase
         .from('investment_applications')
-        .update({ 
+        .update({
           status: 'promissory_note_pending',
           updated_at: new Date().toISOString()
         })
         .eq('id', investment.application_id);
-        
+
       if (appError) console.error('Error updating application:', appError);
-      
+
       // Create promissory note signature record
       await createPromissoryNoteSignatureRecord(investment.application_id);
-      
+
       // Send detailed notification to user about next step
       await sendSystemNotificationToUser(
         investment.user_id,
@@ -1035,26 +1115,26 @@ export const verifyPromissoryNoteSigned = async (
   try {
     // Update the investment status
     await updateInvestmentStatus(investmentId, 'plaid_pending' as InvestmentStatus);
-    
+
     // Get the investment details
     const { data: investment } = await supabase
       .from('investments')
       .select('application_id, user_id')
       .eq('id', investmentId)
       .single();
-      
+
     if (investment?.application_id && investment?.user_id) {
       // Update application status to plaid_pending (skipping bank_details_pending)
       const { error: appError } = await supabase
         .from('investment_applications')
-        .update({ 
+        .update({
           status: 'plaid_pending',
           updated_at: new Date().toISOString()
         })
         .eq('id', investment.application_id);
-        
+
       if (appError) console.error('Error updating application status:', appError);
-      
+
       // Send notification to user
       await sendSystemNotificationToUser(
         investment.user_id,
@@ -1075,19 +1155,19 @@ export const moveInvestmentToFundsPendingStage = async (
   try {
     // Update the investment status
     await updateInvestmentStatus(investmentId, 'funds_pending' as InvestmentStatus);
-    
+
     // Get the user ID from the investment
     const { data: investment } = await supabase
       .from('investments')
       .select('user_id')
       .eq('id', investmentId)
       .single();
-      
+
     // Send notification to user
     if (investment?.user_id) {
       await sendSystemNotificationToUser(
-        investment.user_id, 
-        'Wire Instructions Available: Action Required (Step 2 of 4)', 
+        investment.user_id,
+        'Wire Instructions Available: Action Required (Step 2 of 4)',
         'We have received your signed promissory note. Please proceed to your dashboard to review wire transfer instructions and complete your investment by wire transfer.'
       );
     }
@@ -1104,19 +1184,19 @@ export const confirmFundsReceivedAndProceedToPlaid = async (
   try {
     // Update the investment status to plaid_pending
     await updateInvestmentStatus(investmentId, 'plaid_pending');
-    
+
     // Get the user ID from the investment
     const { data: investment } = await supabase
       .from('investments')
       .select('user_id')
       .eq('id', investmentId)
       .single();
-      
+
     // Send notification to user
     if (investment?.user_id) {
       await sendSystemNotificationToUser(
-        investment.user_id, 
-        'Funds Received: Connect Your Bank Account (Step 3 of 4)', 
+        investment.user_id,
+        'Funds Received: Connect Your Bank Account (Step 3 of 4)',
         'We have verified receipt of your wire transfer and your signed promissory note. Please proceed to your dashboard to connect your bank account for future transactions.'
       );
     }
@@ -1136,56 +1216,56 @@ export const activateInvestment = async (
       const { error } = await supabase.rpc('activate_user_investment', {
         p_investment_id: investmentId
       });
-      
+
       if (error) throw error;
     } catch (rpcError) {
       console.error('RPC error, falling back to direct update:', rpcError);
       // Fallback to direct update if RPC fails
       const { error } = await supabase
         .from('investments')
-        .update({ 
+        .update({
           status: 'active',
           updated_at: new Date().toISOString()
         })
         .eq('id', investmentId);
-        
+
       if (error) throw error;
-      
+
       // Get the application ID from the investment
       const { data: investment, error: fetchError } = await supabase
         .from('investments')
         .select('application_id, user_id')
         .eq('id', investmentId)
         .single();
-        
+
       if (fetchError) throw fetchError;
-      
+
       // Update application status if it exists
       if (investment?.application_id) {
         const { error: appError } = await supabase
           .from('investment_applications')
-          .update({ 
+          .update({
             status: 'active',
             updated_at: new Date().toISOString()
           })
           .eq('id', investment.application_id);
-          
+
         if (appError) console.error('Error updating application:', appError);
       }
     }
-    
+
     // Get the user ID and amount from the investment
     const { data: investment } = await supabase
       .from('investments')
       .select('user_id, amount')
       .eq('id', investmentId)
       .single();
-      
+
     // Send notification to user
     if (investment?.user_id) {
       await sendSystemNotificationToUser(
-        investment.user_id, 
-        'Investment Successfully Activated!', 
+        investment.user_id,
+        'Investment Successfully Activated!',
         `Congratulations! Your bank connection has been verified and your investment of $${investment.amount.toLocaleString()} is now fully activated. Your returns will begin accruing immediately. Thank you for investing with Inner Circle Lending.`
       );
     }
