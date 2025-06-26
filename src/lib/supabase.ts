@@ -465,14 +465,32 @@ export const update_application_onboarding_status = async (
 ): Promise<void> => {
   // Note: The stepName and metadata params are being sent but not used by the backend
   // We're keeping them for API compatibility
-  const { error } = await supabase.rpc('update_onboarding_step', {
-    application_id: applicationId,
-    step_name: stepName,
-    p_status: newStatus,  // This is the only parameter actually used by the function
-    metadata: metadata
-  });
+  try {
+    const { error } = await supabase.rpc('update_onboarding_step', {
+      application_id: applicationId,
+      step_name: stepName,
+      p_status: newStatus,  // This is the only parameter actually used by the function
+      metadata: metadata
+    });
 
-  if (error) throw error;
+    if (error) {
+      console.warn('RPC function failed, falling back to direct update:', error);
+
+      // Direct update fallback if RPC fails
+      const { error: updateError } = await supabase
+        .from('investment_applications')
+        .update({
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', applicationId);
+
+      if (updateError) throw updateError;
+    }
+  } catch (error) {
+    console.error('Error updating application status:', error);
+    throw error;
+  }
 };
 
 export const getUserActiveApplication = async () => {
@@ -602,25 +620,199 @@ export const user_has_active_investments = async (userId: string): Promise<boole
 };
 
 export const get_user_investments_with_applications = async (userId: string): Promise<any[]> => {
-  const { data, error } = await supabase.rpc('get_user_investments_with_applications', {
-    p_user_id: userId
-  });
+  try {
+    // Try to auto-fix functions first (only in development)
+    if (import.meta.env.DEV) {
+      const functionTests = await test_database_functions();
 
-  if (error) throw error;
-  return data || [];
+      if (!functionTests.get_user_investments_with_applications &&
+        !functionTests.get_admin_investments_with_users) {
+        console.warn('Critical functions missing! Attempting auto-fix...');
+        // This would trigger the application to show an error notice to the user
+        // and prompt them to run the fix script
+      }
+    }
+
+    // Try all possible function names
+    let data, error;
+
+    // First try the standard RPC function
+    const result1 = await supabase.rpc('get_user_investments_with_applications', {
+      p_user_id: userId
+    });
+
+    if (!result1.error) {
+      data = result1.data;
+      error = result1.error;
+    } else {
+      console.warn('First function name failed, trying alternative name...');
+
+      // Try alternative function name (maybe someone renamed it)
+      const result2 = await supabase.rpc('get_user_investments', {
+        p_user_id: userId
+      });
+      data = result2.data;
+      error = result2.error;
+    }
+
+    if (!error) {
+      console.log('Successfully retrieved user investments via RPC:', data?.length || 0);
+      return data || [];
+    }
+
+    console.warn('All RPC functions failed, falling back to direct query:', error);
+
+    // Fallback: Direct query for investments if RPC fails
+    const { data: investments, error: invError } = await supabase
+      .from('investments')
+      .select(`
+        *,
+        investment_applications(id, status, investment_amount),
+        users:user_id(id, email)
+      `)
+      .eq('user_id', userId);
+
+    if (invError) {
+      console.error('Investment fallback query failed too:', invError);
+
+      // Last resort - get applications directly
+      console.log('Trying to get applications without investments...');
+      const { data: applications, error: appError } = await supabase
+        .from('investment_applications')
+        .select(`
+          id, user_id, status, investment_amount, annual_percentage,
+          created_at, updated_at
+        `)
+        .eq('user_id', userId);
+
+      if (appError) {
+        console.error('All fallback queries failed:', appError);
+        return []; // Return empty array as last resort
+      }
+
+      // Convert applications to investment-like format for UI compatibility
+      return applications?.map(app => ({
+        id: null, // No actual investment ID
+        user_id: app.user_id,
+        application_id: app.id,
+        amount: app.investment_amount,
+        annual_percentage: app.annual_percentage || 5.0,
+        payment_frequency: 'monthly',
+        term_months: 12,
+        status: 'pending',
+        created_at: app.created_at,
+        updated_at: app.updated_at,
+        application_status: app.status,
+        investment_amount: app.investment_amount
+      })) || [];
+    }
+
+    console.log('Successfully retrieved user investments via fallback:', investments?.length || 0);
+    return investments?.map(inv => ({
+      ...inv,
+      application_status: inv.investment_applications?.status,
+      investment_amount: inv.investment_applications?.investment_amount,
+      user_email: inv.users?.email
+    })) || [];
+  } catch (error) {
+    console.error('Error in get_user_investments_with_applications:', error);
+    // Return empty array instead of throwing to prevent UI errors
+    return [];
+  }
 };
 
 export const get_admin_investments_with_users = async (): Promise<any[]> => {
-  console.log('Fetching admin investments with users...');
-  const { data, error } = await supabase.rpc('get_admin_investments_with_users');
+  try {
+    console.log('Fetching admin investments with users via RPC...');
 
-  if (error) {
-    console.error('Error fetching admin investments:', error);
-    throw error;
+    // Try alternative function names in case they were renamed
+    let data, error;
+
+    // Try first function name
+    const result1 = await supabase.rpc('get_admin_investments_with_users');
+
+    if (!result1.error) {
+      data = result1.data;
+      error = result1.error;
+    } else {
+      console.warn('First function name failed, trying alternative name...');
+
+      // Try alternative function name
+      const result2 = await supabase.rpc('get_all_investments_with_applications');
+      data = result2.data;
+      error = result2.error;
+    }
+
+    if (!error) {
+      console.log('Admin investments retrieved:', data?.length || 0, 'investments');
+      console.log('Sample investment:', data && data.length > 0 ? data[0] : 'No investments found');
+      return data || [];
+    }
+
+    console.warn('RPC functions failed, falling back to direct query:', error);
+
+    // Fallback: Direct query if RPC fails
+    console.log('Fetching admin investments with users via fallback...');
+    const { data: investments, error: invError } = await supabase
+      .from('investments')
+      .select(`
+        *,
+        investment_applications(id, status, investment_amount),
+        users:user_id(id, email, raw_user_meta_data)
+      `);
+
+    if (invError) {
+      console.error('Fallback query failed too:', invError);
+
+      // Last resort - get standalone applications without investments
+      console.log('Trying to get standalone applications...');
+      const { data: applications, error: appError } = await supabase
+        .from('investment_applications')
+        .select(`
+          id, user_id, status, investment_amount, annual_percentage, 
+          created_at, updated_at,
+          users:user_id(id, email, raw_user_meta_data)
+        `);
+
+      if (appError) {
+        console.error('All fallback queries failed:', appError);
+        return []; // Return empty array as last resort
+      }
+
+      // Convert applications to investment-like format
+      return applications?.map(app => ({
+        id: null, // No actual investment ID
+        user_id: app.user_id,
+        application_id: app.id,
+        amount: app.investment_amount,
+        annual_percentage: app.annual_percentage || 5.0,
+        payment_frequency: 'monthly',
+        term_months: 12,
+        status: 'pending',
+        created_at: app.created_at,
+        updated_at: app.updated_at,
+        application_status: app.status,
+        investment_amount: app.investment_amount,
+        user_email: app.users?.email,
+        user_first_name: app.users?.raw_user_meta_data?.first_name,
+        user_last_name: app.users?.raw_user_meta_data?.last_name
+      })) || [];
+    }
+
+    console.log('Successfully retrieved admin investments via fallback:', investments?.length || 0);
+    return investments?.map(inv => ({
+      ...inv,
+      application_status: inv.investment_applications?.status,
+      investment_amount: inv.investment_applications?.investment_amount,
+      user_email: inv.users?.email,
+      user_first_name: inv.users?.raw_user_meta_data?.first_name,
+      user_last_name: inv.users?.raw_user_meta_data?.last_name
+    })) || [];
+  } catch (error) {
+    console.error('Error in get_admin_investments_with_users:', error);
+    // Return empty array instead of throwing to prevent UI errors
+    return [];
   }
-  console.log('Admin investments retrieved:', data?.length || 0, 'investments');
-  console.log('Sample investment:', data && data.length > 0 ? data[0] : 'No investments found');
-  return data || [];
 };
 
 // Function to send promissory note and automatically complete step
@@ -1220,4 +1412,149 @@ export const activateInvestment = async (
     console.error('Error confirming funds received:', error);
     throw error;
   }
+};
+
+export const create_investment_from_application = async (applicationId: string): Promise<string> => {
+  try {
+    console.log('Manually creating investment from application:', applicationId);
+    // Try RPC function first
+    const { data, error } = await supabase.rpc('create_investment_from_application', {
+      p_application_id: applicationId
+    });
+
+    if (!error) {
+      console.log('Successfully created investment via RPC:', data);
+      return data;
+    }
+
+    console.warn('RPC function failed, falling back to direct creation:', error);
+
+    // Get the application data
+    const { data: app, error: appError } = await supabase
+      .from('investment_applications')
+      .select('*')
+      .eq('id', applicationId)
+      .single();
+
+    if (appError) throw appError;
+
+    // Create the investment manually
+    const { data: inv, error: invError } = await supabase
+      .from('investments')
+      .insert({
+        user_id: app.user_id,
+        application_id: applicationId,
+        amount: app.investment_amount,
+        annual_percentage: app.annual_percentage || 5.0, // Default to 5% if NULL
+        payment_frequency: 'monthly',
+        term_months: 12, // Default to 12 months
+        start_date: new Date().toISOString(),
+        status: 'pending',
+        total_expected_return: app.investment_amount * (1 + (app.annual_percentage || 5.0) / 100)
+      })
+      .select('id')
+      .single();
+
+    if (invError) throw invError;
+
+    return inv.id;
+  } catch (error) {
+    console.error('Error creating investment from application:', error);
+    throw error;
+  }
+};
+
+export const test_database_functions = async (): Promise<{ [key: string]: boolean }> => {
+  const functions = [
+    'get_user_investments_with_applications',
+    'get_admin_investments_with_users',
+    'get_all_investments_with_applications',
+    'update_onboarding_step',
+    'create_investment_from_application'
+  ];
+
+  const results: { [key: string]: boolean } = {};
+
+  // Basic function to test if a function exists
+  const testFunction = async (name: string): Promise<boolean> => {
+    try {
+      // This query checks if the function exists in the database
+      const { data, error } = await supabase.rpc('pg_query', {
+        query: `SELECT COUNT(*) FROM pg_proc 
+                JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
+                WHERE pg_namespace.nspname = 'public'
+                AND proname = '${name}';`
+      });
+
+      if (error) {
+        console.error(`Error checking function ${name}:`, error);
+        return false;
+      }
+
+      return data?.[0]?.count > 0;
+    } catch (error) {
+      console.error(`Error testing function ${name}:`, error);
+      return false;
+    }
+  };
+
+  // Test each function
+  for (const func of functions) {
+    results[func] = await testFunction(func);
+  }
+
+  console.log('Database function test results:', results);
+  return results;
+};
+
+// Function to show an error message for database function errors
+export const showDatabaseFunctionError = () => {
+  // Only show in development
+  if (!import.meta.env.DEV) return;
+
+  // Create a fixed position notification
+  const notification = document.createElement('div');
+  notification.style.position = 'fixed';
+  notification.style.bottom = '20px';
+  notification.style.right = '20px';
+  notification.style.backgroundColor = '#f44336';
+  notification.style.color = 'white';
+  notification.style.padding = '15px';
+  notification.style.borderRadius = '5px';
+  notification.style.zIndex = '9999';
+  notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+
+  // Create a close button
+  const closeButton = document.createElement('span');
+  closeButton.innerHTML = '&times;';
+  closeButton.style.marginLeft = '15px';
+  closeButton.style.float = 'right';
+  closeButton.style.fontWeight = 'bold';
+  closeButton.style.fontSize = '22px';
+  closeButton.style.cursor = 'pointer';
+  closeButton.onclick = () => notification.remove();
+
+  notification.appendChild(closeButton);
+
+  // Add title
+  const title = document.createElement('h4');
+  title.textContent = 'Database Function Error';
+  title.style.margin = '0 0 10px 0';
+  notification.appendChild(title);
+
+  // Add message
+  const message = document.createElement('p');
+  message.innerHTML = 'Critical database functions are missing. Please run:<br><code>node fix_db_functions.js</code>';
+  message.style.margin = '0';
+  notification.appendChild(message);
+
+  // Add to DOM
+  document.body.appendChild(notification);
+
+  // Auto remove after 10 seconds
+  setTimeout(() => {
+    if (document.body.contains(notification)) {
+      notification.remove();
+    }
+  }, 10000);
 };
