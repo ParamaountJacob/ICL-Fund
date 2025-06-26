@@ -50,7 +50,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION public.update_onboarding_step(
+-- Drop the function first to allow parameter name changes
+DROP FUNCTION IF EXISTS public.update_onboarding_step(uuid, text, text, jsonb);
+
+-- Create the function with renamed parameter
+CREATE FUNCTION public.update_onboarding_step(
     application_id uuid,
     step_name text,
     p_status text,  -- Renamed parameter to avoid ambiguity
