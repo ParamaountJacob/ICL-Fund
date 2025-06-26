@@ -1,136 +1,69 @@
-/*
-  # Fix Function Return Type Error
-
-  1. Changes
-    - Properly drops the get_admin_investments_with_users function before recreating it
-    - Ensures update_application_onboarding_status function exists and works correctly
-    - Fixes other related functions for consistency
-*/
-
--- First, drop the function causing the return type error
-DROP FUNCTION IF EXISTS public.get_admin_investments_with_users();
-
--- Create update_application_onboarding_status function that's missing
-CREATE OR REPLACE FUNCTION update_application_onboarding_status(
-  p_application_id uuid,
-  p_new_status text
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  v_user_id uuid;
-  v_investment_id uuid;
+-- Restore and improve critical functions
+CREATE OR REPLACE FUNCTION public.activate_user_investment(investment_id uuid)
+RETURNS void AS $$
 BEGIN
-  -- Get the application's user ID
-  SELECT user_id INTO v_user_id 
-  FROM investment_applications 
-  WHERE id = p_application_id;
-  
-  -- Authorization check (allow user who owns the application or admins)
-  IF NOT (auth.uid() = v_user_id OR is_admin()) THEN
-    RAISE EXCEPTION 'Not authorized to update this application';
-  END IF;
-  
-  -- Validate the new status
-  IF NOT (p_new_status = ANY (ARRAY[
-    'pending', 'admin_approved', 'onboarding', 'documents_signed', 'funding_complete', 'active', 
-    'rejected', 'deleted', 'cancelled', 'promissory_note_pending', 'promissory_note_sent', 
-    'bank_details_pending', 'plaid_pending', 'funds_pending', 'investor_onboarding_complete'
-  ])) THEN
-    RAISE EXCEPTION 'Invalid status: %', p_new_status;
-  END IF;
-
-  -- Update the application status
-  UPDATE investment_applications
-  SET status = p_new_status, updated_at = now()
-  WHERE id = p_application_id;
-
-  -- If there's an investment record, update its status too
-  SELECT id INTO v_investment_id 
-  FROM investments 
-  WHERE application_id = p_application_id;
-
-  IF FOUND THEN
     UPDATE investments
-    SET status = 
-      CASE
-        WHEN p_new_status = 'documents_signed' THEN 'pending_approval'::investment_status_enum
-        WHEN p_new_status = 'promissory_note_pending' THEN 'promissory_note_pending'::investment_status_enum
-        WHEN p_new_status = 'promissory_note_sent' THEN 'promissory_note_sent'::investment_status_enum
-        WHEN p_new_status = 'bank_details_pending' THEN 'bank_details_pending'::investment_status_enum
-        WHEN p_new_status = 'plaid_pending' THEN 'plaid_pending'::investment_status_enum
-        WHEN p_new_status = 'funds_pending' THEN 'funds_pending'::investment_status_enum
-        WHEN p_new_status = 'investor_onboarding_complete' THEN 'investor_onboarding_complete'::investment_status_enum
-        WHEN p_new_status = 'active' THEN 'active'::investment_status_enum
-        ELSE status
-      END,
-      updated_at = now()
-    WHERE id = v_investment_id;
-  END IF;
-END;
-$$;
+    SET status = 'active',
+        activated_at = NOW()
+    WHERE id = investment_id;
 
--- Recreate get_admin_investments_with_users function with correct return type
-CREATE OR REPLACE FUNCTION get_admin_investments_with_users()
-RETURNS TABLE (
-  id uuid,
-  user_id uuid,
-  amount numeric,
-  annual_percentage numeric,
-  payment_frequency text,
-  start_date date,
-  end_date date,
-  status text,
-  term_months integer,
-  total_expected_return numeric,
-  created_at timestamptz,
-  updated_at timestamptz,
-  application_id uuid,
-  application_status text,
-  email text,
-  first_name text,
-  last_name text,
-  verification_status text
+    -- Trigger admin notification
+    PERFORM public.send_admin_notification(
+        'Investment Activated',
+        format('Investment %s has been activated', investment_id)
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.create_investment(
+    user_id uuid,
+    principal_amount numeric,
+    interest_rate numeric,
+    payment_freq payment_frequency_enum,
+    start_date date,
+    term_months integer
 )
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
+RETURNS uuid AS $$
+DECLARE
+    new_investment_id uuid;
 BEGIN
-  -- Check if user is admin
-  IF NOT is_admin() THEN
-    RAISE EXCEPTION 'Permission denied: must be admin';
-  END IF;
+    INSERT INTO investments (
+        user_id,
+        principal_amount,
+        interest_rate,
+        payment_frequency,
+        start_date,
+        term_months,
+        status
+    ) VALUES (
+        user_id,
+        principal_amount,
+        interest_rate,
+        payment_freq,
+        start_date,
+        term_months,
+        'pending'
+    )
+    RETURNING id INTO new_investment_id;
 
-  RETURN QUERY
-  SELECT 
-    i.id,
-    i.user_id,
-    i.amount,
-    i.annual_percentage,
-    i.payment_frequency::text, -- Cast enum to text
-    i.start_date,
-    i.end_date,
-    i.status::text, -- Cast enum to text
-    i.term_months,
-    i.total_expected_return,
-    i.created_at,
-    i.updated_at,
-    i.application_id,
-    COALESCE(ia.status, 'no_application'::text) as application_status,
-    u.email,
-    u.first_name,
-    u.last_name,
-    u.verification_status::text -- Cast enum to text
-  FROM investments i
-  LEFT JOIN investment_applications ia ON i.application_id = ia.id
-  JOIN users u ON i.user_id = u.id
-  LEFT JOIN user_profiles up ON i.user_id = up.user_id
-  ORDER BY i.created_at DESC;
+    RETURN new_investment_id;
 END;
-$$;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Grant execute permissions to authenticated users
-GRANT EXECUTE ON FUNCTION update_application_onboarding_status(uuid, text) TO authenticated;
-GRANT EXECUTE ON FUNCTION get_admin_investments_with_users() TO authenticated;
+CREATE OR REPLACE FUNCTION public.update_onboarding_step(
+    application_id uuid,
+    step_name text,
+    p_status text,  -- Renamed parameter to avoid ambiguity
+    metadata jsonb DEFAULT '{}'::jsonb
+)
+RETURNS void AS $$
+BEGIN
+    UPDATE investment_applications
+    SET 
+        current_step = step_name,
+        step_status = p_status,  -- Use the renamed parameter
+        step_metadata = metadata,
+        updated_at = NOW()
+    WHERE id = application_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
