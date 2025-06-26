@@ -22,7 +22,13 @@ BEGIN
     ELSE v_payment_frequency := 'monthly'::payment_frequency_enum;
   END CASE;
   
-  -- Create investment record immediately
+  -- Skip trigger if required fields are NULL
+  IF NEW.investment_amount IS NULL OR NEW.annual_percentage IS NULL THEN
+    RAISE NOTICE 'Not creating investment for application % due to NULL values', NEW.id;
+    RETURN NEW;
+  END IF;
+
+  -- Create investment record immediately with COALESCE for safety
   INSERT INTO investments (
     user_id,
     application_id,
@@ -38,13 +44,13 @@ BEGIN
   ) VALUES (
     NEW.user_id,
     NEW.id,
-    NEW.investment_amount,
-    NEW.annual_percentage,
+    COALESCE(NEW.investment_amount, 0),  -- Use 0 if NULL
+    COALESCE(NEW.annual_percentage, 0),  -- Use 0 if NULL
     v_payment_frequency,
     CURRENT_DATE,
     'pending'::investment_status_enum,
-    NEW.term_months,
-    (NEW.investment_amount * NEW.annual_percentage / 100) * (NEW.term_months / 12.0),
+    COALESCE(NEW.term_months, 12),  -- Default to 12 months if NULL
+    COALESCE((NEW.investment_amount * NEW.annual_percentage / 100) * (NEW.term_months / 12.0), 0),  -- Use 0 if calculation is NULL
     now(),
     now()
   )
@@ -93,7 +99,13 @@ BEGIN
       ELSE v_payment_frequency := 'monthly'::payment_frequency_enum;
     END CASE;
     
-    -- Create missing investment records for existing applications
+    -- Skip applications with NULL investment_amount or annual_percentage
+    IF app.investment_amount IS NULL OR app.annual_percentage IS NULL THEN
+      RAISE NOTICE 'Skipping application % due to NULL values', app.id;
+      CONTINUE;
+    END IF;
+
+    -- Create missing investment records for existing applications with default values for NULLs
     INSERT INTO investments (
       user_id,
       application_id,
@@ -109,8 +121,8 @@ BEGIN
     ) VALUES (
       app.user_id,
       app.id,
-      app.investment_amount,
-      app.annual_percentage,
+      COALESCE(app.investment_amount, 0),  -- Use 0 if NULL
+      COALESCE(app.annual_percentage, 0),  -- Use 0 if NULL
       v_payment_frequency,
       CURRENT_DATE,
       CASE 
@@ -118,9 +130,9 @@ BEGIN
         WHEN app.status = 'pending' THEN 'pending'::investment_status_enum
         ELSE 'pending'::investment_status_enum
       END,
-      app.term_months,
-      (app.investment_amount * app.annual_percentage / 100) * (app.term_months / 12.0),
-      app.created_at,
+      COALESCE(app.term_months, 12),  -- Default to 12 months if NULL
+      COALESCE((app.investment_amount * app.annual_percentage / 100) * (app.term_months / 12.0), 0),  -- Use 0 if calculation is NULL
+      COALESCE(app.created_at, NOW()),
       NOW()
     );
   END LOOP;

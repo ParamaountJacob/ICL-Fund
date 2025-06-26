@@ -616,9 +616,15 @@ export const get_user_investments_with_applications = async (userId: string): Pr
 };
 
 export const get_admin_investments_with_users = async (): Promise<any[]> => {
+  console.log('Fetching admin investments with users...');
   const { data, error } = await supabase.rpc('get_admin_investments_with_users');
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching admin investments:', error);
+    throw error;
+  }
+  console.log('Admin investments retrieved:', data?.length || 0, 'investments');
+  console.log('Sample investment:', data && data.length > 0 ? data[0] : 'No investments found');
   return data || [];
 };
 
