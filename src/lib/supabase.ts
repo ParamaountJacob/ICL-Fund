@@ -43,7 +43,7 @@ export const createOrUpdateDocumentSignature = async (
   autoComplete: boolean = true
 ): Promise<DocumentSignature> => {
   try {
-    // Check if a document signature record already exists
+    // First check if a document signature record already exists
     const { data: existingSignature, error: checkError } = await supabase
       .from('document_signatures')
       .select('id')
@@ -56,7 +56,7 @@ export const createOrUpdateDocumentSignature = async (
     let signatureData;
 
     if (existingSignature) {
-      // Update existing signature record
+      // If exists, update the existing signature record
       const { data, error } = await supabase
         .from('document_signatures')
         .update({
@@ -71,7 +71,7 @@ export const createOrUpdateDocumentSignature = async (
       if (error) throw error;
       signatureData = data;
     } else {
-      // Create new signature record
+      // Otherwise create a new signature record
       const { data, error } = await supabase
         .from('document_signatures')
         .insert({
@@ -85,12 +85,6 @@ export const createOrUpdateDocumentSignature = async (
           updated_at: new Date().toISOString()
         })
         .select()
-        .single();
-
-      if (error) throw error;
-      signatureData = data;
-    }
-
     // Auto-complete application status update if requested
     if (autoComplete && status === 'investor_signed') {
       if (documentType === 'subscription_agreement') {
