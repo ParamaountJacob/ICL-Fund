@@ -1,6 +1,6 @@
-import { supabase } from './supabase';
+import { supabase } from './client';
 import { sanitizeFileName } from './utils';
-import type { DocumentType } from './supabase';
+import type { DocumentType } from './client';
 
 export interface Document {
   id: string;
@@ -19,7 +19,7 @@ export async function uploadDocument(
   try {
     const sanitizedFileName = sanitizeFileName(file.name);
     const storagePath = `documents/${type}/${sanitizedFileName}`;
-    
+
     // Create a new File object with the sanitized name
     const sanitizedFile = new File([file], sanitizedFileName, {
       type: file.type,
@@ -126,3 +126,145 @@ export async function deleteDocument(id: string): Promise<void> {
     throw new Error('Failed to delete document. Please try again.');
   }
 }
+
+// Document Signature Management
+export interface DocumentSignature {
+  id: string;
+  application_id: string;
+  document_type: DocumentType;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export const documentService = {
+  // Create or update document signature (moved from monolithic supabase.ts)
+  async createOrUpdateDocumentSignature(
+    applicationId: string,
+    documentType: DocumentType,
+    status: string = 'pending',
+    sendAdminNotification: boolean = true,
+    autoComplete: boolean = true
+  ): Promise<DocumentSignature> {
+    try {
+      // First check if a document signature record already exists
+      const { data: existingSignature, error: checkError } = await supabase
+        .from('document_signatures')
+        .select('id')
+        .eq('application_id', applicationId)
+        .eq('document_type', documentType)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError;
+      }
+
+      let result;
+      if (existingSignature) {
+        // Update existing signature
+        const { data, error } = await supabase
+          .from('document_signatures')
+          .update({
+            status,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingSignature.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        result = data;
+      } else {
+        // Create new signature
+        const { data, error } = await supabase
+          .from('document_signatures')
+          .insert({
+            application_id: applicationId,
+            document_type: documentType,
+            status,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        result = data;
+      }
+
+      // Send admin notification if requested
+      if (sendAdminNotification && status === 'signed') {
+        await this.sendAdminNotification(applicationId, documentType);
+      }
+
+      // Auto-complete application if all documents are signed
+      if (autoComplete && status === 'signed') {
+        await this.checkAndCompleteApplication(applicationId);
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Error creating/updating document signature:', error);
+      throw error;
+    }
+  },
+
+  // Send admin notification
+  async sendAdminNotification(applicationId: string, documentType: DocumentType) {
+    try {
+      const { error } = await supabase.functions.invoke('send-admin-notification', {
+        body: {
+          type: 'document_signed',
+          applicationId,
+          documentType,
+          message: `Document ${documentType} has been signed for application ${applicationId}`
+        }
+      });
+
+      if (error) {
+        console.error('Error sending admin notification:', error);
+        // Don't throw - notification failure shouldn't break the flow
+      }
+    } catch (error) {
+      console.error('Error invoking admin notification function:', error);
+    }
+  },
+
+  // Check if all documents are signed and complete application
+  async checkAndCompleteApplication(applicationId: string) {
+    try {
+      // Get all required document types for this application
+      const requiredDocs: DocumentType[] = ['subscription_agreement', 'promissory_note'];
+
+      // Check if all required documents are signed
+      const { data: signatures } = await supabase
+        .from('document_signatures')
+        .select('document_type, status')
+        .eq('application_id', applicationId)
+        .in('document_type', requiredDocs);
+
+      const signedDocs = signatures?.filter(sig => sig.status === 'signed').map(sig => sig.document_type) || [];
+      const allDocsSigned = requiredDocs.every(doc => signedDocs.includes(doc));
+
+      if (allDocsSigned) {
+        // Update application status to completed
+        const { error } = await supabase
+          .from('investment_applications')
+          .update({
+            status: 'completed',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', applicationId);
+
+        if (error) {
+          console.error('Error completing application:', error);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking application completion:', error);
+    }
+  }
+};
+
+// Legacy function for backward compatibility
+export const createOrUpdateDocumentSignature = documentService.createOrUpdateDocumentSignature;
