@@ -8,12 +8,7 @@
 
 BEGIN;
 
-DO $$
-BEGIN
-    RAISE NOTICE 'Starting RLS setup';
-    RAISE NOTICE 'Safe to run multiple times';
-    RAISE NOTICE 'Checking objects before creation';
-END $$;
+-- Starting RLS setup - safe to run multiple times - checking objects before creation
 
 -- =================================================================
 -- HELPER FUNCTION: SAFE RLS ENABLEMENT
@@ -31,9 +26,9 @@ BEGIN
         AND relrowsecurity = true
     ) THEN
         EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', table_name);
-        RAISE NOTICE 'Enabled RLS for table: %', table_name;
+        -- Enabled RLS for table
     ELSE
-        RAISE NOTICE 'RLS already enabled for table: %', table_name;
+        -- RLS already enabled for table
     END IF;
 END;
 $$;
@@ -57,13 +52,14 @@ BEGIN
             'setup_completed',
             'completed'
         );
-        RAISE NOTICE 'Created simple_workflow_step enum';
+        -- Created simple_workflow_step enum
     ELSE
-        RAISE NOTICE 'simple_workflow_step enum already exists - skipping';
+        -- simple_workflow_step enum already exists - skipping
     END IF;
 EXCEPTION
     WHEN duplicate_object THEN
-        RAISE NOTICE 'simple_workflow_step enum already exists - skipping';
+        -- simple_workflow_step enum already exists - skipping
+        NULL;
 END $$;
 
 -- =================================================================
@@ -513,10 +509,7 @@ DROP FUNCTION IF EXISTS enable_rls_if_not_enabled(text);
 
 COMMIT;
 
-DO $$
-BEGIN
-    RAISE NOTICE 'RLS policies setup complete';
-    RAISE NOTICE 'Admin user configured';
-    RAISE NOTICE 'All tables have Row Level Security';
-    RAISE NOTICE 'Migration is idempotent';
-END $$;
+-- RLS policies setup complete
+-- Admin user configured  
+-- All tables have Row Level Security
+-- Migration is idempotent
