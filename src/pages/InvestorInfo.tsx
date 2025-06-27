@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowRight, 
-  Shield, 
-  TrendingUp, 
-  Users, 
+import {
+  ArrowRight,
+  Shield,
+  TrendingUp,
+  Users,
   Award,
   DollarSign,
   Clock,
@@ -31,7 +31,7 @@ const InvestorInfo: React.FC = () => {
     else if (amount >= 500000) baseRate = 13;  // $500K-$999K = 13%
     else if (amount >= 350000) baseRate = 12;  // $350K-$499K = 12%
     else baseRate = 11;                        // $200K-$349K = 11%
-    
+
     // Add 1% bonus for 2-year terms
     if (years === 1) {
       return { min: baseRate, max: baseRate };
@@ -88,7 +88,7 @@ const InvestorInfo: React.FC = () => {
               Investor Information
             </h1>
             <p className="text-xl md:text-2xl text-text-secondary max-w-4xl mx-auto leading-relaxed">
-              Discover exclusive investment opportunities designed for qualified investors 
+              Discover exclusive investment opportunities designed for qualified investors
               seeking consistent returns and portfolio diversification.
             </p>
           </div>
@@ -100,11 +100,11 @@ const InvestorInfo: React.FC = () => {
                 Premium Investment Opportunities
               </h2>
               <p className="text-lg text-text-secondary mb-10 leading-relaxed">
-                Inner Circle Lending offers carefully curated investment opportunities 
-                that provide stable returns while supporting real estate development 
+                Inner Circle Lending offers carefully curated investment opportunities
+                that provide stable returns while supporting real estate development
                 and business growth initiatives.
               </p>
-              
+
               <div className="space-y-6">
                 <div className="flex items-center gap-6">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gold/20 rounded-full flex items-center justify-center flex-shrink-0">
@@ -115,7 +115,7 @@ const InvestorInfo: React.FC = () => {
                     <p className="text-text-secondary">11-15% annual returns based on investment tier</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-6">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gold/20 rounded-full flex items-center justify-center flex-shrink-0">
                     <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-gold" />
@@ -125,7 +125,7 @@ const InvestorInfo: React.FC = () => {
                     <p className="text-text-secondary">Asset-backed lending with comprehensive due diligence</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-6">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gold/20 rounded-full flex items-center justify-center flex-shrink-0">
                     <Users className="w-6 h-6 sm:w-8 sm:h-8 text-gold" />
@@ -137,10 +137,10 @@ const InvestorInfo: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-surface p-10 rounded-lg border border-graphite">
               <h3 className="text-2xl font-semibold text-gold mb-8">Investment Tiers</h3>
-              
+
               <div className="space-y-6 md:space-y-8">
                 <div className="bg-accent p-4 md:p-6 rounded-lg border border-graphite">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-1 sm:gap-0">
@@ -149,7 +149,7 @@ const InvestorInfo: React.FC = () => {
                   </div>
                   <p className="text-text-secondary text-sm md:text-base">$200,000 - $349,999</p>
                 </div>
-                
+
                 <div className="bg-accent p-4 md:p-6 rounded-lg border border-graphite">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-1 sm:gap-0">
                     <h4 className="font-semibold text-lg md:text-xl">Tier 2</h4>
@@ -157,7 +157,7 @@ const InvestorInfo: React.FC = () => {
                   </div>
                   <p className="text-text-secondary text-sm md:text-base">$350,000 - $499,999</p>
                 </div>
-                
+
                 <div className="bg-accent p-4 md:p-6 rounded-lg border border-graphite">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-1 sm:gap-0">
                     <h4 className="font-semibold text-lg md:text-xl">Tier 3</h4>
@@ -165,7 +165,7 @@ const InvestorInfo: React.FC = () => {
                   </div>
                   <p className="text-text-secondary text-sm md:text-base">$500,000 - $999,999</p>
                 </div>
-                
+
                 <div className="bg-accent p-4 md:p-6 rounded-lg border border-graphite">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-1 sm:gap-0">
                     <h4 className="font-semibold text-lg md:text-xl">Tier 4</h4>
@@ -199,7 +199,7 @@ const InvestorInfo: React.FC = () => {
                       </div>
                       <h3 className="text-xl md:text-2xl font-semibold">Calculate Your Returns</h3>
                     </div>
-                    
+
                     <div className="space-y-6 md:space-y-8">
                       <div>
                         <label className="block text-xs md:text-sm uppercase tracking-wide text-text-secondary mb-3 md:mb-4">
@@ -210,11 +210,10 @@ const InvestorInfo: React.FC = () => {
                             <button
                               key={years}
                               onClick={() => setTermYears(years)}
-                              className={`p-4 md:p-4 rounded-lg md:rounded-xl border-2 transition-all duration-300 font-semibold text-base md:text-base ${
-                                termYears === years 
-                                  ? 'border-gold bg-gold/10 text-gold shadow-lg' 
+                              className={`p-4 md:p-4 rounded-lg md:rounded-xl border-2 transition-all duration-300 font-semibold text-base md:text-base ${termYears === years
+                                  ? 'border-gold bg-gold/10 text-gold shadow-lg'
                                   : 'border-graphite bg-accent text-text-secondary hover:border-gold/50 hover:bg-gold/5'
-                              }`}
+                                }`}
                             >
                               {years} Year{years > 1 ? 's' : ''}
                             </button>
@@ -233,11 +232,10 @@ const InvestorInfo: React.FC = () => {
                               <button
                                 key={amount}
                                 onClick={() => handleTierSelect(amount)}
-                                className={`p-3 md:p-4 rounded-lg md:rounded-xl border-2 transition-all duration-300 text-center ${
-                                  selectedTier === amount 
-                                    ? 'border-gold bg-gold/10 text-gold shadow-lg' 
+                                className={`p-3 md:p-4 rounded-lg md:rounded-xl border-2 transition-all duration-300 text-center ${selectedTier === amount
+                                    ? 'border-gold bg-gold/10 text-gold shadow-lg'
                                     : 'border-graphite bg-accent text-text-secondary hover:border-gold/50 hover:bg-gold/5'
-                                }`}
+                                  }`}
                               >
                                 <div className="font-semibold text-sm md:text-base mb-1">
                                   {getTierLabel(amount)}
@@ -249,7 +247,7 @@ const InvestorInfo: React.FC = () => {
                             );
                           })}
                         </div>
-                        
+
                         {showCustomInput && (
                           <div className="space-y-3">
                             <label className="block text-xs uppercase tracking-wide text-text-secondary">
@@ -280,7 +278,7 @@ const InvestorInfo: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Results Section */}
                   <div className="lg:col-span-2">
                     <div className="flex items-center gap-3 mb-6 md:mb-8">
@@ -359,9 +357,9 @@ const InvestorInfo: React.FC = () => {
 
                     <div className="mt-6 md:mt-8 bg-accent border border-graphite p-4 md:p-6 rounded-lg md:rounded-xl">
                       <p className="text-text-secondary text-xs md:text-sm leading-relaxed">
-                        <strong className="text-gold">Disclaimer:</strong> Returns are calculated using the average rate for your investment tier and term length. 
-                        {termYears === 2 && <span className="text-gold"> 2-year terms receive +1% bonus rate.</span>} 
-                        Actual returns may vary within the specified range based on market conditions and investment performance. 
+                        <strong className="text-gold">Disclaimer:</strong> Returns are calculated using the average rate for your investment tier and term length.
+                        {termYears === 2 && <span className="text-gold"> 2-year terms receive +1% bonus rate.</span>}
+                        Actual returns may vary within the specified range based on market conditions and investment performance.
                         Past performance does not guarantee future results.
                       </p>
                     </div>
@@ -376,7 +374,7 @@ const InvestorInfo: React.FC = () => {
             <h2 className="text-3xl md:text-4xl font-display font-semibold text-center mb-16">
               Why Choose Inner Circle Lending
             </h2>
-            
+
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
               <div className="text-center">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -387,7 +385,7 @@ const InvestorInfo: React.FC = () => {
                   Choose from 12-24 month terms with monthly, quarterly, or annual payment options
                 </p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Clock className="w-8 h-8 sm:w-10 sm:h-10 text-gold" />
@@ -397,7 +395,7 @@ const InvestorInfo: React.FC = () => {
                   Streamlined application and approval process for qualified investors
                 </p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Target className="w-8 h-8 sm:w-10 sm:h-10 text-gold" />
@@ -407,7 +405,7 @@ const InvestorInfo: React.FC = () => {
                   Predictable returns based on your investment amount and chosen terms
                 </p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Award className="w-8 h-8 sm:w-10 sm:h-10 text-gold" />
@@ -420,6 +418,45 @@ const InvestorInfo: React.FC = () => {
             </div>
           </div>
 
+          {/* Pitch Deck Section */}
+          <div className="mb-32">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-display font-semibold mb-6">
+                Investment Presentation
+              </h2>
+              <p className="text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
+                View our comprehensive pitch deck to understand our investment strategy,
+                market analysis, and detailed financial projections.
+              </p>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-gradient-to-br from-surface via-surface to-accent p-8 md:p-12 rounded-2xl border border-graphite shadow-2xl text-center">
+                <div className="w-20 h-20 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-semibold mb-4">
+                  Complete Pitch Deck
+                </h3>
+                <p className="text-text-secondary mb-8 max-w-2xl mx-auto">
+                  Access our detailed presentation covering market opportunity, business model,
+                  financial projections, and risk analysis.
+                </p>
+
+                <button
+                  onClick={() => navigate('/pitch-deck')}
+                  className="bg-gold text-background px-8 py-4 text-lg font-semibold rounded-xl hover:bg-gold/90 transition-all duration-300 inline-flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  View Pitch Deck
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* Prominent Call to Action */}
           <div className="bg-gradient-to-r from-gold/20 to-gold/10 border border-gold/30 rounded-2xl p-12 text-center mb-20 md:mb-0">
             <div className="max-w-3xl mx-auto">
@@ -427,19 +464,20 @@ const InvestorInfo: React.FC = () => {
                 Ready to Start Earning?
               </h2>
               <p className="text-xl text-text-secondary mb-10 leading-relaxed">
-                Join our exclusive group of investors and start earning consistent returns. 
+                Join our exclusive group of investors and start earning consistent returns.
                 Our streamlined onboarding process makes it easy to begin your investment journey today.
               </p>
-              
+
               <div className="space-y-6">
-                <button
+                {/* Hidden Start Investing button - focusing on calls/contact only */}
+                {/* <button
                   onClick={handleGetStarted}
                   className="fixed md:relative bottom-4 left-4 right-4 md:bottom-auto md:left-auto md:right-auto bg-gold text-background px-12 py-6 text-xl font-semibold rounded-xl hover:bg-gold/90 transition-all duration-300 flex md:inline-flex items-center justify-center gap-4 shadow-lg hover:shadow-xl transform hover:scale-105 z-10"
                 >
                   Start Investing
                   <ArrowRight className="w-6 h-6" />
-                </button>
-                
+                </button> */}
+
                 <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-sm text-text-secondary">
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-gold" />

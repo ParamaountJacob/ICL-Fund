@@ -6,6 +6,7 @@ import { createLeadFromContact, createLeadFromConsultation } from '../lib/crm';
 import { supabase } from '../lib/supabase';
 import AuthModal from '../components/AuthModal';
 import { SuccessModal } from '../components/SuccessModal';
+import CalendlyEmbed from '../components/CalendlyEmbed';
 
 type ContactMethod = 'email' | 'video' | 'phone' | null;
 
@@ -14,6 +15,8 @@ const Contact: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showCalendlyEmbed, setShowCalendlyEmbed] = useState(false);
+  const [calendlyUrl, setCalendlyUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -38,7 +41,7 @@ const Contact: React.FC = () => {
           ...prev,
           email: user.email || ''
         }));
-        
+
         supabase
           .from('user_profiles')
           .select('*')
@@ -79,8 +82,9 @@ const Contact: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!user) {
+
+    // Only require authentication for video/phone consultations
+    if ((selectedMethod === 'video' || selectedMethod === 'phone') && !user) {
       setShowAuthModal(true);
       return;
     }
@@ -98,21 +102,7 @@ const Contact: React.FC = () => {
 
     setLoading(true);
     try {
-      await supabase
-        .from('user_profiles')
-        .upsert(
-        {
-          user_id: user.id,
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          phone: formData.phone,
-          address: formData.address || null,
-          investment_goals: formData.investment_goals || null,
-          updated_at: new Date().toISOString()
-        },
-        { onConflict: 'user_id' }
-        );
-
+      // For video and phone consultations, create consultation request and open Calendly
       if (selectedMethod === 'video' || selectedMethod === 'phone') {
         await createConsultationRequest({
           name: `${formData.first_name} ${formData.last_name}`,
@@ -141,25 +131,32 @@ const Contact: React.FC = () => {
           console.error('Error creating CRM lead:', crmError);
         }
 
-        const calendlyBaseUrl = selectedMethod === 'video' 
+        const calendlyBaseUrl = selectedMethod === 'video'
           ? 'https://calendly.com/innercirclelending/30min'
           : 'https://calendly.com/innercirclelending/q-a-phone-chat';
-        
+
         const dateTimeString = `${selectedDate}T${convertTimeToISO(selectedTime)}-05:00`;
         const params = new URLSearchParams();
-        
+
         if (formData.first_name && formData.last_name) params.append('name', `${formData.first_name} ${formData.last_name}`);
         if (formData.email) params.append('email', formData.email);
         if (formData.message) params.append('a1', formData.message);
         if (formData.suggested_investment_amount) params.append('a2', `$${parseInt(formData.suggested_investment_amount).toLocaleString()}`);
         if (formData.investment_goals) params.append('a3', formData.investment_goals);
         if (formData.phone) params.append('phone', formData.phone);
-        
+
         params.append('date', selectedDate);
         params.append('month', `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}`);
 
         const calendlyUrl = `${calendlyBaseUrl}/${dateTimeString}?${params.toString()}`;
-        window.open(calendlyUrl, '_blank');
+
+        // Show Calendly embed instead of opening new window
+        setCalendlyUrl(calendlyUrl);
+        setShowCalendlyEmbed(true);
+
+        // For consultations, don't show success modal - go straight to Calendly
+        setLoading(false);
+        return;
       } else {
         // Create CRM lead for email contact
         try {
@@ -194,7 +191,7 @@ const Contact: React.FC = () => {
           throw new Error('Failed to send email');
         }
       }
-      
+
       setShowSuccessModal(true);
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -207,10 +204,10 @@ const Contact: React.FC = () => {
   const convertTimeToISO = (time: string) => {
     const [timePart, period] = time.split(' ');
     let [hours, minutes] = timePart.split(':').map(Number);
-    
+
     if (period === 'PM' && hours !== 12) hours += 12;
     if (period === 'AM' && hours === 12) hours = 0;
-    
+
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
   };
 
@@ -220,19 +217,19 @@ const Contact: React.FC = () => {
     const lastDay = new Date(currentYear, currentMonth + 1, 0);
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = firstDay.getDay();
-    
+
     const days = [];
-    
+
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push(null);
     }
-    
+
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentYear, currentMonth, day);
       const dateString = date.toISOString().split('T')[0];
       const isWeekend = date.getDay() === 0 || date.getDay() === 6;
       const isPast = date < today;
-      
+
       if (!isWeekend && !isPast) {
         days.push({
           date: dateString,
@@ -247,7 +244,7 @@ const Contact: React.FC = () => {
         });
       }
     }
-    
+
     return days;
   };
 
@@ -275,7 +272,7 @@ const Contact: React.FC = () => {
   const prevMonth = () => {
     const today = new Date();
     const newDate = new Date(currentYear, currentMonth - 1);
-    
+
     if (newDate >= new Date(today.getFullYear(), today.getMonth())) {
       if (currentMonth === 0) {
         setCurrentMonth(11);
@@ -530,13 +527,13 @@ const Contact: React.FC = () => {
                 {(selectedMethod === 'video' || selectedMethod === 'phone') && (
                   <div className="space-y-6">
                     <h3 className="text-lg font-semibold text-gold">Schedule Your Call</h3>
-                    
+
                     {!selectedDate ? (
                       <div className="space-y-4">
                         <label className="text-sm font-medium text-text-secondary uppercase tracking-wide">
                           Choose Your Preferred Date
                         </label>
-                        
+
                         <div className="flex items-center justify-between mb-4">
                           <button
                             type="button"
@@ -573,13 +570,12 @@ const Contact: React.FC = () => {
                                     type="button"
                                     onClick={() => day.isSelectable && setSelectedDate(day.date)}
                                     disabled={!day.isSelectable}
-                                    className={`w-full h-full rounded-lg text-sm transition-all duration-200 ${
-                                      day.isSelectable
-                                        ? selectedDate === day.date
-                                          ? 'bg-gold text-background font-semibold'
-                                          : 'bg-accent hover:bg-gold/20 text-text-primary hover:text-gold'
-                                        : 'bg-graphite/20 text-text-secondary cursor-not-allowed'
-                                    }`}
+                                    className={`w-full h-full rounded-lg text-sm transition-all duration-200 ${day.isSelectable
+                                      ? selectedDate === day.date
+                                        ? 'bg-gold text-background font-semibold'
+                                        : 'bg-accent hover:bg-gold/20 text-text-primary hover:text-gold'
+                                      : 'bg-graphite/20 text-text-secondary cursor-not-allowed'
+                                      }`}
                                   >
                                     {day.display}
                                   </button>
@@ -606,7 +602,7 @@ const Contact: React.FC = () => {
                             Change Date
                           </button>
                         </div>
-                        
+
                         <div className="bg-gold/10 border border-gold/20 p-4 rounded-lg">
                           <p className="text-gold font-medium">
                             {new Date(selectedDate).toLocaleDateString('en-US', {
@@ -624,11 +620,10 @@ const Contact: React.FC = () => {
                               key={time}
                               type="button"
                               onClick={() => setSelectedTime(time)}
-                              className={`p-4 rounded-lg border-2 transition-all duration-200 text-center ${
-                                selectedTime === time
-                                  ? 'border-gold bg-gold/10 text-gold font-semibold'
-                                  : 'border-graphite bg-surface hover:border-gold/50 hover:bg-gold/5 text-text-primary'
-                              }`}
+                              className={`p-4 rounded-lg border-2 transition-all duration-200 text-center ${selectedTime === time
+                                ? 'border-gold bg-gold/10 text-gold font-semibold'
+                                : 'border-graphite bg-surface hover:border-gold/50 hover:bg-gold/5 text-text-primary'
+                                }`}
                             >
                               {time}
                             </button>
@@ -652,7 +647,7 @@ const Contact: React.FC = () => {
                     rows={4}
                     className="w-full bg-surface border border-graphite rounded-lg px-4 py-4 text-lg focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary resize-none transition-all duration-200"
                     placeholder={
-                      selectedMethod === 'email' 
+                      selectedMethod === 'email'
                         ? "Tell us about your investment goals and how we can help..."
                         : "Any specific topics you'd like to discuss..."
                     }
@@ -663,14 +658,13 @@ const Contact: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full button py-5 text-lg flex items-center justify-center gap-3 ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={`w-full button py-5 text-lg flex items-center justify-center gap-3 ${loading ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                 >
                   {selectedMethod === 'email' && <Mail className="w-5 h-5" />}
                   {selectedMethod === 'video' && <Video className="w-5 h-5" />}
                   {selectedMethod === 'phone' && <Phone className="w-5 h-5" />}
-                  {loading ? 'Processing...' : 
+                  {loading ? 'Processing...' :
                     selectedMethod === 'email' ? 'Send Message' : 'Schedule Call'
                   }
                 </button>
@@ -692,15 +686,22 @@ const Contact: React.FC = () => {
             resetForm();
           }}
           title={
-            selectedMethod === 'email' 
-              ? "Message Sent Successfully!" 
+            selectedMethod === 'email'
+              ? "Message Sent Successfully!"
               : "Consultation Scheduled Successfully!"
           }
           message={
             selectedMethod === 'email'
               ? "Thank you for your message. We'll respond within 1-2 business days."
-              : "Your consultation request has been submitted and Calendly has been opened. Please complete the scheduling process in the new tab."
+              : "Your consultation request has been submitted. Please complete the scheduling process in the Calendly embed."
           }
+        />
+
+        <CalendlyEmbed
+          isOpen={showCalendlyEmbed}
+          onClose={() => setShowCalendlyEmbed(false)}
+          calendlyUrl={calendlyUrl}
+          consultationType={selectedMethod as 'video' | 'phone'}
         />
       </div>
     </div>

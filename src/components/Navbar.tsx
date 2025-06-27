@@ -91,7 +91,8 @@ const Navbar: React.FC = () => {
           <Link to="/investor-info" className="nav-link">Investor Info</Link>
           <Link to="/contact" className="nav-link">Contact</Link>
 
-          {(userRole === 'admin' || userRole === 'sub_admin') && (
+          {/* Simplified - removed admin dropdown and user profile features */}
+          {/* {(userRole === 'admin' || userRole === 'sub_admin') && (
             <div className="relative group">
               <Link to="/admin" className="nav-link">Admin</Link>
               <div className="absolute left-0 mt-2 py-2 w-64 bg-surface border border-graphite rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
@@ -116,39 +117,16 @@ const Navbar: React.FC = () => {
                 </Link>
               </div>
             </div>
-          )}
+          )} */}
 
+          {/* Simplified auth - just basic sign in/out */}
           {user ? (
-            <>
-              <div className="relative group">
-                <Link to="/profile" className="w-8 h-8 rounded-full bg-surface border border-graphite flex items-center justify-center hover:bg-accent transition-colors">
-                  <User className="w-4 h-4 text-gold" />
-                </Link>
-                <div className="absolute right-0 mt-2 py-2 w-56 bg-surface border border-graphite rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  {userName && (
-                    <div className="px-4 py-2 border-b border-graphite">
-                      <p className="text-sm text-gold font-medium">{userName}</p>
-                      <p className="text-xs text-text-secondary">{user?.email}</p>
-                    </div>
-                  )}
-                  <Link to="/dashboard" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">Dashboard</Link>
-                  <Link to="/profile" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">View Profile</Link>
-                  <hr className="my-1 border-graphite" />
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-              <NotificationBell
-                userRole={userRole}
-                isMobile={false}
-                onNavigateToAdmin={() => navigate('/admin')}
-                onNavigateToDashboard={() => navigate('/dashboard')}
-              />
-            </>
+            <button
+              onClick={handleSignOut}
+              className="nav-link"
+            >
+              Sign Out
+            </button>
           ) : (
             <button
               onClick={() => {
@@ -183,16 +161,17 @@ const Navbar: React.FC = () => {
           )}
         </nav>
 
-        {/* Mobile: Contact + Hamburger */}
+        {/* Mobile: Just Contact + Hamburger */}
         <div className="md:hidden flex items-center gap-4">
-          {user && (
+          {/* Removed notifications */}
+          {/* {user && (
             <NotificationBell
               userRole={userRole}
               isMobile={true}
               onNavigateToAdmin={() => navigate('/admin')}
               onNavigateToDashboard={() => navigate('/dashboard')}
             />
-          )}
+          )} */}
           <Link
             to="/contact"
             className="text-text-primary hover:text-gold transition-colors font-medium text-sm"
@@ -221,53 +200,7 @@ const Navbar: React.FC = () => {
             >
               <div className="py-6 px-6">
                 <div className="flex flex-col space-y-1 max-w-full">
-                  {(userRole === 'admin' || userRole === 'sub_admin') && (
-                    <>
-                      <Link
-                        to="/admin"
-                        className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Admin Dashboard
-                      </Link>
-                      <Link
-                        to="/admin/health"
-                        className="py-2 px-6 text-md text-text-secondary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        System Health
-                      </Link>
-                      <Link
-                        to="/admin/performance"
-                        className="py-2 px-6 text-md text-text-secondary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Performance Monitor
-                      </Link>
-                      <Link
-                        to="/admin/business-intelligence"
-                        className="py-2 px-6 text-md text-text-secondary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Business Intelligence
-                      </Link>
-                      <Link
-                        to="/admin/user-journey"
-                        className="py-2 px-6 text-md text-text-secondary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        User Journey Analytics
-                      </Link>
-                      <Link
-                        to="/admin/monitoring"
-                        className="py-2 px-6 text-md text-text-secondary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Real-Time Monitoring
-                      </Link>
-                    </>
-                  )}
-
+                  {/* Simplified mobile menu - removed admin and profile sections */}
                   <Link to="/"
                     className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
                     onClick={() => setIsOpen(false)}
@@ -303,21 +236,12 @@ const Navbar: React.FC = () => {
                     Contact
                   </Link>
                   {user ? (
-                    <>
-                      <Link
-                        to="/profile"
-                        className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Profile
-                      </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="py-3 px-4 text-lg text-left text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block w-full"
-                      >
-                        Sign Out
-                      </button>
-                    </>
+                    <button
+                      onClick={handleSignOut}
+                      className="py-3 px-4 text-lg text-left text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block w-full"
+                    >
+                      Sign Out
+                    </button>
                   ) : (
                     <Link
                       to="#"

@@ -62,23 +62,7 @@ function ScrollToTop() {
 
 // AppContent component that uses AuthContext
 function AppContent() {
-  const { user, profile } = useAuth();
-  const [showForceProfileUpdate, setShowForceProfileUpdate] = useState(false);
-
-  // Check if profile needs completion
-  useEffect(() => {
-    if (user && profile !== null) {
-      // Profile is loaded
-      if (!profile || !profile.first_name || !profile.last_name) {
-        console.log('Profile missing or incomplete, showing modal');
-        setShowForceProfileUpdate(true);
-      } else {
-        console.log('Profile complete:', profile.first_name, profile.last_name);
-        setShowForceProfileUpdate(false);
-      }
-    }
-  }, [user, profile]);
-
+  // Simplified - no profile checking or force updates
   return (
     <div className="min-h-screen bg-background text-text-primary">
       <Navbar />
@@ -90,7 +74,8 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/pitch-deck" element={<PitchDeck />} />
-        <Route path="/ppm" element={<ProtectedRoute><PPM /></ProtectedRoute>} />
+        {/* Disabled profile and investment routes */}
+        {/* <Route path="/ppm" element={<ProtectedRoute><PPM /></ProtectedRoute>} />
         <Route path="/ppm/edit" element={<ProtectedRoute><PPMEdit /></ProtectedRoute>} />
         <Route path="/ppm/view" element={<ProtectedRoute><PPMView /></ProtectedRoute>} />
         <Route path="/onboarding-flow/subscription-agreement" element={<ProtectedRoute><SubscriptionAgreement /></ProtectedRoute>} />
@@ -107,11 +92,12 @@ function AppContent() {
           <Route path="monitoring" element={<RealTimeMonitoringDashboard />} />
           <Route path="performance" element={<AdminPerformanceDashboard />} />
           <Route path="health" element={<SystemHealthChecker />} />
-        </Route>
+        </Route> */}
       </Routes>
       <Footer />
 
-      <ForceProfileUpdateModal
+      {/* Disabled profile update modal */}
+      {/* <ForceProfileUpdateModal
         isOpen={showForceProfileUpdate}
         onClose={() => {
           console.log('Modal closed - profile should be updated');
@@ -119,7 +105,7 @@ function AppContent() {
         }}
         firstName={profile?.first_name || ''}
         lastName={profile?.last_name || ''}
-      />
+      /> */}
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import ProtectedRoute from '../components/ProtectedRoute';
 
 const PitchDeckContent: React.FC = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -8,21 +7,19 @@ const PitchDeckContent: React.FC = () => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   const images = [
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554838/Pitch_Deck-1_mxvdxw.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554838/Pitch_Deck-2_oxghtl.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554837/Pitch_Deck-3_qiugvc.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554839/Pitch_Deck-4_ibidvl.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554840/Pitch_Deck-5_svvlx9.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554839/Pitch_Deck-6_znaipy.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554840/Pitch_Deck-7_p9rodg.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554841/Pitch_Deck-8_y7mlnq.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554841/Pitch_Deck-9_fhgxao.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554842/Pitch_Deck-10_x2pbqm.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554842/Pitch_Deck-12_fvgywj.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554843/Pitch_Deck-13_xi2mvo.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554838/Pitch_Deck-14_isk4pn.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554837/Pitch_Deck-15_zfel13.png",
-    "https://res.cloudinary.com/digjsdron/image/upload/v1746554840/Pitch_Deck-16_yboqg7.png"
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052904/ICL_Read_Deck_-1_ezcgqs.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052904/ICL_Read_Deck_-2_upqyie.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052905/ICL_Read_Deck_-3_mzniim.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052904/ICL_Read_Deck_-4_ykdn8x.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052904/ICL_Read_Deck_-5_evc2n1.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052904/ICL_Read_Deck_-6_czib7e.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052904/ICL_Read_Deck_-7_g15pbq.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052905/ICL_Read_Deck_-8_hwpvr8.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052905/ICL_Read_Deck_-9_trckcq.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052905/ICL_Read_Deck_-10_d7vzhl.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052905/ICL_Read_Deck_-11_p7gydu.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052905/ICL_Read_Deck_-12_lik9sh.png",
+    "https://res.cloudinary.com/digjsdron/image/upload/v1751052917/ICL_Read_Deck_-13_maf1eg.png"
   ];
 
   return (
@@ -69,7 +66,7 @@ const PitchDeckContent: React.FC = () => {
 
       {/* Fullscreen Modal */}
       {modalIsOpen && (
-        <div 
+        <div
           ref={modalRef}
           className="fixed inset-0 bg-black/90 z-50 overflow-auto"
           onClick={(e) => {
@@ -96,7 +93,7 @@ const PitchDeckContent: React.FC = () => {
               Exit Fullscreen
             </button>
           </div>
-          
+
           <div className={`p-8 flex ${modalIsHorizontal ? 'flex-row overflow-x-auto' : 'flex-col'} items-center justify-center min-h-[calc(100vh-80px)]`}>
             {images.map((src, index) => (
               <img
@@ -118,11 +115,7 @@ const PitchDeckContent: React.FC = () => {
 };
 
 const PitchDeck: React.FC = () => {
-  return (
-    <ProtectedRoute>
-      <PitchDeckContent />
-    </ProtectedRoute>
-  );
+  return <PitchDeckContent />;
 };
 
 export default PitchDeck;
