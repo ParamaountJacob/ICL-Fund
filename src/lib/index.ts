@@ -16,7 +16,8 @@ export { crmService } from './crm-service';
 export type {
     CRMContact,
     CRMActivity,
-    Consultation
+    Consultation,
+    ConsultationRequest
 } from './crm-service';
 
 export { notificationService } from './notifications';
@@ -24,6 +25,9 @@ export type { Notification } from './notifications';
 
 export { documentService } from './documents';
 export type { DocumentSignature } from './documents';
+
+export { profileService } from './profile-service';
+export type { UserProfile } from './profile-service';
 
 // Legacy re-exports for backward compatibility during migration
 // TODO: Remove these once all components are updated to use the new services

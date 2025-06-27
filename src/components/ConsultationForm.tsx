@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Video, Phone, DollarSign, Calendar, Clock, User, Mail, MessageSquare, ArrowRight, CheckCircle, Building, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { createConsultationRequest } from '../lib/supabase';
+import { authService, crmService, profileService } from '../lib';
 import { createLeadFromConsultation } from '../lib/crm';
-import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import AuthModal from './AuthModal';
 import SuccessModal from './SuccessModal';
@@ -38,47 +37,38 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
   });
 
   React.useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-      if (user) {
-        setFormData(prev => ({
-          ...prev,
-          email: user.email || ''
-        }));
-        
-        // Fetch existing profile data
-        supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle()
-          .then(({ data: profile }) => {
-            if (profile) {
-              setFormData(prev => ({
-                ...prev,
-                first_name: profile.first_name || '',
-                last_name: profile.last_name || '',
-                phone: profile.phone || '',
-                address: profile.address || '',
-                retirement_account_details: profile.ira_accounts || '',
-                investment_goals: profile.investment_goals || ''
-              }));
-            }
-          });
-      }
-    });
+    // Get current user and profile data
+    const loadUserData = async () => {
+      try {
+        const currentUser = await authService.getCurrentUser();
+        setUser(currentUser);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        setFormData(prev => ({
-          ...prev,
-          email: session.user.email || ''
-        }));
-      }
-    });
+        if (currentUser) {
+          setFormData(prev => ({
+            ...prev,
+            email: currentUser.email || ''
+          }));
 
-    return () => subscription.unsubscribe();
+          // Fetch existing profile data
+          const profile = await profileService.getUserProfile(currentUser.id);
+          if (profile) {
+            setFormData(prev => ({
+              ...prev,
+              first_name: profile.first_name || '',
+              last_name: profile.last_name || '',
+              phone: profile.phone || '',
+              address: profile.address || '',
+              retirement_account_details: profile.ira_accounts || '',
+              investment_goals: profile.investment_goals || ''
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    };
+
+    loadUserData();
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -109,17 +99,17 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
       await supabase
         .from('user_profiles')
         .upsert(
-        {
-          user_id: user.id,
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          phone: formData.phone,
-          address: formData.address || null,
-          ira_accounts: formData.retirement_account_details || null,
-          investment_goals: formData.investment_goals || null,
-          updated_at: new Date().toISOString()
-        },
-        { onConflict: 'user_id' }
+          {
+            user_id: user.id,
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            phone: formData.phone,
+            address: formData.address || null,
+            ira_accounts: formData.retirement_account_details || null,
+            investment_goals: formData.investment_goals || null,
+            updated_at: new Date().toISOString()
+          },
+          { onConflict: 'user_id' }
         );
 
       // Create consultation request
@@ -152,38 +142,38 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
       }
 
       // Construct Calendly URL with pre-filled data
-      const calendlyBaseUrl = consultationType === 'video' 
+      const calendlyBaseUrl = consultationType === 'video'
         ? 'https://calendly.com/innercirclelending/30min'
         : 'https://calendly.com/innercirclelending/q-a-phone-chat';
-      
+
       // Format the date and time for Calendly
       const dateTimeString = `${selectedDate}T${convertTimeToISO(selectedTime)}-05:00`;
-      
+
       const params = new URLSearchParams();
-      
+
       // Pre-fill name and email
       if (formData.first_name && formData.last_name) params.append('name', `${formData.first_name} ${formData.last_name}`);
       if (formData.email) params.append('email', formData.email);
-      
+
       // Add custom questions as URL parameters
       if (formData.notes) params.append('a1', formData.notes);
       if (formData.suggested_investment_amount) params.append('a2', `$${parseInt(formData.suggested_investment_amount).toLocaleString()}`);
       if (formData.investment_goals) params.append('a3', formData.investment_goals);
       if (formData.retirement_account_details) params.append('a4', formData.retirement_account_details);
       if (formData.has_retirement_accounts) params.append('a5', formData.has_retirement_accounts);
-      
+
       // Add phone number to the dedicated phone field
       if (formData.phone) params.append('phone', formData.phone);
-      
+
       // Pre-select the date and time
       params.append('date', selectedDate);
       params.append('month', `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}`);
 
       const calendlyUrl = `${calendlyBaseUrl}/${dateTimeString}?${params.toString()}`;
-      
+
       // Open Calendly in new tab
       window.open(calendlyUrl, '_blank');
-      
+
       setShowSuccessModal(true);
     } catch (error) {
       console.error('Error submitting consultation request:', error);
@@ -196,10 +186,10 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
   const convertTimeToISO = (time: string) => {
     const [timePart, period] = time.split(' ');
     let [hours, minutes] = timePart.split(':').map(Number);
-    
+
     if (period === 'PM' && hours !== 12) hours += 12;
     if (period === 'AM' && hours === 12) hours = 0;
-    
+
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
   };
 
@@ -239,21 +229,21 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
     const lastDay = new Date(currentYear, currentMonth + 1, 0);
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = firstDay.getDay();
-    
+
     const days = [];
-    
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push(null);
     }
-    
+
     // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentYear, currentMonth, day);
       const dateString = date.toISOString().split('T')[0];
       const isWeekend = date.getDay() === 0 || date.getDay() === 6;
       const isPast = date < today;
-      
+
       if (!isWeekend && !isPast) {
         days.push({
           date: dateString,
@@ -268,7 +258,7 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
         });
       }
     }
-    
+
     return days;
   };
 
@@ -296,7 +286,7 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
   const prevMonth = () => {
     const today = new Date();
     const newDate = new Date(currentYear, currentMonth - 1);
-    
+
     // Don't go to previous months before current month
     if (newDate >= new Date(today.getFullYear(), today.getMonth())) {
       if (currentMonth === 0) {
@@ -316,17 +306,15 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
           <div className="flex items-center justify-between mb-4">
             {[2, 3, 4].map((step) => (
               <div key={step} className="flex items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
-                  currentStep >= step 
-                    ? 'bg-gold text-background' 
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${currentStep >= step
+                    ? 'bg-gold text-background'
                     : 'bg-surface border-2 border-graphite text-text-secondary'
-                }`}>
+                  }`}>
                   {currentStep > step ? <CheckCircle className="w-5 h-5" /> : step}
                 </div>
                 {step < 4 && (
-                  <div className={`w-12 h-1 mx-2 transition-all duration-300 ${
-                    currentStep > step ? 'bg-gold' : 'bg-graphite'
-                  }`} />
+                  <div className={`w-12 h-1 mx-2 transition-all duration-300 ${currentStep > step ? 'bg-gold' : 'bg-graphite'
+                    }`} />
                 )}
               </div>
             ))}
@@ -541,11 +529,10 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, has_retirement_accounts: 'yes' }))}
-                    className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
-                      formData.has_retirement_accounts === 'yes'
+                    className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${formData.has_retirement_accounts === 'yes'
                         ? 'border-gold bg-gold/10'
                         : 'border-graphite bg-surface hover:border-gold/50'
-                    }`}
+                      }`}
                   >
                     <div className="font-semibold mb-2">Yes, I have retirement accounts</div>
                     <p className="text-sm text-text-secondary">
@@ -555,11 +542,10 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, has_retirement_accounts: 'no' }))}
-                    className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
-                      formData.has_retirement_accounts === 'no'
+                    className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${formData.has_retirement_accounts === 'no'
                         ? 'border-gold bg-gold/10'
                         : 'border-graphite bg-surface hover:border-gold/50'
-                    }`}
+                      }`}
                   >
                     <div className="font-semibold mb-2">No, I don't have retirement accounts</div>
                     <p className="text-sm text-text-secondary">
@@ -640,7 +626,7 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                     <Calendar className="w-4 h-4 mr-2 text-gold" />
                     Choose Your Preferred Date
                   </label>
-                  
+
                   {/* Month Navigation */}
                   <div className="flex items-center justify-between mb-4">
                     <button
@@ -679,13 +665,12 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                               type="button"
                               onClick={() => day.isSelectable && setSelectedDate(day.date)}
                               disabled={!day.isSelectable}
-                              className={`w-full h-full rounded-lg text-sm transition-all duration-200 ${
-                                day.isSelectable
+                              className={`w-full h-full rounded-lg text-sm transition-all duration-200 ${day.isSelectable
                                   ? selectedDate === day.date
                                     ? 'bg-gold text-background font-semibold'
                                     : 'bg-accent hover:bg-gold/20 text-text-primary hover:text-gold'
                                   : 'bg-graphite/20 text-text-secondary cursor-not-allowed'
-                              }`}
+                                }`}
                             >
                               {day.display}
                             </button>
@@ -713,7 +698,7 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                       Change Date
                     </button>
                   </div>
-                  
+
                   <div className="bg-gold/10 border border-gold/20 p-4 rounded-lg">
                     <p className="text-gold font-medium">
                       Selected Date: {new Date(selectedDate).toLocaleDateString('en-US', {
@@ -731,17 +716,16 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                         key={time}
                         type="button"
                         onClick={() => setSelectedTime(time)}
-                        className={`p-3 rounded-lg border-2 transition-all duration-200 text-center ${
-                          selectedTime === time
+                        className={`p-3 rounded-lg border-2 transition-all duration-200 text-center ${selectedTime === time
                             ? 'border-gold bg-gold/10 text-gold font-semibold'
                             : 'border-graphite bg-surface hover:border-gold/50 hover:bg-gold/5 text-text-primary'
-                        }`}
+                          }`}
                       >
                         {time}
                       </button>
                     ))}
                   </div>
-                  
+
                   <p className="text-xs text-text-secondary text-center">
                     All times are in Eastern Standard Time (EST)
                   </p>
@@ -773,9 +757,8 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                 disabled={!isStepValid()}
                 whileHover={{ scale: isStepValid() ? 1.02 : 1 }}
                 whileTap={{ scale: isStepValid() ? 0.98 : 1 }}
-                className={`button px-6 py-3 flex items-center gap-2 ${
-                  !isStepValid() ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                className={`button px-6 py-3 flex items-center gap-2 ${!isStepValid() ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
               >
                 Next
                 <ArrowRight className="w-4 h-4" />
@@ -796,20 +779,19 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                     placeholder="Tell us about your investment goals or any specific topics you'd like to discuss..."
                   />
                 </div>
-                
-              <motion.button
-                type="button"
-                onClick={handleSubmit}
-                disabled={loading || !isStepValid()}
-                whileHover={{ scale: !loading && isStepValid() ? 1.02 : 1 }}
-                whileTap={{ scale: !loading && isStepValid() ? 0.98 : 1 }}
-                className={`button px-8 py-3 flex items-center gap-2 ${
-                  loading || !isStepValid() ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                {consultationType === 'video' ? <Video className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
-                {loading ? 'Processing...' : 'Submit & Schedule'}
-              </motion.button>
+
+                <motion.button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={loading || !isStepValid()}
+                  whileHover={{ scale: !loading && isStepValid() ? 1.02 : 1 }}
+                  whileTap={{ scale: !loading && isStepValid() ? 0.98 : 1 }}
+                  className={`button px-8 py-3 flex items-center gap-2 ${loading || !isStepValid() ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                >
+                  {consultationType === 'video' ? <Video className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
+                  {loading ? 'Processing...' : 'Submit & Schedule'}
+                </motion.button>
               </div>
             )}
           </div>

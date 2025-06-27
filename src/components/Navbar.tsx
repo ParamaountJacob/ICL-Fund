@@ -92,7 +92,30 @@ const Navbar: React.FC = () => {
           <Link to="/contact" className="nav-link">Contact</Link>
 
           {(userRole === 'admin' || userRole === 'sub_admin') && (
-            <Link to="/admin" className="nav-link">Admin</Link>
+            <div className="relative group">
+              <Link to="/admin" className="nav-link">Admin</Link>
+              <div className="absolute left-0 mt-2 py-2 w-64 bg-surface border border-graphite rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <Link to="/admin" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
+                  Main Dashboard
+                </Link>
+                <Link to="/admin/health" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
+                  System Health
+                </Link>
+                <Link to="/admin/performance" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
+                  Performance Monitor
+                </Link>
+                <hr className="my-1 border-graphite" />
+                <Link to="/admin/business-intelligence" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
+                  Business Intelligence
+                </Link>
+                <Link to="/admin/user-journey" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
+                  User Journey Analytics
+                </Link>
+                <Link to="/admin/monitoring" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
+                  Real-Time Monitoring
+                </Link>
+              </div>
+            </div>
           )}
 
           {user ? (
@@ -199,13 +222,50 @@ const Navbar: React.FC = () => {
               <div className="py-6 px-6">
                 <div className="flex flex-col space-y-1 max-w-full">
                   {(userRole === 'admin' || userRole === 'sub_admin') && (
-                    <Link
-                      to="/admin"
-                      className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Admin
-                    </Link>
+                    <>
+                      <Link
+                        to="/admin"
+                        className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Admin Dashboard
+                      </Link>
+                      <Link
+                        to="/admin/health"
+                        className="py-2 px-6 text-md text-text-secondary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        System Health
+                      </Link>
+                      <Link
+                        to="/admin/performance"
+                        className="py-2 px-6 text-md text-text-secondary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Performance Monitor
+                      </Link>
+                      <Link
+                        to="/admin/business-intelligence"
+                        className="py-2 px-6 text-md text-text-secondary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Business Intelligence
+                      </Link>
+                      <Link
+                        to="/admin/user-journey"
+                        className="py-2 px-6 text-md text-text-secondary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        User Journey Analytics
+                      </Link>
+                      <Link
+                        to="/admin/monitoring"
+                        className="py-2 px-6 text-md text-text-secondary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Real-Time Monitoring
+                      </Link>
+                    </>
                   )}
 
                   <Link to="/"

@@ -43,6 +43,22 @@ export interface Consultation {
     updated_at: string;
 }
 
+export interface ConsultationRequest {
+    id: string;
+    user_id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    suggested_investment_amount?: number;
+    preferred_date?: string;
+    preferred_time?: string;
+    consultation_type: 'video' | 'phone';
+    notes?: string;
+    status: 'pending' | 'scheduled' | 'completed' | 'cancelled';
+    created_at: string;
+    updated_at: string;
+}
+
 export const crmService = {
     // CRM Contacts
     async getContacts(): Promise<CRMContact[]> {
@@ -208,6 +224,39 @@ export const crmService = {
             if (error) throw error;
         } catch (error) {
             console.error('Error deleting consultation:', error);
+            throw error;
+        }
+    },
+
+    // Consultation Requests (separate from consultations table)
+    async createConsultationRequest(data: {
+        name: string;
+        email: string;
+        phone?: string;
+        suggested_investment_amount?: number;
+        preferred_date?: string;
+        preferred_time?: string;
+        consultation_type: 'video' | 'phone';
+        notes?: string;
+    }): Promise<ConsultationRequest> {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('User not authenticated');
+
+            const { data: result, error } = await supabase
+                .from('consultation_requests')
+                .insert([{
+                    user_id: user.id,
+                    ...data,
+                    status: 'pending'
+                }])
+                .select()
+                .single();
+
+            if (error) throw error;
+            return result;
+        } catch (error) {
+            console.error('Error creating consultation request:', error);
             throw error;
         }
     }

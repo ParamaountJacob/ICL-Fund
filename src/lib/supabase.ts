@@ -434,15 +434,26 @@ export const getUserProfileById = async (userId: string): Promise<UserProfile | 
 export const updateUserProfile = async (profile: Partial<UserProfile>): Promise<UserProfile | null> => {
   const { data: { user } } = await supabase.auth.getUser();
   const userId = profile.user_id || (user ? user.id : null);
-  if (!userId) return null;
+
+  if (!userId) {
+    throw new Error('PROFILE_UPDATE_FAILED: No user ID available for profile update');
+  }
+
+  // Validate required profile data
+  if (!profile.first_name && !profile.last_name && !profile.phone && !profile.address) {
+    throw new Error('PROFILE_UPDATE_FAILED: No profile data provided for update');
+  }
+
+  console.log('=== UPDATE USER PROFILE START ===');
+  console.log('Updating profile for user ID:', userId);
+  console.log('Profile data to save:', profile);
+
+  let updateResult: UserProfile | null = null;
+  let lastError: Error | null = null;
 
   try {
-    console.log('=== UPDATE USER PROFILE START (RLS BYPASS APPROACH) ===');
-    console.log('Updating profile for user ID:', userId);
-    console.log('Profile data to save:', profile);
-
-    // Try using the database function with SECURITY DEFINER which should bypass RLS
-    console.log('Attempting to use database function to bypass RLS...');
+    // ATTEMPT 1: Try database function (preferred method)
+    console.log('Attempting to use database function...');
     const { data: functionResult, error: functionError } = await supabase.rpc('safe_upsert_user_profile', {
       p_user_id: userId,
       p_first_name: profile.first_name,
@@ -456,53 +467,100 @@ export const updateUserProfile = async (profile: Partial<UserProfile>): Promise<
       p_annual_income: profile.annual_income || null
     });
 
-    console.log('Database function result:', { data: functionResult, error: functionError });
+    if (!functionError && functionResult) {
+      console.log('Database function succeeded');
+      updateResult = await getUserProfile();
+      if (updateResult) {
+        console.log('=== UPDATE USER PROFILE SUCCESS (via function) ===');
+        return updateResult;
+      }
+    } else {
+      lastError = new Error(`DATABASE_FUNCTION_FAILED: ${functionError?.message || 'Unknown error'}`);
+      console.warn('Database function failed:', lastError.message);
+    }
 
-    if (functionError) {
-      console.error('Database function failed, trying direct approach with service role...');
+    // ATTEMPT 2: Direct database operations with proper error checking
+    console.log('Attempting direct database update...');
 
-      // If the function fails, try a different approach - create a minimal record first
+    // First, check if profile exists
+    const { data: existingProfile, error: checkError } = await supabase
+      .from('user_profiles')
+      .select('user_id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (checkError) {
+      lastError = new Error(`PROFILE_CHECK_FAILED: ${checkError.message}`);
+      throw lastError;
+    }
+
+    const profileData = {
+      user_id: userId,
+      first_name: profile.first_name,
+      last_name: profile.last_name,
+      phone: profile.phone,
+      address: profile.address,
+      ira_accounts: profile.ira_accounts,
+      investment_goals: profile.investment_goals,
+      risk_tolerance: profile.risk_tolerance,
+      net_worth: profile.net_worth,
+      annual_income: profile.annual_income,
+      updated_at: new Date().toISOString()
+    };
+
+    if (existingProfile) {
+      // Profile exists - update it
+      const { data: updateData, error: updateError } = await supabase
+        .from('user_profiles')
+        .update(profileData)
+        .eq('user_id', userId)
+        .select()
+        .single();
+
+      if (updateError) {
+        lastError = new Error(`PROFILE_UPDATE_FAILED: ${updateError.message}`);
+        throw lastError;
+      }
+
+      console.log('Direct update succeeded');
+      updateResult = updateData as UserProfile;
+    } else {
+      // Profile doesn't exist - create it
       const { data: insertData, error: insertError } = await supabase
         .from('user_profiles')
         .insert({
-          id: userId,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          ...profileData,
+          created_at: new Date().toISOString()
         })
-        .select();
+        .select()
+        .single();
 
-      console.log('Direct insert result:', { data: insertData, error: insertError });
-
-      if (insertError && !insertError.message.includes('duplicate key')) {
-        // If insert fails and it's not a duplicate key error, try update
-        const { data: updateData, error: updateError } = await supabase
-          .from('user_profiles')
-          .update({
-            first_name: profile.first_name,
-            last_name: profile.last_name,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', userId)
-          .select();
-
-        console.log('Direct update result:', { data: updateData, error: updateError });
-
-        if (updateError) {
-          throw updateError;
-        }
+      if (insertError) {
+        lastError = new Error(`PROFILE_CREATE_FAILED: ${insertError.message}`);
+        throw lastError;
       }
+
+      console.log('Direct insert succeeded');
+      updateResult = insertData as UserProfile;
     }
 
-    console.log('Getting updated profile...');
-    const updatedProfile = await getUserProfile();
-    console.log('Updated profile retrieved:', updatedProfile);
-    console.log('=== UPDATE USER PROFILE END (RLS BYPASS APPROACH) ===');
+    // Validate that the update actually worked
+    if (!updateResult || updateResult.user_id !== userId) {
+      throw new Error('PROFILE_VALIDATION_FAILED: Profile update succeeded but validation failed');
+    }
 
-    return updatedProfile;
+    console.log('=== UPDATE USER PROFILE SUCCESS (via direct) ===');
+    return updateResult;
+
   } catch (error) {
-    console.error('Error updating user profile:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('Error updating user profile:', errorMessage);
+
+    // Preserve error context and provide specific error information
+    if (lastError && !errorMessage.includes('PROFILE_')) {
+      throw new Error(`PROFILE_UPDATE_CHAIN_FAILED: ${lastError.message} -> ${errorMessage}`);
+    }
+
     throw error;
   }
 };

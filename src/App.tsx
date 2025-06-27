@@ -26,6 +26,12 @@ import SubscriptionAgreement from './pages/onboarding-flow/SubscriptionAgreement
 import PromissoryNote from './pages/onboarding-flow/PromissoryNote';
 import WireDetails from './pages/onboarding-flow/WireDetails';
 import PlaidBanking from './pages/onboarding-flow/PlaidBanking';
+import { BusinessIntelligenceDashboard } from './components/BusinessIntelligenceDashboard';
+import { UserJourneyAnalytics } from './components/UserJourneyAnalytics';
+import { RealTimeMonitoringDashboard } from './components/RealTimeMonitoringDashboard';
+import { AdminPerformanceDashboard } from './components/AdminPerformanceDashboard';
+import { SystemHealthChecker } from './components/SystemHealthChecker';
+import { AdminLayout } from './components/AdminLayout';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -94,7 +100,14 @@ function AppContent() {
         <Route path="/promissory-note-flow" element={<ProtectedRoute><PromissoryNoteFlow /></ProtectedRoute>} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+          <Route index element={<Admin />} />
+          <Route path="business-intelligence" element={<BusinessIntelligenceDashboard />} />
+          <Route path="user-journey" element={<UserJourneyAnalytics />} />
+          <Route path="monitoring" element={<RealTimeMonitoringDashboard />} />
+          <Route path="performance" element={<AdminPerformanceDashboard />} />
+          <Route path="health" element={<SystemHealthChecker />} />
+        </Route>
       </Routes>
       <Footer />
 
