@@ -88,7 +88,6 @@ const Profile: React.FC = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user);
-        fetchRequests(session.user.id);
         fetchProfile(session.user.id);
         setShowAuthModal(false);
       } else if (event === 'SIGNED_OUT') {
@@ -346,8 +345,8 @@ const Profile: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('overview')}
                     className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'overview'
-                        ? 'bg-gold text-background'
-                        : 'text-text-secondary hover:text-text-primary'
+                      ? 'bg-gold text-background'
+                      : 'text-text-secondary hover:text-text-primary'
                       }`}
                   >
                     <Settings className="w-4 h-4 inline mr-1 md:mr-2" />
@@ -356,8 +355,8 @@ const Profile: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('personal')}
                     className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'personal'
-                        ? 'bg-gold text-background'
-                        : 'text-text-secondary hover:text-text-primary'
+                      ? 'bg-gold text-background'
+                      : 'text-text-secondary hover:text-text-primary'
                       }`}
                   >
                     <User className="w-4 h-4 inline mr-1 md:mr-2" />
@@ -366,8 +365,8 @@ const Profile: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('security')}
                     className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'security'
-                        ? 'bg-gold text-background'
-                        : 'text-text-secondary hover:text-text-primary'
+                      ? 'bg-gold text-background'
+                      : 'text-text-secondary hover:text-text-primary'
                       }`}
                   >
                     <Shield className="w-4 h-4 inline mr-1 md:mr-2" />
@@ -376,8 +375,8 @@ const Profile: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('documents')}
                     className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'documents'
-                        ? 'bg-gold text-background'
-                        : 'text-text-secondary hover:text-text-primary'
+                      ? 'bg-gold text-background'
+                      : 'text-text-secondary hover:text-text-primary'
                       }`}
                   >
                     <FileText className="w-4 h-4 inline mr-1 md:mr-2" />
