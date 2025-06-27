@@ -3,7 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, FileText, Bell } from 'lucide-react';
 import { createRoot } from 'react-dom/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase, checkUserRole, getUserProfile } from '../lib/supabase';
+import { supabase, authService } from '../lib';
+import type { UserRole } from '../lib';
 import AuthModal from './AuthModal';
 import NotificationBell from './NotificationBell';
 
@@ -13,7 +14,7 @@ const Navbar: React.FC = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<'user' | 'sub_admin' | 'admin'>('user');
+  const [userRole, setUserRole] = useState<UserRole>('user');
   const [userName, setUserName] = useState<string>('');
 
   useEffect(() => {
@@ -35,33 +36,57 @@ const Navbar: React.FC = () => {
   }, [pathname]);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    // Get current user and profile using the new auth service
+    const initializeAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+
       if (user) {
-        checkUserRole().then(setUserRole);
-        getUserProfile().then(profile => {
+        const authUser = await authService.getCurrentUser();
+        if (authUser) {
+          setUserRole(authUser.role);
+
+          // Get profile for name display
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('first_name, last_name, full_name')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
           // Prioritize full_name over first_name + last_name
           if (profile?.full_name) {
             setUserName(profile.full_name);
           } else if (profile?.first_name && profile?.last_name) {
             setUserName(`${profile.first_name} ${profile.last_name}`);
           }
-        });
+        }
       }
-    });
+    };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    initializeAuth();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkUserRole().then(setUserRole);
-        getUserProfile().then(profile => {
+        const authUser = await authService.getCurrentUser();
+        if (authUser) {
+          setUserRole(authUser.role);
+
+          // Get profile for name display
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('first_name, last_name, full_name')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+
           // Prioritize full_name over first_name + last_name
           if (profile?.full_name) {
             setUserName(profile.full_name);
           } else if (profile?.first_name && profile?.last_name) {
             setUserName(`${profile.first_name} ${profile.last_name}`);
           }
-        });
+        }
       } else {
         setUserRole('user');
         setUserName('');
@@ -72,7 +97,7 @@ const Navbar: React.FC = () => {
   }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await authService.signOut();
     setIsOpen(false);
     navigate('/');
   };
