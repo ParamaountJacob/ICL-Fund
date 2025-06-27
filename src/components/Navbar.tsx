@@ -3,18 +3,20 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, FileText, Bell } from 'lucide-react';
 import { createRoot } from 'react-dom/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase, authService } from '../lib';
-import type { UserRole } from '../lib';
+import { supabase, checkUserRole } from '../lib/supabase';
+import type { UserRole } from '../lib/supabase';
 import AuthModal from './AuthModal';
 import NotificationBell from './NotificationBell';
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<UserRole>('user');
+
+  // Use the centralized auth context
+  const { user, profile, userRole, signOut } = useAuth();
   const [userName, setUserName] = useState<string>('');
 
   useEffect(() => {
@@ -35,76 +37,29 @@ const Navbar: React.FC = () => {
     };
   }, [pathname]);
 
+  // Update user name when profile changes
   useEffect(() => {
-    // Get current user and profile using the new auth service
-    const initializeAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-
-      if (user) {
-        const authUser = await authService.getCurrentUser();
-        if (authUser) {
-          setUserRole(authUser.role);
-
-          // Get profile for name display
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('first_name, last_name, full_name')
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-          // Prioritize full_name over first_name + last_name
-          if (profile?.full_name) {
-            setUserName(profile.full_name);
-          } else if (profile?.first_name && profile?.last_name) {
-            setUserName(`${profile.first_name} ${profile.last_name}`);
-          }
-        }
-      }
-    };
-
-    initializeAuth();
-
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        const authUser = await authService.getCurrentUser();
-        if (authUser) {
-          setUserRole(authUser.role);
-
-          // Get profile for name display
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('first_name, last_name, full_name')
-            .eq('user_id', session.user.id)
-            .maybeSingle();
-
-          // Prioritize full_name over first_name + last_name
-          if (profile?.full_name) {
-            setUserName(profile.full_name);
-          } else if (profile?.first_name && profile?.last_name) {
-            setUserName(`${profile.first_name} ${profile.last_name}`);
-          }
-        }
+    if (profile) {
+      // Prioritize full_name over first_name + last_name
+      if (profile.full_name) {
+        setUserName(profile.full_name);
+      } else if (profile.first_name && profile.last_name) {
+        setUserName(`${profile.first_name} ${profile.last_name}`);
+      } else if (profile.first_name) {
+        setUserName(profile.first_name);
       } else {
-        setUserRole('user');
-        setUserName('');
+        setUserName('User');
       }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+    } else {
+      setUserName('');
+    }
+  }, [profile]);
 
   const handleSignOut = async () => {
-    await authService.signOut();
-    setIsOpen(false);
+    await signOut();
     navigate('/');
   };
 
-  const handleNavigateToAdmin = () => {
-    navigate('/admin');
-  };
   // Determine if this is the home page
   const isHomePage = pathname === '/';
 

@@ -26,6 +26,8 @@ import { useNavigate } from 'react-router-dom';
 import type { DocumentType } from '../lib/supabase';
 import { SuccessModal } from '../components/SuccessModal';
 import AuthModal from '../components/AuthModal';
+import { useAuth } from '../contexts/AuthContext';
+import { useNotifications } from '../contexts/NotificationContext';
 
 interface DocumentRequest {
   document_type: DocumentType;
@@ -47,8 +49,10 @@ interface UserProfile {
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
+  const { user, profile: authProfile, refreshProfile } = useAuth();
+  const { success, error: showError } = useNotifications();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  // Local profile state for editing
   const [profile, setProfile] = useState<UserProfile>({
     first_name: '',
     last_name: '',
@@ -59,6 +63,7 @@ const Profile: React.FC = () => {
     net_worth: '',
     annual_income: ''
   });
+
   const [activeTab, setActiveTab] = useState<'overview' | 'personal' | 'security' | 'documents'>('overview');
   const [editingPersonal, setEditingPersonal] = useState(false);
   const [editingPassword, setEditingPassword] = useState(false);
@@ -72,63 +77,30 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  // Update local profile when auth profile changes
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      if (user) {
-        fetchProfile(user.id);
-      } else {
-        setShowAuthModal(true);
-      }
-    };
-
-    checkUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        setUser(session.user);
-        fetchProfile(session.user.id);
-        setShowAuthModal(false);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setShowAuthModal(true);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const fetchProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return;
-      }
-
-      if (data) {
-        setProfile({
-          id: data.id,
-          first_name: data.first_name || '',
-          last_name: data.last_name || '',
-          phone: data.phone || '',
-          address: data.address || '',
-          ira_accounts: data.ira_accounts || '',
-          investment_goals: data.investment_goals || '',
-          net_worth: data.net_worth || '',
-          annual_income: data.annual_income || ''
-        });
-      }
-    } catch (err) {
-      console.error('Unexpected error fetching profile:', err);
+    if (authProfile) {
+      setProfile({
+        first_name: authProfile.first_name || '',
+        last_name: authProfile.last_name || '',
+        phone: authProfile.phone || '',
+        address: authProfile.address || '',
+        ira_accounts: authProfile.ira_accounts || '',
+        investment_goals: authProfile.investment_goals || '',
+        net_worth: authProfile.net_worth || '',
+        annual_income: authProfile.annual_income || ''
+      });
     }
-  };
+  }, [authProfile]);
+
+  // Check auth state
+  useEffect(() => {
+    if (!user) {
+      setShowAuthModal(true);
+    } else {
+      setShowAuthModal(false);
+    }
+  }, [user]);
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -145,21 +117,32 @@ const Profile: React.FC = () => {
 
     setLoading(true);
     try {
-      const upsertData = profile.id
-        ? { id: profile.id, user_id: user.id, ...profile, updated_at: new Date().toISOString() }
-        : { user_id: user.id, ...profile, updated_at: new Date().toISOString() };
-
       const { error } = await supabase
         .from('user_profiles')
-        .upsert(upsertData, { onConflict: 'user_id' });
+        .upsert({
+          user_id: user.id,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          phone: profile.phone,
+          address: profile.address,
+          ira_accounts: profile.ira_accounts,
+          investment_goals: profile.investment_goals,
+          net_worth: profile.net_worth,
+          annual_income: profile.annual_income,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
 
       if (error) throw error;
 
+      // Refresh the auth profile
+      await refreshProfile();
+
       setEditingPersonal(false);
       setShowSuccessModal(true);
+      success('Profile Updated', 'Your profile has been saved successfully.');
     } catch (error) {
       console.error('Error saving profile:', error);
-      alert('Failed to save profile. Please try again.');
+      showError('Save Failed', 'Failed to save profile. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -167,12 +150,12 @@ const Profile: React.FC = () => {
 
   const updatePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('New passwords do not match.');
+      showError('Password Mismatch', 'New passwords do not match.');
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      alert('Password must be at least 6 characters long.');
+      showError('Password Too Short', 'Password must be at least 6 characters long.');
       return;
     }
 
@@ -190,10 +173,10 @@ const Profile: React.FC = () => {
         confirmPassword: ''
       });
       setEditingPassword(false);
-      alert('Password updated successfully!');
+      success('Password Updated', 'Your password has been updated successfully!');
     } catch (error) {
       console.error('Error updating password:', error);
-      alert('Failed to update password. Please try again.');
+      showError('Update Failed', 'Failed to update password. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -210,10 +193,10 @@ const Profile: React.FC = () => {
       });
 
       if (error) throw error;
-      alert('Email update initiated. Please check your new email for confirmation.');
+      info('Email Update', 'Email update initiated. Please check your new email for confirmation.');
     } catch (error) {
       console.error('Error updating email:', error);
-      alert('Failed to update email. Please try again.');
+      showError('Update Failed', 'Failed to update email. Please try again.');
     } finally {
       setLoading(false);
     }
