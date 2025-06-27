@@ -10,9 +10,9 @@ BEGIN;
 
 DO $$
 BEGIN
-    RAISE NOTICE 'STARTING FULLY IDEMPOTENT RLS POLICY SETUP...';
-    RAISE NOTICE 'This migration is 100% safe to run multiple times';
-    RAISE NOTICE 'All objects will be checked before creation';
+    RAISE NOTICE 'Starting RLS setup';
+    RAISE NOTICE 'Safe to run multiple times';
+    RAISE NOTICE 'Checking objects before creation';
 END $$;
 
 -- =================================================================
@@ -515,8 +515,8 @@ COMMIT;
 
 DO $$
 BEGIN
-    RAISE NOTICE 'FULLY IDEMPOTENT RLS POLICIES SETUP COMPLETE!';
-    RAISE NOTICE 'Admin user: innercirclelending@gmail.com';
-    RAISE NOTICE 'All tables now have proper Row Level Security policies';
-    RAISE NOTICE 'Migration can be run safely multiple times';
+    RAISE NOTICE 'RLS policies setup complete';
+    RAISE NOTICE 'Admin user configured';
+    RAISE NOTICE 'All tables have Row Level Security';
+    RAISE NOTICE 'Migration is idempotent';
 END $$;
