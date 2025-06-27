@@ -3,11 +3,12 @@
 -- Fixes all tables with missing RLS policies
 -- Sets up proper admin user (innercirclelending@gmail.com)
 -- 100% SAFE TO RUN MULTIPLE TIMES - CHECKS ALL OBJECTS FIRST
--- Timestamp: June 27, 2025 17:00:00 FIXED VERSION
+-- Timestamp: June 27, 2025 17:00:01 CORRECTED VERSION
 -- =================================================================
 
 BEGIN;
 
+-- Simple notice messages without parameters
 DO $$
 BEGIN
     RAISE NOTICE 'Starting RLS setup';
@@ -513,6 +514,7 @@ DROP FUNCTION IF EXISTS enable_rls_if_not_enabled(text);
 
 COMMIT;
 
+-- Final success message
 DO $$
 BEGIN
     RAISE NOTICE 'RLS policies setup complete';
