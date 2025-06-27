@@ -80,7 +80,10 @@ DROP TYPE IF EXISTS workflow_step CASCADE;
 DROP TYPE IF EXISTS application_status CASCADE;
 DROP TYPE IF EXISTS investment_status CASCADE;
 
-RAISE NOTICE '✓ NUCLEAR CLEANUP COMPLETE';
+DO $$
+BEGIN
+    RAISE NOTICE '✓ NUCLEAR CLEANUP COMPLETE';
+END $$;
 
 -- =================================================================
 -- STEP 2: CREATE FOUNDATION - ENUMS AND CORE TABLES
@@ -135,7 +138,10 @@ CREATE TABLE IF NOT EXISTS simple_notifications (
     created_at timestamptz DEFAULT now()
 );
 
-RAISE NOTICE '✓ FOUNDATION TABLES CREATED';
+DO $$
+BEGIN
+    RAISE NOTICE '✓ FOUNDATION TABLES CREATED';
+END $$;
 
 -- =================================================================
 -- STEP 3: CREATE SIMPLE WORKFLOW FUNCTIONS
