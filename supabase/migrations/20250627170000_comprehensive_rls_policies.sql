@@ -31,9 +31,9 @@ BEGIN
         AND relrowsecurity = true
     ) THEN
         EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', table_name);
-        RAISE NOTICE 'Enabled RLS for table: %', table_name;
+        RAISE NOTICE 'Enabled RLS for table: ' || table_name;
     ELSE
-        RAISE NOTICE 'RLS already enabled for table: %', table_name;
+        RAISE NOTICE 'RLS already enabled for table: ' || table_name;
     END IF;
 END;
 $$;
