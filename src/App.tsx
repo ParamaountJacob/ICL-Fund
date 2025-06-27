@@ -4,6 +4,10 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import ForceProfileUpdateModal from './components/ForceProfileUpdateModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
+import { LoadingProvider } from './contexts/LoadingContext';
 import Home from './pages/Home';
 import About from './pages/About';
 import InvestorInfo from './pages/InvestorInfo';
@@ -22,7 +26,6 @@ import SubscriptionAgreement from './pages/onboarding-flow/SubscriptionAgreement
 import PromissoryNote from './pages/onboarding-flow/PromissoryNote';
 import WireDetails from './pages/onboarding-flow/WireDetails';
 import PlaidBanking from './pages/onboarding-flow/PlaidBanking';
-import { supabase, getUserProfile, debugDatabaseState, ensureUserProfileExists } from './lib/supabase';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -51,107 +54,81 @@ function ScrollToTop() {
   return null;
 }
 
+// AppContent component that uses AuthContext
+function AppContent() {
+  const { user, profile } = useAuth();
+  const [showForceProfileUpdate, setShowForceProfileUpdate] = useState(false);
+
+  // Check if profile needs completion
+  useEffect(() => {
+    if (user && profile !== null) {
+      // Profile is loaded
+      if (!profile || !profile.first_name || !profile.last_name) {
+        console.log('Profile missing or incomplete, showing modal');
+        setShowForceProfileUpdate(true);
+      } else {
+        console.log('Profile complete:', profile.first_name, profile.last_name);
+        setShowForceProfileUpdate(false);
+      }
+    }
+  }, [user, profile]);
+
+  return (
+    <div className="min-h-screen bg-background text-text-primary">
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/investor-info" element={<InvestorInfo />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/pitch-deck" element={<PitchDeck />} />
+        <Route path="/ppm" element={<ProtectedRoute><PPM /></ProtectedRoute>} />
+        <Route path="/ppm/edit" element={<ProtectedRoute><PPMEdit /></ProtectedRoute>} />
+        <Route path="/ppm/view" element={<ProtectedRoute><PPMView /></ProtectedRoute>} />
+        <Route path="/onboarding-flow/subscription-agreement" element={<ProtectedRoute><SubscriptionAgreement /></ProtectedRoute>} />
+        <Route path="/onboarding-flow/promissory-note" element={<ProtectedRoute><PromissoryNote /></ProtectedRoute>} />
+        <Route path="/onboarding-flow/wire-details" element={<ProtectedRoute><WireDetails /></ProtectedRoute>} />
+        <Route path="/onboarding-flow/plaid-banking" element={<ProtectedRoute><PlaidBanking /></ProtectedRoute>} />
+        <Route path="/promissory-note-flow" element={<ProtectedRoute><PromissoryNoteFlow /></ProtectedRoute>} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+      </Routes>
+      <Footer />
+
+      <ForceProfileUpdateModal
+        isOpen={showForceProfileUpdate}
+        onClose={() => {
+          console.log('Modal closed - profile should be updated');
+          setShowForceProfileUpdate(false);
+        }}
+        firstName={profile?.first_name || ''}
+        lastName={profile?.last_name || ''}
+      />
+    </div>
+  );
+}
+
 function App() {
   useEffect(() => {
     document.title = 'Inner Circle Lending | Private Capital';
   }, []);
 
-  const [user, setUser] = useState<any>(null);
-  const [showForceProfileUpdate, setShowForceProfileUpdate] = useState(false);
-  const [userFirstName, setUserFirstName] = useState('');
-  const [userLastName, setUserLastName] = useState('');
-
-  const checkUserProfile = async () => {
-    console.log('=== CHECKING USER PROFILE START ===');
-    const { data: { user } } = await supabase.auth.getUser();
-    console.log('Current user from auth:', user);
-    setUser(user);
-
-    if (user) {
-      console.log('Checking profile for user:', user.id);
-
-      try {
-        const profile = await getUserProfile();
-        console.log('Profile retrieved:', profile);
-
-        if (!profile || !profile.first_name || !profile.last_name) {
-          console.log('Profile missing or incomplete, showing modal');
-          setUserFirstName(profile?.first_name || '');
-          setUserLastName(profile?.last_name || '');
-          setShowForceProfileUpdate(true);
-        } else {
-          console.log('Profile complete:', profile.first_name, profile.last_name);
-          setShowForceProfileUpdate(false);
-        }
-      } catch (error) {
-        console.error('Error checking profile:', error);
-        // On error, show modal to collect name
-        setUserFirstName('');
-        setUserLastName('');
-        setShowForceProfileUpdate(true);
-      }
-    }
-    console.log('=== CHECKING USER PROFILE END ===');
-  };
-
-  useEffect(() => {
-    checkUserProfile();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        checkUserProfile();
-      } else {
-        setShowForceProfileUpdate(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <div className="min-h-screen bg-background text-text-primary">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/investor-info" element={<InvestorInfo />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/pitch-deck" element={<PitchDeck />} />
-          <Route path="/ppm" element={<ProtectedRoute><PPM /></ProtectedRoute>} />
-          <Route path="/ppm/edit" element={<ProtectedRoute><PPMEdit /></ProtectedRoute>} />
-          <Route path="/ppm/view" element={<ProtectedRoute><PPMView /></ProtectedRoute>} />
-          <Route path="/onboarding-flow/subscription-agreement" element={<ProtectedRoute><SubscriptionAgreement /></ProtectedRoute>} />
-          <Route path="/onboarding-flow/promissory-note" element={<ProtectedRoute><PromissoryNote /></ProtectedRoute>} />
-          <Route path="/onboarding-flow/wire-details" element={<ProtectedRoute><WireDetails /></ProtectedRoute>} />
-          <Route path="/onboarding-flow/plaid-banking" element={<ProtectedRoute><PlaidBanking /></ProtectedRoute>} />
-          <Route path="/promissory-note-flow" element={<ProtectedRoute><PromissoryNoteFlow /></ProtectedRoute>} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-        </Routes>
-        <Footer />
-
-        <ForceProfileUpdateModal
-          isOpen={showForceProfileUpdate}
-          onClose={() => {
-            console.log('Modal closed - re-checking profile');
-            setShowForceProfileUpdate(false);
-            // Re-check profile after modal closes to see if it was saved
-            if (user) {
-              setTimeout(() => checkUserProfile(), 500);
-            }
-          }}
-          firstName={userFirstName}
-          lastName={userLastName}
-        />
-      </div>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ScrollToTop />
+        <LoadingProvider>
+          <NotificationProvider>
+            <AuthProvider>
+              <AppContent />
+            </AuthProvider>
+          </NotificationProvider>
+        </LoadingProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

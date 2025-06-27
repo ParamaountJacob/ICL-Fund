@@ -139,6 +139,121 @@ export type InvestmentStatus = 'pending' | 'pending_approval' | 'pending_activat
   'investor_onboarding_complete' | 'active' | 'completed' | 'cancelled' | 'promissory_note_pending' |
   'promissory_note_sent' | 'funds_pending' | 'bank_details_pending';
 
+// ===============================================
+// UNIFIED WORKFLOW STATUS MIGRATION FUNCTIONS
+// ===============================================
+
+// Import the new unified type
+import type { UnifiedWorkflowStatus, WorkflowStep } from '../types';
+
+// Migration function: Legacy InvestmentStatus -> Unified Status
+export const mapLegacyToUnified = (status: InvestmentStatus): UnifiedWorkflowStatus => {
+  const mapping: Record<InvestmentStatus, UnifiedWorkflowStatus> = {
+    'pending': 'subscription_pending',
+    'pending_approval': 'subscription_admin_review',
+    'pending_activation': 'subscription_admin_review',
+    'promissory_note_pending': 'promissory_note_pending',
+    'promissory_note_sent': 'promissory_note_pending',
+    'bank_details_pending': 'promissory_note_admin_review',
+    'funds_pending': 'funds_pending',
+    'plaid_pending': 'plaid_pending',
+    'investor_onboarding_complete': 'plaid_admin_complete',
+    'active': 'active',
+    'completed': 'completed',
+    'cancelled': 'cancelled'
+  };
+  return mapping[status] || 'subscription_pending';
+};
+
+// Migration function: Simple Workflow WorkflowStep -> Unified Status  
+export const mapWorkflowToUnified = (step: WorkflowStep): UnifiedWorkflowStatus => {
+  const mapping: Record<WorkflowStep, UnifiedWorkflowStatus> = {
+    'subscription_pending': 'subscription_pending',
+    'admin_review': 'subscription_admin_review',
+    'promissory_pending': 'promissory_note_pending',
+    'funds_pending': 'funds_pending',
+    'admin_confirm': 'funds_admin_confirm',
+    'plaid_pending': 'plaid_pending',
+    'admin_complete': 'plaid_admin_complete',
+    'active': 'active'
+  };
+  return mapping[step] || 'subscription_pending';
+};
+
+// Reverse mapping: Unified Status -> Legacy InvestmentStatus (for database compatibility)
+export const mapUnifiedToLegacy = (status: UnifiedWorkflowStatus): InvestmentStatus => {
+  const mapping: Record<UnifiedWorkflowStatus, InvestmentStatus> = {
+    'subscription_pending': 'pending',
+    'subscription_admin_review': 'pending_approval',
+    'promissory_note_pending': 'promissory_note_pending',
+    'promissory_note_admin_review': 'bank_details_pending',
+    'funds_pending': 'funds_pending',
+    'funds_admin_confirm': 'funds_pending',
+    'plaid_pending': 'plaid_pending',
+    'plaid_admin_complete': 'investor_onboarding_complete',
+    'active': 'active',
+    'completed': 'completed',
+    'cancelled': 'cancelled'
+  };
+  return mapping[status] || 'pending';
+};
+
+// Helper function to get user-friendly status text
+export const getUnifiedStatusText = (status: UnifiedWorkflowStatus): string => {
+  const statusText: Record<UnifiedWorkflowStatus, string> = {
+    'subscription_pending': 'Awaiting Subscription Agreement Signature',
+    'subscription_admin_review': 'Admin Reviewing Subscription Agreement',
+    'promissory_note_pending': 'Awaiting Promissory Note Signature',
+    'promissory_note_admin_review': 'Admin Processing Promissory Note',
+    'funds_pending': 'Awaiting Wire Transfer',
+    'funds_admin_confirm': 'Admin Confirming Fund Receipt',
+    'plaid_pending': 'Awaiting Bank Connection',
+    'plaid_admin_complete': 'Admin Completing Final Setup',
+    'active': 'Investment Active',
+    'completed': 'Investment Completed',
+    'cancelled': 'Investment Cancelled'
+  };
+  return statusText[status] || 'Unknown Status';
+};
+
+// Helper function to determine if user action is required
+export const isUserActionRequired = (status: UnifiedWorkflowStatus): boolean => {
+  return [
+    'subscription_pending',
+    'promissory_note_pending',
+    'funds_pending',
+    'plaid_pending'
+  ].includes(status);
+};
+
+// Helper function to determine if admin action is required  
+export const isAdminActionRequired = (status: UnifiedWorkflowStatus): boolean => {
+  return [
+    'subscription_admin_review',
+    'promissory_note_admin_review',
+    'funds_admin_confirm',
+    'plaid_admin_complete'
+  ].includes(status);
+};
+
+// Get progress percentage for unified status
+export const getUnifiedProgressPercentage = (status: UnifiedWorkflowStatus): number => {
+  const progressMap: Record<UnifiedWorkflowStatus, number> = {
+    'subscription_pending': 10,
+    'subscription_admin_review': 20,
+    'promissory_note_pending': 30,
+    'promissory_note_admin_review': 40,
+    'funds_pending': 50,
+    'funds_admin_confirm': 70,
+    'plaid_pending': 80,
+    'plaid_admin_complete': 90,
+    'active': 100,
+    'completed': 100,
+    'cancelled': 0
+  };
+  return progressMap[status] || 0;
+};
+
 export interface DocumentRequest {
   id: string;
   user_id: string;
@@ -1469,231 +1584,148 @@ export const create_investment_from_application = async (applicationId: string):
   }
 };
 
-export const test_database_functions = async (): Promise<{ [key: string]: boolean }> => {
-  const functions = [
-    'get_user_investments_with_applications',
-    'get_admin_investments_with_users',
-    'get_all_investments_with_applications',
-    'update_onboarding_step',
-    'create_investment_from_application'
-  ];
+// ===============================================
+// UNIFIED STATUS UPDATE FUNCTIONS
+// ===============================================
 
-  const results: { [key: string]: boolean } = {};
+// New unified status update function
+export const updateUnifiedInvestmentStatus = async (
+  investmentId: string,
+  newStatus: UnifiedWorkflowStatus
+): Promise<void> => {
+  try {
+    // Convert unified status to legacy for database storage
+    const legacyStatus = mapUnifiedToLegacy(newStatus);
 
-  // Basic function to test if a function exists
-  const testFunction = async (name: string): Promise<boolean> => {
-    try {
-      // This query checks if the function exists in the database
-      const { data, error } = await supabase.rpc('pg_query', {
-        query: `SELECT COUNT(*) FROM pg_proc 
-                JOIN pg_namespace ON pg_namespace.oid = pg_proc.pronamespace
-                WHERE pg_namespace.nspname = 'public'
-                AND proname = '${name}';`
-      });
+    // Update the investment with legacy status (for database compatibility)
+    const { error } = await supabase
+      .from('investments')
+      .update({
+        status: legacyStatus,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', investmentId);
 
-      if (error) {
-        console.error(`Error checking function ${name}:`, error);
-        return false;
+    if (error) throw error;
+
+    // Get the investment to check if it has an application_id
+    const { data: investment } = await supabase
+      .from('investments')
+      .select('application_id, user_id')
+      .eq('id', investmentId)
+      .single();
+
+    // Update both investments and simple_applications tables
+    if (investment?.application_id) {
+      // Update investment_applications with legacy status mapping
+      let appStatus;
+      switch (newStatus) {
+        case 'active':
+        case 'completed':
+          appStatus = 'active';
+          break;
+        case 'cancelled':
+          appStatus = 'rejected';
+          break;
+        case 'promissory_note_pending':
+        case 'promissory_note_admin_review':
+          appStatus = 'promissory_note_pending';
+          break;
+        case 'funds_pending':
+        case 'funds_admin_confirm':
+          appStatus = 'funds_pending';
+          break;
+        default:
+          appStatus = 'pending_review';
       }
 
-      return data?.[0]?.count > 0;
-    } catch (error) {
-      console.error(`Error testing function ${name}:`, error);
-      return false;
-    }
-  };
+      const { error: appError } = await supabase
+        .from('investment_applications')
+        .update({ status: appStatus })
+        .eq('id', investment.application_id);
 
-  // Test each function
-  for (const func of functions) {
-    results[func] = await testFunction(func);
-  }
+      if (appError) {
+        console.error('Error updating application status:', appError);
+      }
 
-  console.log('Database function test results:', results);
-  return results;
-};
+      // Also update simple_applications if exists
+      // Convert unified status to workflow_step format for simple_applications
+      let workflowStep;
+      switch (newStatus) {
+        case 'subscription_pending':
+          workflowStep = 'subscription_pending';
+          break;
+        case 'subscription_admin_review':
+          workflowStep = 'admin_signature_pending';
+          break;
+        case 'promissory_note_pending':
+          workflowStep = 'promissory_note_pending';
+          break;
+        case 'promissory_note_admin_review':
+          workflowStep = 'admin_signature_pending';
+          break;
+        case 'funds_pending':
+          workflowStep = 'wire_transfer_pending';
+          break;
+        case 'funds_admin_confirm':
+          workflowStep = 'admin_final_setup';
+          break;
+        case 'plaid_pending':
+          workflowStep = 'plaid_connection_pending';
+          break;
+        case 'plaid_admin_complete':
+          workflowStep = 'admin_final_setup';
+          break;
+        case 'active':
+        case 'completed':
+          workflowStep = 'completed';
+          break;
+        default:
+          workflowStep = 'subscription_pending';
+      }
 
-// Function to show an error message for database function errors
-export const showDatabaseFunctionError = () => {
-  // Only show in development
-  if (!import.meta.env.DEV) return;
+      const { error: simpleAppError } = await supabase
+        .from('simple_applications')
+        .update({
+          workflow_step: workflowStep,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', investment.application_id);
 
-  // Create a fixed position notification
-  const notification = document.createElement('div');
-  notification.style.position = 'fixed';
-  notification.style.bottom = '20px';
-  notification.style.right = '20px';
-  notification.style.backgroundColor = '#f44336';
-  notification.style.color = 'white';
-  notification.style.padding = '15px';
-  notification.style.borderRadius = '5px';
-  notification.style.zIndex = '9999';
-  notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-
-  // Create a close button
-  const closeButton = document.createElement('span');
-  closeButton.innerHTML = '&times;';
-  closeButton.style.marginLeft = '15px';
-  closeButton.style.float = 'right';
-  closeButton.style.fontWeight = 'bold';
-  closeButton.style.fontSize = '22px';
-  closeButton.style.cursor = 'pointer';
-  closeButton.onclick = () => notification.remove();
-
-  notification.appendChild(closeButton);
-
-  // Add title
-  const title = document.createElement('h4');
-  title.textContent = 'Database Function Error';
-  title.style.margin = '0 0 10px 0';
-  notification.appendChild(title);
-
-  // Add message
-  const message = document.createElement('p');
-  message.innerHTML = 'Critical database functions are missing. Please run:<br><code>node fix_db_functions.js</code>';
-  message.style.margin = '0';
-  notification.appendChild(message);
-
-  // Add to DOM
-  document.body.appendChild(notification);
-
-  // Auto remove after 10 seconds
-  setTimeout(() => {
-    if (document.body.contains(notification)) {
-      notification.remove();
-    }
-  }, 10000);
-};
-
-// Diagnostic function to check database state
-export const debugDatabaseState = async () => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.log('No authenticated user');
-      return;
+      if (simpleAppError) {
+        console.error('Error updating simple_applications workflow_step:', simpleAppError);
+      }
     }
 
-    console.log('=== DATABASE DIAGNOSTIC START ===');
-    console.log('Current user ID:', user.id);
-
-    // Check if user_profiles table exists and what columns it has
-    const { data: tableInfo, error: tableError } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .limit(0);
-
-    console.log('Table query result:', { data: tableInfo, error: tableError });
-
-    // Try to get the specific user profile by ID
-    const { data: profileById, error: profileError } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', user.id);
-
-    console.log('Profile by ID query:', { data: profileById, error: profileError });
-
-    // Also try by user_id to see if that column exists
-    const { data: profileByUserId, error: userIdError } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('user_id', user.id);
-
-    console.log('Profile by user_id query:', { data: profileByUserId, error: userIdError });
-
-    // Get all profiles to see the structure
-    const { data: allProfiles, error: allError } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .limit(5);
-
-    console.log('All profiles sample:', { data: allProfiles, error: allError });
-
-    console.log('=== DATABASE DIAGNOSTIC END ===');
+    console.log(`Updated investment ${investmentId} to unified status: ${newStatus} (legacy: ${legacyStatus})`);
   } catch (error) {
-    console.error('Diagnostic error:', error);
+    console.error('Error updating unified investment status:', error);
+    throw error;
   }
 };
 
-// Emergency function to ensure the user_profiles table exists
-export const ensureUserProfilesTable = async () => {
-  try {
-    console.log('=== ENSURING USER_PROFILES TABLE EXISTS ===');
+// Wrapper function that accepts either legacy or unified status
+export const updateInvestmentStatusUnified = async (
+  investmentId: string,
+  status: InvestmentStatus | UnifiedWorkflowStatus
+): Promise<void> => {
+  // Check if it's already a unified status
+  const unifiedStatuses: UnifiedWorkflowStatus[] = [
+    'subscription_pending', 'subscription_admin_review',
+    'promissory_note_pending', 'promissory_note_admin_review',
+    'funds_pending', 'funds_admin_confirm',
+    'plaid_pending', 'plaid_admin_complete',
+    'active', 'completed', 'cancelled'
+  ];
 
-    // Try to create the table if it doesn't exist using raw SQL
-    const { data, error } = await supabase.rpc('sql', {
-      query: `
-        CREATE TABLE IF NOT EXISTS user_profiles (
-          id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-          first_name text,
-          last_name text,
-          email text,
-          phone text,
-          address text,
-          ira_accounts jsonb,
-          investment_goals text,
-          risk_tolerance text,
-          net_worth text,
-          annual_income text,
-          role text DEFAULT 'user',
-          verification_status text DEFAULT 'pending',
-          created_at timestamptz DEFAULT now(),
-          updated_at timestamptz DEFAULT now()
-        );
-        
-        ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
-        
-        DROP POLICY IF EXISTS user_profiles_policy ON user_profiles;
-        CREATE POLICY user_profiles_policy ON user_profiles FOR ALL USING (id = auth.uid());
-        
-        GRANT ALL ON user_profiles TO authenticated;
-      `
-    });
-
-    console.log('Table creation result:', { data, error });
-    return true;
-  } catch (error) {
-    console.error('Error ensuring table exists:', error);
-    return false;
+  if (unifiedStatuses.includes(status as UnifiedWorkflowStatus)) {
+    // It's already unified, use it directly
+    await updateUnifiedInvestmentStatus(investmentId, status as UnifiedWorkflowStatus);
+  } else {
+    // It's legacy, convert it first
+    const unifiedStatus = mapLegacyToUnified(status as InvestmentStatus);
+    await updateUnifiedInvestmentStatus(investmentId, unifiedStatus);
   }
 };
 
-// Emergency function to test if user_profiles table works and create a profile manually if needed
-export const ensureUserProfileExists = async (): Promise<boolean> => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
-
-    console.log('=== ENSURING USER PROFILE EXISTS ===');
-
-    // SKIP the table test for now since RLS is blocking it
-    // Instead, try to create the profile directly using the database function
-    console.log('Attempting to create profile using database function...');
-
-    const { data: functionResult, error: functionError } = await supabase.rpc('safe_upsert_user_profile', {
-      p_user_id: user.id,
-      p_first_name: null,
-      p_last_name: null,
-      p_phone: null,
-      p_address: null,
-      p_ira_accounts: null,
-      p_investment_goals: null,
-      p_risk_tolerance: null,
-      p_net_worth: null,
-      p_annual_income: null
-    });
-
-    console.log('Database function result for profile creation:', { data: functionResult, error: functionError });
-
-    if (functionResult === true) {
-      console.log('Profile created successfully using database function');
-      return true;
-    }
-
-    console.log('Database function did not create profile, but continuing...');
-    return true; // Return true anyway to continue with the flow
-
-  } catch (error) {
-    console.error('Error ensuring profile exists:', error);
-    return true; // Return true to continue even if this fails
-  }
-};
+// ...existing code...

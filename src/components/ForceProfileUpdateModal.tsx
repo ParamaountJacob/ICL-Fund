@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Save } from 'lucide-react';
-import { updateUserProfile, getUserProfile, supabase } from '../lib/supabase';
+import { updateUserProfile } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+import { useNotifications } from '../contexts/NotificationContext';
+import { useFormValidation } from '../hooks/useFormValidation';
 
 interface ForceProfileUpdateModalProps {
   isOpen: boolean;
@@ -16,60 +19,65 @@ const ForceProfileUpdateModal: React.FC<ForceProfileUpdateModalProps> = ({
   firstName = '',
   lastName = ''
 }) => {
-  const [formData, setFormData] = useState({
-    first_name: firstName,
-    last_name: lastName
-  });
+  const { refreshProfile } = useAuth();
+  const { success, error: showError } = useNotifications();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  // Form validation setup
+  const {
+    values,
+    errors,
+    setValue,
+    setFieldTouched,
+    validateAllFields,
+    resetForm
+  } = useFormValidation(
+    {
+      first_name: firstName,
+      last_name: lastName
+    },
+    {
+      first_name: { required: true, minLength: 2 },
+      last_name: { required: true, minLength: 2 }
+    }
+  );
+
+  // Update form when props change
+  useEffect(() => {
+    setValue('first_name', firstName);
+    setValue('last_name', lastName);
+  }, [firstName, lastName, setValue]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.first_name || !formData.last_name) {
-      setError('Both first name and last name are required');
+    if (!validateAllFields()) {
       return;
     }
 
     setLoading(true);
-    setError(null);
 
     try {
       console.log('=== FORCE PROFILE UPDATE START ===');
-      console.log('Saving profile with data:', formData);
+      console.log('Saving profile with data:', values);
 
-      const result = await updateUserProfile({
-        first_name: formData.first_name,
-        last_name: formData.last_name
+      await updateUserProfile({
+        first_name: values.first_name,
+        last_name: values.last_name
       });
 
-      console.log('Profile update result:', result);
+      console.log('Profile update successful');
 
-      if (result && result.first_name && result.last_name) {
-        console.log('Profile save successful - closing modal');
-        onClose();
-      } else {
-        // Check if the profile was actually saved by re-fetching
-        const savedProfile = await getUserProfile();
-        console.log('Re-fetched profile after save:', savedProfile);
+      // Refresh the profile in auth context
+      await refreshProfile();
 
-        if (savedProfile && savedProfile.first_name && savedProfile.last_name) {
-          console.log('Profile was saved successfully - closing modal');
-          onClose();
-        } else {
-          setError('Failed to save profile. Please try again.');
-        }
-      }
+      success('Profile Updated', 'Your profile has been saved successfully.');
+      onClose();
 
       console.log('=== FORCE PROFILE UPDATE END ===');
     } catch (err) {
       console.error('Error updating profile:', err);
-      setError('An error occurred while saving your profile. Please try again.');
+      showError('Save Failed', 'An error occurred while saving your profile. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -108,12 +116,17 @@ const ForceProfileUpdateModal: React.FC<ForceProfileUpdateModalProps> = ({
                 <input
                   type="text"
                   name="first_name"
-                  value={formData.first_name}
-                  onChange={handleChange}
+                  value={values.first_name}
+                  onChange={(e) => setValue('first_name', e.target.value)}
+                  onBlur={() => setFieldTouched('first_name')}
                   required
-                  className="w-full bg-background border-0 border-b border-graphite px-0 py-2 focus:ring-0 focus:border-gold text-text-primary"
+                  className={`w-full bg-background border-0 border-b px-0 py-2 focus:ring-0 text-text-primary ${errors.first_name ? 'border-red-500 focus:border-red-500' : 'border-graphite focus:border-gold'
+                    }`}
                   placeholder="Your first name"
                 />
+                {errors.first_name && (
+                  <p className="text-red-500 text-xs mt-1">{errors.first_name}</p>
+                )}
               </div>
 
               <div className="space-y-4">
@@ -123,22 +136,25 @@ const ForceProfileUpdateModal: React.FC<ForceProfileUpdateModalProps> = ({
                 <input
                   type="text"
                   name="last_name"
-                  value={formData.last_name}
-                  onChange={handleChange}
+                  value={values.last_name}
+                  onChange={(e) => setValue('last_name', e.target.value)}
+                  onBlur={() => setFieldTouched('last_name')}
                   required
-                  className="w-full bg-background border-0 border-b border-graphite px-0 py-2 focus:ring-0 focus:border-gold text-text-primary"
+                  className={`w-full bg-background border-0 border-b px-0 py-2 focus:ring-0 text-text-primary ${errors.last_name ? 'border-red-500 focus:border-red-500' : 'border-graphite focus:border-gold'
+                    }`}
                   placeholder="Your last name"
                 />
+                {errors.last_name && (
+                  <p className="text-red-500 text-xs mt-1">{errors.last_name}</p>
+                )}
               </div>
-
-              {error && (
-                <p className="text-red-500 text-sm">{error}</p>
-              )}
 
               <button
                 type="submit"
-                disabled={loading || !formData.first_name || !formData.last_name}
-                className={`button w-full flex items-center justify-center gap-2 ${loading || !formData.first_name || !formData.last_name ? 'opacity-50 cursor-not-allowed' : ''
+                disabled={loading || Object.keys(errors).length > 0 || !values.first_name || !values.last_name}
+                className={`button w-full flex items-center justify-center gap-2 ${loading || Object.keys(errors).length > 0 || !values.first_name || !values.last_name
+                    ? 'opacity-50 cursor-not-allowed'
+                    : ''
                   }`}
               >
                 <Save className="w-4 h-4" />
