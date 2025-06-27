@@ -581,10 +581,17 @@ const Contact: React.FC = () => {
                                     onClick={() => day.isSelectable && setSelectedDate(day.date)}
                                     disabled={!day.isSelectable}
                                     className={`w-full h-full rounded-lg text-sm transition-all duration-200 ${day.isSelectable
+<<<<<<< HEAD
+                                      ? selectedDate === day.date
+                                        ? 'bg-gold text-background font-bold shadow-lg'
+                                        : 'bg-gold/10 border border-gold/30 text-gold font-semibold hover:bg-gold/20 hover:border-gold/50'
+                                      : 'bg-transparent text-text-secondary/60 hover:bg-surface/50 cursor-default'
+=======
                                         ? selectedDate === day.date
                                           ? 'bg-gold text-background font-bold shadow-lg ring-2 ring-gold/50'
                                           : 'bg-gold/10 border-2 border-gold/30 text-gold font-semibold hover:bg-gold/20 hover:border-gold/50 hover:shadow-md'
                                         : 'bg-graphite/20 text-text-secondary/40 cursor-not-allowed opacity-30'
+>>>>>>> c5daf87a778a4548022ecd4abf170dbed68f94b5
                                       }`}
                                   >
                                     {day.display}
@@ -644,25 +651,23 @@ const Contact: React.FC = () => {
                   </div>
                 )}
 
-                {/* Message */}
-                <div className="space-y-3">
-                  <label className="text-sm font-medium text-text-secondary uppercase tracking-wide">
-                    {selectedMethod === 'email' ? 'Your Message *' : 'Notes (Optional)'}
-                  </label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    required={selectedMethod === 'email'}
-                    rows={4}
-                    className="w-full bg-surface border border-graphite rounded-lg px-4 py-4 text-lg focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary resize-none transition-all duration-200"
-                    placeholder={
-                      selectedMethod === 'email'
-                        ? "Tell us about your investment goals and how we can help..."
-                        : "Any specific topics you'd like to discuss..."
-                    }
-                  />
-                </div>
+                {/* Message - Only for email contacts */}
+                {selectedMethod === 'email' && (
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium text-text-secondary uppercase tracking-wide">
+                      Your Message *
+                    </label>
+                    <textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required={selectedMethod === 'email'}
+                      rows={4}
+                      className="w-full bg-surface border border-graphite rounded-lg px-4 py-4 text-lg focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary resize-none transition-all duration-200"
+                      placeholder="Tell us about your investment goals and how we can help..."
+                    />
+                  </div>
+                )}
 
                 {/* Submit Button */}
                 <button
