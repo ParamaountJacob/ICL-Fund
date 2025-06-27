@@ -298,7 +298,7 @@ export const getUserProfile = async (): Promise<UserProfile | null> => {
   const { data } = await supabase
     .from('user_profiles')
     .select('*')
-    .eq('id', user.id)
+    .eq('user_id', user.id)
     .maybeSingle();
 
   return data;
@@ -308,7 +308,7 @@ export const getUserProfileById = async (userId: string): Promise<UserProfile | 
   const { data } = await supabase
     .from('user_profiles')
     .select('*')
-    .eq('id', userId)
+    .eq('user_id', userId)
     .maybeSingle();
 
   return data;
