@@ -156,6 +156,7 @@ END $$;
 -- =================================================================
 
 -- 1. Get user applications (REPLACES get_user_investments_with_applications)
+-- Version with parameters
 CREATE OR REPLACE FUNCTION get_user_applications(p_user_id uuid)
 RETURNS TABLE (
     id uuid,
@@ -193,6 +194,48 @@ BEGIN
         sa.updated_at
     FROM simple_applications sa
     WHERE sa.user_id = p_user_id
+    ORDER BY sa.created_at DESC;
+END;
+$$;
+
+-- Version without parameters (uses auth.uid())
+CREATE OR REPLACE FUNCTION get_user_applications()
+RETURNS TABLE (
+    id uuid,
+    amount numeric,
+    expected_return_rate numeric,
+    investment_term_months integer,
+    workflow_step text,
+    subscription_agreement_signed_by_user_at timestamptz,
+    subscription_agreement_signed_by_admin_at timestamptz,
+    promissory_note_id uuid,
+    promissory_note_signed_at timestamptz,
+    wire_transfer_confirmed_at timestamptz,
+    plaid_account_id text,
+    created_at timestamptz,
+    updated_at timestamptz
+) 
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        sa.id,
+        sa.amount,
+        sa.expected_return_rate,
+        sa.investment_term_months,
+        sa.workflow_step::text,
+        sa.subscription_agreement_signed_by_user_at,
+        sa.subscription_agreement_signed_by_admin_at,
+        sa.promissory_note_id,
+        sa.promissory_note_signed_at,
+        sa.wire_transfer_confirmed_at,
+        sa.plaid_account_id,
+        sa.created_at,
+        sa.updated_at
+    FROM simple_applications sa
+    WHERE sa.user_id = auth.uid()
     ORDER BY sa.created_at DESC;
 END;
 $$;
@@ -839,6 +882,7 @@ $$;
 
 -- Grant permissions on workflow functions
 GRANT EXECUTE ON FUNCTION get_user_applications(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION get_user_applications() TO authenticated;
 GRANT EXECUTE ON FUNCTION submit_subscription_agreement(uuid, numeric, numeric, integer) TO authenticated;
 GRANT EXECUTE ON FUNCTION admin_sign_subscription_agreement(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION admin_create_promissory_note(uuid, uuid) TO authenticated;
