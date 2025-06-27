@@ -38,13 +38,13 @@ function ScrollToTop() {
         window.pageYOffset = 0;
       }
     };
-    
+
     // Execute immediately
     scrollToTop();
-    
+
     // Also execute after a small delay to ensure it works with dynamic content
     const timeoutId = setTimeout(scrollToTop, 10);
-    
+
     return () => clearTimeout(timeoutId);
   }, [pathname]);
 
@@ -61,30 +61,34 @@ function App() {
   const [userFirstName, setUserFirstName] = useState('');
   const [userLastName, setUserLastName] = useState('');
 
-  useEffect(() => {
-    const checkUserProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      
-      if (user) {
-        const profile = await getUserProfile();
-        
-        // Check if first_name or last_name is missing
-        if (!profile?.first_name || !profile?.last_name) {
-          setUserFirstName(profile?.first_name || '');
-          setUserLastName(profile?.last_name || '');
-          setShowForceProfileUpdate(true);
-        } else {
-          setShowForceProfileUpdate(false);
-        }
-      }
-    };
+  const checkUserProfile = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
 
+    if (user) {
+      console.log('Checking profile for user:', user.id);
+      const profile = await getUserProfile();
+      console.log('Profile data:', profile);
+
+      // Check if first_name or last_name is missing
+      if (!profile?.first_name || !profile?.last_name) {
+        console.log('Profile incomplete, showing modal. First name:', profile?.first_name, 'Last name:', profile?.last_name);
+        setUserFirstName(profile?.first_name || '');
+        setUserLastName(profile?.last_name || '');
+        setShowForceProfileUpdate(true);
+      } else {
+        console.log('Profile complete!');
+        setShowForceProfileUpdate(false);
+      }
+    }
+  };
+
+  useEffect(() => {
     checkUserProfile();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
         checkUserProfile();
       } else {
@@ -121,10 +125,14 @@ function App() {
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         </Routes>
         <Footer />
-        
-        <ForceProfileUpdateModal 
-          isOpen={showForceProfileUpdate} 
-          onClose={() => setShowForceProfileUpdate(false)}
+
+        <ForceProfileUpdateModal
+          isOpen={showForceProfileUpdate}
+          onClose={() => {
+            setShowForceProfileUpdate(false);
+            // Re-check profile after modal closes to ensure it's complete
+            checkUserProfile();
+          }}
           firstName={userFirstName}
           lastName={userLastName}
         />

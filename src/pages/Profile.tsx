@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { supabase, getUserProfile } from '../lib/supabase';
-import { 
-  FileText, 
-  FileCheck, 
-  Wallet, 
-  User, 
-  Mail, 
-  Calendar, 
-  Phone, 
-  Building, 
-  Edit, 
-  Save, 
-  Lock, 
-  Eye, 
+import {
+  FileText,
+  FileCheck,
+  Wallet,
+  User,
+  Mail,
+  Calendar,
+  Phone,
+  Building,
+  Edit,
+  Save,
+  Lock,
+  Eye,
   EyeOff,
   Shield,
   Settings,
@@ -82,9 +82,9 @@ const Profile: React.FC = () => {
         setShowAuthModal(true);
       }
     };
-    
+
     checkUser();
-    
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user);
@@ -96,7 +96,7 @@ const Profile: React.FC = () => {
         setShowAuthModal(true);
       }
     });
-    
+
     return () => subscription.unsubscribe();
   }, []);
 
@@ -105,7 +105,7 @@ const Profile: React.FC = () => {
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .maybeSingle();
 
       if (error) {
@@ -146,7 +146,7 @@ const Profile: React.FC = () => {
 
     setLoading(true);
     try {
-      const upsertData = profile.id 
+      const upsertData = profile.id
         ? { id: profile.id, user_id: user.id, ...profile, updated_at: new Date().toISOString() }
         : { user_id: user.id, ...profile, updated_at: new Date().toISOString() };
 
@@ -155,7 +155,7 @@ const Profile: React.FC = () => {
         .upsert(upsertData, { onConflict: 'user_id' });
 
       if (error) throw error;
-      
+
       setEditingPersonal(false);
       setShowSuccessModal(true);
     } catch (error) {
@@ -285,9 +285,9 @@ const Profile: React.FC = () => {
         <section className="py-24 md:py-32">
           <div className="section">
             <div className="max-w-md mx-auto">
-              <AuthModal 
-                isOpen={true} 
-                onClose={() => window.location.href = '/'} 
+              <AuthModal
+                isOpen={true}
+                onClose={() => window.location.href = '/'}
                 onSuccess={() => setShowAuthModal(false)}
                 onSignUpSuccess={() => {
                   setShowAuthModal(false);
@@ -345,44 +345,40 @@ const Profile: React.FC = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
                   <button
                     onClick={() => setActiveTab('overview')}
-                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${
-                      activeTab === 'overview'
+                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'overview'
                         ? 'bg-gold text-background'
                         : 'text-text-secondary hover:text-text-primary'
-                    }`}
+                      }`}
                   >
                     <Settings className="w-4 h-4 inline mr-1 md:mr-2" />
                     <span className="hidden sm:inline">Overview</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('personal')}
-                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${
-                      activeTab === 'personal'
+                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'personal'
                         ? 'bg-gold text-background'
                         : 'text-text-secondary hover:text-text-primary'
-                    }`}
+                      }`}
                   >
                     <User className="w-4 h-4 inline mr-1 md:mr-2" />
                     <span className="hidden sm:inline">Personal</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('security')}
-                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${
-                      activeTab === 'security'
+                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'security'
                         ? 'bg-gold text-background'
                         : 'text-text-secondary hover:text-text-primary'
-                    }`}
+                      }`}
                   >
                     <Shield className="w-4 h-4 inline mr-1 md:mr-2" />
                     <span className="hidden sm:inline">Security</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('documents')}
-                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${
-                      activeTab === 'documents'
+                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'documents'
                         ? 'bg-gold text-background'
                         : 'text-text-secondary hover:text-text-primary'
-                    }`}
+                      }`}
                   >
                     <FileText className="w-4 h-4 inline mr-1 md:mr-2" />
                     <span className="hidden sm:inline">Documents</span>
@@ -525,7 +521,7 @@ const Profile: React.FC = () => {
                   {/* Contact Information */}
                   <div className="space-y-6">
                     <h3 className="text-lg font-semibold text-gold mb-4">Contact Information</h3>
-                    
+
                     <div className="space-y-2">
                       <label className="block text-sm uppercase tracking-wide text-text-secondary">
                         <User className="w-4 h-4 inline mr-2" />
@@ -622,7 +618,7 @@ const Profile: React.FC = () => {
                   {/* Investment Information */}
                   <div className="space-y-6">
                     <h3 className="text-lg font-semibold text-gold mb-4">Investment Profile</h3>
-                    
+
                     <div className="space-y-2">
                       <label className="block text-sm uppercase tracking-wide text-text-secondary">
                         IRA/401(k) Account Names

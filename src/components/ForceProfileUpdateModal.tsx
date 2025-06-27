@@ -30,7 +30,7 @@ const ForceProfileUpdateModal: React.FC<ForceProfileUpdateModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.first_name || !formData.last_name) {
       setError('Both first name and last name are required');
       return;
@@ -40,10 +40,16 @@ const ForceProfileUpdateModal: React.FC<ForceProfileUpdateModalProps> = ({
     setError(null);
 
     try {
-      await updateUserProfile({
+      console.log('Saving profile with data:', formData);
+      const result = await updateUserProfile({
         first_name: formData.first_name,
         last_name: formData.last_name
       });
+      console.log('Profile update result:', result);
+
+      // Add a small delay to ensure database transaction completes
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       onClose();
     } catch (err) {
       console.error('Error updating profile:', err);
@@ -116,9 +122,8 @@ const ForceProfileUpdateModal: React.FC<ForceProfileUpdateModalProps> = ({
               <button
                 type="submit"
                 disabled={loading || !formData.first_name || !formData.last_name}
-                className={`button w-full flex items-center justify-center gap-2 ${
-                  loading || !formData.first_name || !formData.last_name ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                className={`button w-full flex items-center justify-center gap-2 ${loading || !formData.first_name || !formData.last_name ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
               >
                 <Save className="w-4 h-4" />
                 {loading ? 'Saving...' : 'Save and Continue'}
