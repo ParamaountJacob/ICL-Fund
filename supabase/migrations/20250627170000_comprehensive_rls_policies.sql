@@ -31,9 +31,9 @@ BEGIN
         AND relrowsecurity = true
     ) THEN
         EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', table_name);
-        RAISE NOTICE 'Enabled RLS for table: ' || table_name;
+        RAISE NOTICE 'Enabled RLS for table: %', table_name;
     ELSE
-        RAISE NOTICE 'RLS already enabled for table: ' || table_name;
+        RAISE NOTICE 'RLS already enabled for table: %', table_name;
     END IF;
 END;
 $$;
@@ -57,13 +57,13 @@ BEGIN
             'setup_completed',
             'completed'
         );
-        RAISE NOTICE 'Created simple_workflow_step enum';
+        RAISE NOTICE '%', 'Created simple_workflow_step enum';
     ELSE
-        RAISE NOTICE 'simple_workflow_step enum already exists - skipping';
+        RAISE NOTICE '%', 'simple_workflow_step enum already exists - skipping';
     END IF;
 EXCEPTION
     WHEN duplicate_object THEN
-        RAISE NOTICE 'simple_workflow_step enum already exists - skipping';
+        RAISE NOTICE '%', 'simple_workflow_step enum already exists - skipping';
 END $$;
 
 -- =================================================================
