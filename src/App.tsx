@@ -70,34 +70,12 @@ function App() {
     if (user) {
       console.log('Checking profile for user:', user.id);
 
-      // Ensure the user profile exists in the database
-      const profileExists = await ensureUserProfileExists();
-      console.log('Profile exists check:', profileExists);
-
-      // Run database diagnostic
-      await debugDatabaseState();
-
-      const profile = await getUserProfile();
-      console.log('Profile data retrieved:', profile);
-      console.log('Profile first_name:', profile?.first_name, '(type:', typeof profile?.first_name, ')');
-      console.log('Profile last_name:', profile?.last_name, '(type:', typeof profile?.last_name, ')');
-
-      // Check if first_name or last_name is missing
-      const isFirstNameMissing = !profile?.first_name || profile?.first_name.trim() === '';
-      const isLastNameMissing = !profile?.last_name || profile?.last_name.trim() === '';
-
-      console.log('Is first name missing?', isFirstNameMissing);
-      console.log('Is last name missing?', isLastNameMissing);
-
-      if (isFirstNameMissing || isLastNameMissing) {
-        console.log('Profile incomplete, showing modal. First name:', profile?.first_name, 'Last name:', profile?.last_name);
-        setUserFirstName(profile?.first_name || '');
-        setUserLastName(profile?.last_name || '');
-        setShowForceProfileUpdate(true);
-      } else {
-        console.log('Profile complete!');
-        setShowForceProfileUpdate(false);
-      }
+      // TEMPORARY BYPASS: Skip database checks due to RLS issues
+      // Always show the modal so user can enter their name
+      console.log('RLS BYPASS: Showing modal to collect name data');
+      setUserFirstName('');
+      setUserLastName('');
+      setShowForceProfileUpdate(true);
     }
     console.log('=== CHECKING USER PROFILE END ===');
   };
@@ -148,9 +126,9 @@ function App() {
         <ForceProfileUpdateModal
           isOpen={showForceProfileUpdate}
           onClose={() => {
+            console.log('Modal closed - stopping the infinite loop');
             setShowForceProfileUpdate(false);
-            // Re-check profile after modal closes to ensure it's complete
-            checkUserProfile();
+            // Don't re-check profile to avoid infinite loop
           }}
           firstName={userFirstName}
           lastName={userLastName}
