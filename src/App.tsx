@@ -70,12 +70,26 @@ function App() {
     if (user) {
       console.log('Checking profile for user:', user.id);
 
-      // TEMPORARY BYPASS: Skip database checks due to RLS issues
-      // Always show the modal so user can enter their name
-      console.log('RLS BYPASS: Showing modal to collect name data');
-      setUserFirstName('');
-      setUserLastName('');
-      setShowForceProfileUpdate(true);
+      try {
+        const profile = await getUserProfile();
+        console.log('Profile retrieved:', profile);
+
+        if (!profile || !profile.first_name || !profile.last_name) {
+          console.log('Profile missing or incomplete, showing modal');
+          setUserFirstName(profile?.first_name || '');
+          setUserLastName(profile?.last_name || '');
+          setShowForceProfileUpdate(true);
+        } else {
+          console.log('Profile complete:', profile.first_name, profile.last_name);
+          setShowForceProfileUpdate(false);
+        }
+      } catch (error) {
+        console.error('Error checking profile:', error);
+        // On error, show modal to collect name
+        setUserFirstName('');
+        setUserLastName('');
+        setShowForceProfileUpdate(true);
+      }
     }
     console.log('=== CHECKING USER PROFILE END ===');
   };
@@ -126,9 +140,12 @@ function App() {
         <ForceProfileUpdateModal
           isOpen={showForceProfileUpdate}
           onClose={() => {
-            console.log('Modal closed - stopping the infinite loop');
+            console.log('Modal closed - re-checking profile');
             setShowForceProfileUpdate(false);
-            // Don't re-check profile to avoid infinite loop
+            // Re-check profile after modal closes to see if it was saved
+            if (user) {
+              setTimeout(() => checkUserProfile(), 500);
+            }
           }}
           firstName={userFirstName}
           lastName={userLastName}

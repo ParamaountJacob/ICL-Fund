@@ -37,29 +37,39 @@ const ForceProfileUpdateModal: React.FC<ForceProfileUpdateModalProps> = ({
     }
 
     setLoading(true);
-    setError(null); try {
-      console.log('=== FORCE PROFILE UPDATE START (BYPASS MODE) ===');
-      console.log('Saving profile with data:', formData);
-      console.log('Current user from auth:', await supabase.auth.getUser());
+    setError(null);
 
-      // Try the database function first
+    try {
+      console.log('=== FORCE PROFILE UPDATE START ===');
+      console.log('Saving profile with data:', formData);
+
       const result = await updateUserProfile({
         first_name: formData.first_name,
         last_name: formData.last_name
       });
+
       console.log('Profile update result:', result);
 
-      // If we get here without errors, assume success
-      console.log('Profile save completed - closing modal');
-      console.log('=== FORCE PROFILE UPDATE END ===');
+      if (result && result.first_name && result.last_name) {
+        console.log('Profile save successful - closing modal');
+        onClose();
+      } else {
+        // Check if the profile was actually saved by re-fetching
+        const savedProfile = await getUserProfile();
+        console.log('Re-fetched profile after save:', savedProfile);
 
-      onClose();
+        if (savedProfile && savedProfile.first_name && savedProfile.last_name) {
+          console.log('Profile was saved successfully - closing modal');
+          onClose();
+        } else {
+          setError('Failed to save profile. Please try again.');
+        }
+      }
+
+      console.log('=== FORCE PROFILE UPDATE END ===');
     } catch (err) {
       console.error('Error updating profile:', err);
-
-      // Even if there's an error, let's close the modal to stop the loop
-      console.log('Error occurred but closing modal to prevent infinite loop');
-      onClose();
+      setError('An error occurred while saving your profile. Please try again.');
     } finally {
       setLoading(false);
     }
