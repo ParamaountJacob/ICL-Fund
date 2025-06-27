@@ -70,23 +70,15 @@ const Contact: React.FC = () => {
           email: session.user.email || ''
         }));
       }
-    });
-
-    return () => subscription.unsubscribe();
+    }); return () => subscription.unsubscribe();
   }, []);
 
-  // Auto-select today's date if it's available and no date is selected
+  // Ensure calendar starts on current month/year when form loads
   React.useEffect(() => {
-    if ((selectedMethod === 'video' || selectedMethod === 'phone') && !selectedDate) {
-      const today = new Date();
-      const todayString = today.toISOString().split('T')[0];
-      const isWeekend = today.getDay() === 0 || today.getDay() === 6;
-
-      if (!isWeekend) {
-        setSelectedDate(todayString);
-      }
-    }
-  }, [selectedMethod, selectedDate]);
+    const now = new Date();
+    setCurrentMonth(now.getMonth());
+    setCurrentYear(now.getFullYear());
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -117,29 +109,10 @@ const Contact: React.FC = () => {
     try {
       // For video and phone consultations, create consultation request and open Calendly
       if (selectedMethod === 'video' || selectedMethod === 'phone') {
-        // Skip consultation request creation for anonymous users - just create CRM lead
-        // Only create consultation request if user is authenticated
-        if (user) {
-          try {
-            await createConsultationRequest({
-              name: `${formData.first_name} ${formData.last_name}`,
-              email: formData.email,
-              phone: formData.phone,
-              suggested_investment_amount: formData.suggested_investment_amount ? parseInt(formData.suggested_investment_amount) : undefined,
-              preferred_date: selectedDate,
-              preferred_time: selectedTime,
-              consultation_type: selectedMethod,
-              notes: formData.message || undefined
-            });
-          } catch (consultationError) {
-            console.error('Error creating consultation request:', consultationError);
-            // Continue anyway - the Calendly booking is what matters
-          }
-        }
-
-        // Create CRM lead for consultation (works for anonymous users)
-        try {
-          await createLeadFromConsultation({
+        // Background operations - don't let these block the UI
+        Promise.all([
+          // Only create consultation request if user is authenticated
+          user ? createConsultationRequest({
             name: `${formData.first_name} ${formData.last_name}`,
             email: formData.email,
             phone: formData.phone,
@@ -148,11 +121,25 @@ const Contact: React.FC = () => {
             preferred_time: selectedTime,
             consultation_type: selectedMethod,
             notes: formData.message || undefined
-          });
-        } catch (crmError) {
-          console.error('Error creating CRM lead:', crmError);
-        }
+          }).catch(error => console.error('Consultation request error:', error)) : Promise.resolve(),
 
+          // Create CRM lead for consultation (works for anonymous users)
+          createLeadFromConsultation({
+            name: `${formData.first_name} ${formData.last_name}`,
+            email: formData.email,
+            phone: formData.phone,
+            suggested_investment_amount: formData.suggested_investment_amount ? parseInt(formData.suggested_investment_amount) : undefined,
+            preferred_date: selectedDate,
+            preferred_time: selectedTime,
+            consultation_type: selectedMethod,
+            notes: formData.message || undefined
+          }).catch(error => console.error('CRM lead error:', error))
+        ]).catch(error => {
+          console.error('Background operations error:', error);
+          // Don't block the user experience for background operations
+        });
+
+        // Build Calendly URL and show embed immediately
         const calendlyBaseUrl = selectedMethod === 'video'
           ? 'https://calendly.com/innercirclelending/30min'
           : 'https://calendly.com/innercirclelending/q-a-phone-chat';
