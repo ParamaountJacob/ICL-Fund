@@ -667,102 +667,20 @@ export const user_has_active_investments = async (userId: string): Promise<boole
 
 export const get_user_investments_with_applications = async (userId: string): Promise<any[]> => {
   try {
-    // Try to auto-fix functions first (only in development)
-    if (import.meta.env.DEV) {
-      const functionTests = await test_database_functions();
+    console.log('Using new simple workflow function...');
 
-      if (!functionTests.get_user_investments_with_applications &&
-        !functionTests.get_admin_investments_with_users) {
-        console.warn('Critical functions missing! Attempting auto-fix...');
-        // This would trigger the application to show an error notice to the user
-        // and prompt them to run the fix script
-      }
+    // Use the new simple workflow function (no user_id parameter needed - uses auth.uid())
+    const { data, error } = await supabase.rpc('get_user_applications');
+
+    if (error) {
+      console.error('Error getting user applications:', error);
+      return [];
     }
 
-    // Try all possible function names
-    let data, error;
-
-    // First try the standard RPC function
-    const result1 = await supabase.rpc('get_user_investments_with_applications', {
-      p_user_id: userId
-    });
-
-    if (!result1.error) {
-      data = result1.data;
-      error = result1.error;
-    } else {
-      console.warn('First function name failed, trying alternative name...');
-
-      // Try alternative function name (maybe someone renamed it)
-      const result2 = await supabase.rpc('get_user_investments', {
-        p_user_id: userId
-      });
-      data = result2.data;
-      error = result2.error;
-    }
-
-    if (!error) {
-      console.log('Successfully retrieved user investments via RPC:', data?.length || 0);
-      return data || [];
-    }
-
-    console.warn('All RPC functions failed, falling back to direct query:', error);
-
-    // Fallback: Direct query for investments if RPC fails
-    const { data: investments, error: invError } = await supabase
-      .from('investments')
-      .select(`
-        *,
-        investment_applications(id, status, investment_amount),
-        users:user_id(id, email)
-      `)
-      .eq('user_id', userId);
-
-    if (invError) {
-      console.error('Investment fallback query failed too:', invError);
-
-      // Last resort - get applications directly
-      console.log('Trying to get applications without investments...');
-      const { data: applications, error: appError } = await supabase
-        .from('investment_applications')
-        .select(`
-          id, user_id, status, investment_amount, annual_percentage,
-          created_at, updated_at
-        `)
-        .eq('user_id', userId);
-
-      if (appError) {
-        console.error('All fallback queries failed:', appError);
-        return []; // Return empty array as last resort
-      }
-
-      // Convert applications to investment-like format for UI compatibility
-      return applications?.map(app => ({
-        id: null, // No actual investment ID
-        user_id: app.user_id,
-        application_id: app.id,
-        amount: app.investment_amount,
-        annual_percentage: app.annual_percentage || 5.0,
-        payment_frequency: 'monthly',
-        term_months: 12,
-        status: 'pending',
-        created_at: app.created_at,
-        updated_at: app.updated_at,
-        application_status: app.status,
-        investment_amount: app.investment_amount
-      })) || [];
-    }
-
-    console.log('Successfully retrieved user investments via fallback:', investments?.length || 0);
-    return investments?.map(inv => ({
-      ...inv,
-      application_status: inv.investment_applications?.status,
-      investment_amount: inv.investment_applications?.investment_amount,
-      user_email: inv.users?.email
-    })) || [];
+    console.log('Successfully retrieved user applications:', data?.length || 0);
+    return data || [];
   } catch (error) {
     console.error('Error in get_user_investments_with_applications:', error);
-    // Return empty array instead of throwing to prevent UI errors
     return [];
   }
 };

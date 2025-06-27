@@ -95,9 +95,9 @@ interface Message {
   };
 }
 
-const UserProfileModal: React.FC<UserProfileModalProps> = ({ 
-  isOpen, 
-  onClose, 
+const UserProfileModal: React.FC<UserProfileModalProps> = ({
+  isOpen,
+  onClose,
   user,
   currentUserRole = 'user',
   defaultTab,
@@ -135,14 +135,14 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
           setCurrentUserId(currentUser.id);
         }
       });
-      
+
       fetchUserData();
     }
   }, [isOpen, user]);
 
   const fetchUserData = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
       // Fetch user profile
@@ -189,14 +189,13 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
       if (consultRequests) {
         setConsultationRequests(consultRequests);
       }
-        
+
       try {
-        const { data: investmentsWithApps, error } = await supabase.rpc('get_user_investments_with_applications', {
-          p_user_id: user.id
-        });
-        
+        // Use the new simple workflow function (no user_id parameter needed - uses auth.uid())
+        const { data: investmentsWithApps, error } = await supabase.rpc('get_user_applications');
+
         if (error) throw error;
-          
+
         if (investmentsWithApps) {
           setInvestments(investmentsWithApps);
         }
@@ -246,7 +245,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
       } else {
         setMessages([]);
       }
-      
+
       // Fetch user activity
       try {
         const { data: activityData, error: activityError } = await supabase.rpc('get_user_activity', {
@@ -254,7 +253,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
           p_limit: 50,
           p_offset: 0
         });
-        
+
         if (activityError) throw activityError;
         setActivities(activityData || []);
       } catch (activityError) {
@@ -274,16 +273,16 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
             .eq('user_id', user.id)
             .order('created_at', { ascending: false })
             .limit(50);
-            
+
           if (fallbackError) throw fallbackError;
-          
+
           // Get performer details
           const performerIds = [...new Set(fallbackData.map(a => a.performed_by))];
           const { data: performers } = await supabase
             .from('users')
             .select('id, first_name, last_name, email')
             .in('id', performerIds);
-            
+
           const performerMap = new Map();
           performers?.forEach(p => {
             performerMap.set(p.id, {
@@ -291,14 +290,14 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
               email: p.email
             });
           });
-          
+
           // Map performer details to activities
           const activitiesWithPerformers = fallbackData.map(a => ({
             ...a,
             performer_name: performerMap.get(a.performed_by)?.name || 'Unknown',
             performer_email: performerMap.get(a.performed_by)?.email || 'Unknown'
           }));
-          
+
           setActivities(activitiesWithPerformers);
         } catch (fallbackErr) {
           console.error('Error with fallback activity query:', fallbackErr);
@@ -314,7 +313,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
   const handleDeleteUser = async () => {
     if (!user || !onDeleteUser) return;
-    
+
     if (currentUserRole !== 'admin') {
       setAlertInfo({
         title: 'Permission Denied',
@@ -324,7 +323,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
       setShowAlert(true);
       return;
     }
-    
+
     if (window.confirm(`Are you sure you want to delete user "${user.first_name} ${user.last_name}" (${user.email})? This will permanently delete ALL data associated with this user and cannot be undone.`)) {
       setDeleting(true);
       try {
@@ -335,7 +334,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
           type: 'success'
         });
         setShowAlert(true);
-        
+
         // Close the modal after a short delay
         setTimeout(() => {
           onDeleteUser(user.id);
@@ -357,7 +356,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
   const handleAddNote = async (note: string) => {
     if (!user) return;
     await addAdminNote(user.id, note);
-    
+
     // Update local state
     setProfile(prev => ({
       ...prev,
@@ -367,13 +366,13 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
   const handleSaveNameSection = async (data: { first_name: string; last_name: string }) => {
     if (!user) return;
-    
+
     // Update the profile
     await updateUserProfile({
       user_id: user.id,
       ...data
     });
-    
+
     // Update the user's first and last name in the users table
     const { error } = await supabase
       .from('users')
@@ -382,16 +381,16 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
         last_name: data.last_name
       })
       .eq('id', user.id);
-    
+
     if (error) throw error;
-    
+
     // Update local state
     setProfile(prev => ({
       ...prev,
       first_name: data.first_name,
       last_name: data.last_name
     }));
-    
+
     // Update the local user object
     user.first_name = data.first_name;
     user.last_name = data.last_name;
@@ -399,13 +398,13 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
   const handleSaveContactSection = async (data: { phone: string; address: string }) => {
     if (!user) return;
-    
+
     // Update the profile
     await updateUserProfile({
       user_id: user.id,
       ...data
     });
-    
+
     // Update local state
     setProfile(prev => ({
       ...prev,
@@ -422,13 +421,13 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
     investment_goals: string;
   }) => {
     if (!user) return;
-    
+
     // Update the profile
     await updateUserProfile({
       user_id: user.id,
       ...data
     });
-    
+
     // Update local state
     setProfile(prev => ({
       ...prev,
@@ -442,7 +441,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
   const handleSendMessage = async (subject: string, content: string) => {
     if (!user) return;
-    
+
     const { data: { user: currentUser } } = await supabase.auth.getUser();
     if (!currentUser) throw new Error('Not authenticated');
 
@@ -470,135 +469,135 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
   return (
     <>
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        onClick={onClose}
-      >
+      <AnimatePresence>
         <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
-          onClick={e => e.stopPropagation()}
-          className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={onClose}
         >
-          {/* Header */}
-          <UserProfileHeader 
-            email={user.email} 
-            role={user.role} 
-            onClose={onClose} 
-            userId={user.id}
-            onDeleteUser={currentUserRole === 'admin' ? handleDeleteUser : undefined}
-            deleting={deleting}
-          />
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+          >
+            {/* Header */}
+            <UserProfileHeader
+              email={user.email}
+              role={user.role}
+              onClose={onClose}
+              userId={user.id}
+              onDeleteUser={currentUserRole === 'admin' ? handleDeleteUser : undefined}
+              deleting={deleting}
+            />
 
-          {/* Tab Navigation */}
-          <UserProfileTabs 
-            activeTab={activeTab} 
-            setActiveTab={setActiveTab} 
-          />
+            {/* Tab Navigation */}
+            <UserProfileTabs
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
 
-          {/* Content */}
-          <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="ml-3 text-gray-600">Loading user data...</span>
-              </div>
-            ) : (
-              <div>
-                {activeTab === 'profile' && (
-                  <div className="space-y-8">
-                    {/* Basic Information */}
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <UserProfileAccountInfo 
-                        email={user.email}
-                        role={user.role}
-                        createdAt={user.created_at}
-                        verificationStatus={user.verification_status}
-                        userId={user.id}
+            {/* Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <span className="ml-3 text-gray-600">Loading user data...</span>
+                </div>
+              ) : (
+                <div>
+                  {activeTab === 'profile' && (
+                    <div className="space-y-8">
+                      {/* Basic Information */}
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <UserProfileAccountInfo
+                          email={user.email}
+                          role={user.role}
+                          createdAt={user.created_at}
+                          verificationStatus={user.verification_status}
+                          userId={user.id}
+                        />
+
+                        {/* Claim Status - Only show for regular users */}
+                        {user.role === 'user' && (
+                          <UserProfileClaimStatus
+                            user={user}
+                            currentUserId={currentUserId}
+                            onUserClaimed={fetchUserData}
+                          />
+                        )}
+
+                        <UserProfileContactInfo
+                          firstName={profile.first_name}
+                          lastName={profile.last_name}
+                          phone={profile.phone}
+                          address={profile.address}
+                          onSave={handleSaveNameSection}
+                          onSaveContact={handleSaveContactSection}
+                        />
+                      </div>
+
+                      {/* Investment Profile */}
+                      <UserProfileInvestmentProfile
+                        netWorth={profile.net_worth}
+                        annualIncome={profile.annual_income}
+                        riskTolerance={profile.risk_tolerance}
+                        iraAccounts={profile.ira_accounts}
+                        investmentGoals={profile.investment_goals}
+                        onSave={handleSaveInvestmentProfile}
                       />
 
-                      {/* Claim Status - Only show for regular users */}
-                      {user.role === 'user' && (
-                        <UserProfileClaimStatus
-                          user={user}
-                          currentUserId={currentUserId}
-                          onUserClaimed={fetchUserData}
-                        />
-                      )}
+                      {/* Admin Notes */}
+                      <UserProfileAdminNotes
+                        notes={profile.admin_notes || []}
+                        onAddNote={handleAddNote}
+                      />
 
-                      <UserProfileContactInfo 
-                        firstName={profile.first_name}
-                        lastName={profile.last_name}
-                        phone={profile.phone}
-                        address={profile.address}
-                        onSave={handleSaveNameSection}
-                        onSaveContact={handleSaveContactSection}
+                      {/* User Activity */}
+                      <UserProfileActivity
+                        activities={activities}
+                      />
+
+                      {/* Consultation Requests */}
+                      <UserProfileConsultationRequests
+                        consultationRequests={consultationRequests}
+                        onDeleteConsultationRequest={fetchUserData}
+                        currentUserRole={currentUserRole}
                       />
                     </div>
+                  )}
 
-                    {/* Investment Profile */}
-                    <UserProfileInvestmentProfile 
-                      netWorth={profile.net_worth}
-                      annualIncome={profile.annual_income}
-                      riskTolerance={profile.risk_tolerance}
-                      iraAccounts={profile.ira_accounts}
-                      investmentGoals={profile.investment_goals}
-                      onSave={handleSaveInvestmentProfile}
+                  {activeTab === 'investments' && (
+                    <UserProfileInvestments
+                      investments={investments}
+                      user={user}
+                      onInvestmentUpdate={fetchUserData}
                     />
+                  )}
 
-                    {/* Admin Notes */}
-                    <UserProfileAdminNotes 
-                      notes={profile.admin_notes || []}
-                      onAddNote={handleAddNote}
+                  {activeTab === 'messages' && (
+                    <UserProfileMessages
+                      messages={messages}
+                      onSendMessage={handleSendMessage}
                     />
-                    
-                    {/* User Activity */}
-                    <UserProfileActivity 
-                      activities={activities}
-                    />
-
-                    {/* Consultation Requests */}
-                    <UserProfileConsultationRequests 
-                      consultationRequests={consultationRequests}
-                      onDeleteConsultationRequest={fetchUserData}
-                      currentUserRole={currentUserRole}
-                    />
-                  </div>
-                )}
-
-                {activeTab === 'investments' && (
-                  <UserProfileInvestments 
-                    investments={investments}
-                    user={user}
-                    onInvestmentUpdate={fetchUserData} 
-                  />
-                )}
-
-                {activeTab === 'messages' && (
-                  <UserProfileMessages 
-                    messages={messages}
-                    onSendMessage={handleSendMessage} 
-                  />
-                )}
-              </div>
-            )}
-          </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
-    
-    <AlertModal
-      isOpen={showAlert}
-      onClose={() => setShowAlert(false)}
-      title={alertInfo.title}
-      message={alertInfo.message}
-      type={alertInfo.type}
-    />
+      </AnimatePresence>
+
+      <AlertModal
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        title={alertInfo.title}
+        message={alertInfo.message}
+        type={alertInfo.type}
+      />
     </>
   );
 };

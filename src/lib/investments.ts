@@ -40,9 +40,9 @@ export const investmentService = {
     // Get user investments with applications (with fallback)
     async getUserInvestmentsWithApplications(userId: string): Promise<InvestmentWithApplication[]> {
         try {
-            // Try the RPC function first
+            // Use the new simple workflow function
             const { data: rpcData, error: rpcError } = await supabase
-                .rpc('get_user_investments_with_applications', { p_user_id: userId });
+                .rpc('get_user_applications');
 
             if (!rpcError && rpcData) {
                 return rpcData;

@@ -5,8 +5,7 @@ import {
     sendSystemNotificationToUser,
     updateInvestmentDetails,
     supabase,
-    getAdminDocumentSignatures,
-    get_user_investments_with_applications
+    getAdminDocumentSignatures
 } from '../../lib/supabase';
 import { InvestmentDetailsModal } from '../InvestmentDetailsModal';
 import AlertModal from '../AlertModal';
@@ -57,7 +56,7 @@ interface UserProfileInvestmentsProps {
 const UserProfileInvestments: React.FC<UserProfileInvestmentsProps> = ({
     investments,
     user,
-    onInvestmentUpdate = () => {}
+    onInvestmentUpdate = () => { }
 }) => {
     const [selectedInvestment, setSelectedInvestment] = useState<Investment | null>(null);
     const [showModal, setShowModal] = useState(false);
@@ -85,8 +84,10 @@ const UserProfileInvestments: React.FC<UserProfileInvestmentsProps> = ({
 
     const fetchUserInvestments = async (userId: string) => {
         try {
-            const data = await get_user_investments_with_applications(userId);
-            setUserInvestments(data);
+            // Use the new simple workflow function (no user_id parameter needed - uses auth.uid())
+            const { data, error } = await supabase.rpc('get_user_applications');
+            if (error) throw error;
+            setUserInvestments(data || []);
         } catch (error) {
             console.error('Error fetching user investments:', error);
         }
@@ -627,29 +628,29 @@ const UserProfileInvestments: React.FC<UserProfileInvestmentsProps> = ({
                     documentSignatures={documentSignatures}
                     onInvestmentUpdate={(updatedInvestment) => {
                         // Update the selected investment in the list
-                        setUserInvestments(prev => 
+                        setUserInvestments(prev =>
                             prev.map(inv => inv.id === updatedInvestment.id ? updatedInvestment : inv)
                         );
-                        
+
                         // If there's a parent update function, call it
-                        
+
                         // Update the local investment data
                         if (updatedInvestment) {
                             setSelectedInvestment(updatedInvestment);
-                            
+
                             // Also update the investment in the list
-                            setUserInvestments(prev => 
+                            setUserInvestments(prev =>
                                 prev.map(inv => inv.id === updatedInvestment.id ? updatedInvestment : inv)
                             );
                         }
-                        
+
                         if (onInvestmentUpdate) {
                             onInvestmentUpdate();
                         }
                     }}
                 />
             )}
-            
+
             <AlertModal
                 isOpen={showAlert}
                 onClose={() => setShowAlert(false)}

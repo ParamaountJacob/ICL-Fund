@@ -5,8 +5,7 @@ import {
   getUserSignedDocuments,
   getUserLatestPendingApplication,
   type SignedDocument,
-  user_has_active_investments,
-  get_user_investments_with_applications
+  user_has_active_investments
 } from '../lib/supabase';
 import { type InvestmentStatus } from '../types';
 import {
@@ -257,17 +256,16 @@ const Dashboard: React.FC = () => {
 
   const fetchAllUserInvestments = async (userId: string) => {
     try {
-      const { data, error } = await supabase.rpc('get_user_investments_with_applications', {
-        p_user_id: userId
-      });
+      // Use the new simple workflow function (no user_id parameter needed - uses auth.uid())
+      const { data, error } = await supabase.rpc('get_user_applications');
 
       if (error) {
-        console.error('Error in get_user_investments_with_applications:', error);
+        console.error('Error in get_user_applications:', error);
         throw error;
       }
 
       // Debug logging to help troubleshoot
-      console.log('User investments from database:', data);
+      console.log('User applications from database:', data);
       console.log('User ID being queried:', userId);
 
       setUserInvestments(data || []);
