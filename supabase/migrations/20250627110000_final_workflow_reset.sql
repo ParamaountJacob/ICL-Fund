@@ -82,7 +82,6 @@ BEGIN
 END $$;
 
 -- Drop problematic types
-DROP TYPE IF EXISTS simple_workflow_step CASCADE;
 DROP TYPE IF EXISTS workflow_step CASCADE;
 DROP TYPE IF EXISTS application_status CASCADE;
 DROP TYPE IF EXISTS investment_status CASCADE;
@@ -97,17 +96,26 @@ END $$;
 -- STEP 2: BUILD CLEAN FOUNDATION - NEW 8-STEP WORKFLOW
 -- =================================================================
 
--- Create the simple 8-step workflow enum
-CREATE TYPE simple_workflow_step AS ENUM (
-    'subscription_agreement_pending',     -- 1. User fills, needs admin signature
-    'subscription_agreement_signed',      -- 2. Admin signed, user notified  
-    'promissory_note_created',           -- 3. Admin created note, user has access
-    'promissory_note_signed',            -- 4. User signed & wired money
-    'funds_confirmed',                   -- 5. Admin confirmed both signature & wire
-    'plaid_connected',                   -- 6. User connected Plaid account
-    'setup_completed',                   -- 7. Admin completed final setup
-    'active'                            -- 8. Investment is active
-);
+-- Create the simple 8-step workflow enum (safe creation)
+DO $$
+BEGIN
+    -- Only create if it doesn't exist
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'simple_workflow_step') THEN
+        CREATE TYPE simple_workflow_step AS ENUM (
+            'subscription_agreement_pending',     -- 1. User fills, needs admin signature
+            'subscription_agreement_signed',      -- 2. Admin signed, user notified  
+            'promissory_note_created',           -- 3. Admin created note, user has access
+            'promissory_note_signed',            -- 4. User signed & wired money
+            'funds_confirmed',                   -- 5. Admin confirmed both signature & wire
+            'plaid_connected',                   -- 6. User connected Plaid account
+            'setup_completed',                   -- 7. Admin completed final setup
+            'active'                            -- 8. Investment is active
+        );
+        RAISE NOTICE '✅ Created simple_workflow_step enum';
+    ELSE
+        RAISE NOTICE '⚠️  simple_workflow_step enum already exists - using existing';
+    END IF;
+END $$;
 
 -- Create simple applications table (replaces complex investment_applications)
 CREATE TABLE IF NOT EXISTS simple_applications (
@@ -1028,6 +1036,152 @@ BEGIN
 END $$;
 
 COMMIT;
+
+-- =================================================================
+-- STEP 7: CRITICAL - SET ADMIN STATUS FOR innercirclelending@gmail.com
+-- =================================================================
+
+DO $$
+DECLARE
+    admin_user_id uuid;
+BEGIN
+    RAISE NOTICE '👑 SETTING UP ADMIN ACCESS FOR innercirclelending@gmail.com...';
+    
+    -- Ensure user_profiles table has all required columns
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'user_profiles') THEN
+        -- Add email column if it doesn't exist
+        IF NOT EXISTS (
+            SELECT FROM information_schema.columns 
+            WHERE table_name = 'user_profiles' AND column_name = 'email'
+        ) THEN
+            ALTER TABLE user_profiles ADD COLUMN email text;
+            RAISE NOTICE '✅ Added email column to user_profiles';
+        END IF;
+        
+        -- Add role column if it doesn't exist
+        IF NOT EXISTS (
+            SELECT FROM information_schema.columns 
+            WHERE table_name = 'user_profiles' AND column_name = 'role'
+        ) THEN
+            ALTER TABLE user_profiles ADD COLUMN role text DEFAULT 'user';
+            RAISE NOTICE '✅ Added role column to user_profiles';
+        END IF;
+        
+        -- Add verification_status column if it doesn't exist
+        IF NOT EXISTS (
+            SELECT FROM information_schema.columns 
+            WHERE table_name = 'user_profiles' AND column_name = 'verification_status'
+        ) THEN
+            ALTER TABLE user_profiles ADD COLUMN verification_status text DEFAULT 'pending';
+            RAISE NOTICE '✅ Added verification_status column to user_profiles';
+        END IF;
+        
+        -- Add user_id column if it doesn't exist (some tables might use this instead of id)
+        IF NOT EXISTS (
+            SELECT FROM information_schema.columns 
+            WHERE table_name = 'user_profiles' AND column_name = 'user_id'
+        ) AND NOT EXISTS (
+            SELECT FROM information_schema.columns 
+            WHERE table_name = 'user_profiles' AND column_name = 'id'
+        ) THEN
+            ALTER TABLE user_profiles ADD COLUMN user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE;
+            RAISE NOTICE '✅ Added user_id column to user_profiles';
+        END IF;
+    ELSE
+        -- Create table if it doesn't exist
+        CREATE TABLE user_profiles (
+            id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+            first_name text,
+            last_name text,
+            email text,
+            phone text,
+            address text,
+            role text DEFAULT 'user',
+            verification_status text DEFAULT 'pending',
+            created_at timestamptz DEFAULT now(),
+            updated_at timestamptz DEFAULT now()
+        );
+        
+        ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+        CREATE POLICY user_profiles_policy ON user_profiles FOR ALL USING (id = auth.uid());
+        RAISE NOTICE '✅ Created user_profiles table with all columns';
+    END IF;
+    
+    -- Find the user ID for innercirclelending@gmail.com
+    SELECT id INTO admin_user_id 
+    FROM auth.users 
+    WHERE email = 'innercirclelending@gmail.com';
+    
+    IF admin_user_id IS NOT NULL THEN
+        -- Check if user_id column exists (vs id column)
+        IF EXISTS (
+            SELECT FROM information_schema.columns 
+            WHERE table_name = 'user_profiles' AND column_name = 'user_id'
+        ) THEN
+            -- Table uses user_id column
+            INSERT INTO user_profiles (
+                user_id, 
+                email, 
+                first_name, 
+                last_name, 
+                role,
+                verification_status,
+                created_at, 
+                updated_at
+            )
+            VALUES (
+                admin_user_id,
+                'innercirclelending@gmail.com',
+                'Admin',
+                'User',
+                'admin',
+                'verified',
+                now(),
+                now()
+            )
+            ON CONFLICT (user_id) DO UPDATE SET
+                email = EXCLUDED.email,
+                first_name = EXCLUDED.first_name,
+                last_name = EXCLUDED.last_name,
+                role = 'admin',
+                verification_status = 'verified',
+                updated_at = now();
+        ELSE
+            -- Table uses id column (standard)
+            INSERT INTO user_profiles (
+                id, 
+                email, 
+                first_name, 
+                last_name, 
+                role,
+                verification_status,
+                created_at, 
+                updated_at
+            )
+            VALUES (
+                admin_user_id,
+                'innercirclelending@gmail.com',
+                'Admin',
+                'User',
+                'admin',
+                'verified',
+                now(),
+                now()
+            )
+            ON CONFLICT (id) DO UPDATE SET
+                email = EXCLUDED.email,
+                first_name = EXCLUDED.first_name,
+                last_name = EXCLUDED.last_name,
+                role = 'admin',
+                verification_status = 'verified',
+                updated_at = now();
+        END IF;
+            
+        RAISE NOTICE '✅ Successfully set innercirclelending@gmail.com as ADMIN with ID: %', admin_user_id;
+    ELSE
+        RAISE NOTICE '❌ Could not find user innercirclelending@gmail.com in auth.users';
+    END IF;
+END $$;
 
 -- =================================================================
 -- SUCCESS! 🎉
