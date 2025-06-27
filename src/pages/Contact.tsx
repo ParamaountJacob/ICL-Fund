@@ -311,7 +311,7 @@ const Contact: React.FC = () => {
 
   return (
     <div className="pt-16 min-h-screen bg-background">
-      <div className="w-full max-w-2xl mx-auto px-6 py-12">
+      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <AnimatePresence mode="wait">
           {!selectedMethod ? (
             <motion.div
@@ -323,8 +323,8 @@ const Contact: React.FC = () => {
               className="text-center space-y-12"
             >
               <div>
-                <h1 className="text-4xl font-bold text-text-primary mb-6">Get in Touch</h1>
-                <p className="text-lg text-text-secondary">
+                <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-6">Get in Touch</h1>
+                <p className="text-base sm:text-lg text-text-secondary">
                   Choose how you'd like to connect with our team
                 </p>
               </div>
@@ -334,20 +334,20 @@ const Contact: React.FC = () => {
                   onClick={() => setSelectedMethod('email')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full p-8 bg-surface border border-graphite rounded-xl hover:border-gold/50 transition-all duration-300 group"
+                  className="w-full p-6 sm:p-8 bg-surface border border-graphite rounded-xl hover:border-gold/50 transition-all duration-300 group"
                 >
-                  <div className="flex items-center space-x-6">
-                    <div className="w-16 h-16 rounded-full bg-accent group-hover:bg-gold/20 flex items-center justify-center transition-all duration-300">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
+                    <div className="w-16 h-16 rounded-full bg-accent group-hover:bg-gold/20 flex items-center justify-center transition-all duration-300 flex-shrink-0">
                       <Mail className="w-8 h-8 text-gold" />
                     </div>
-                    <div className="text-left flex-1">
+                    <div className="flex-1">
                       <h3 className="text-xl font-semibold mb-2 text-text-primary group-hover:text-gold transition-colors">
                         Email
                       </h3>
                       <p className="text-text-secondary mb-2">
                         Send us a detailed message about your investment goals
                       </p>
-                      <div className="flex items-center gap-2 text-sm text-text-secondary">
+                      <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-text-secondary">
                         <Clock className="w-4 h-4" />
                         <span>1-2 days</span>
                       </div>
@@ -359,20 +359,20 @@ const Contact: React.FC = () => {
                   onClick={() => setSelectedMethod('video')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full p-8 bg-surface border border-graphite rounded-xl hover:border-gold/50 transition-all duration-300 group"
+                  className="w-full p-6 sm:p-8 bg-surface border border-graphite rounded-xl hover:border-gold/50 transition-all duration-300 group"
                 >
-                  <div className="flex items-center space-x-6">
-                    <div className="w-16 h-16 rounded-full bg-accent group-hover:bg-gold/20 flex items-center justify-center transition-all duration-300">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
+                    <div className="w-16 h-16 rounded-full bg-accent group-hover:bg-gold/20 flex items-center justify-center transition-all duration-300 flex-shrink-0">
                       <Video className="w-8 h-8 text-gold" />
                     </div>
-                    <div className="text-left flex-1">
+                    <div className="flex-1">
                       <h3 className="text-xl font-semibold mb-2 text-text-primary group-hover:text-gold transition-colors">
                         Video Call
                       </h3>
                       <p className="text-text-secondary mb-2">
                         Face-to-face consultation with screen sharing
                       </p>
-                      <div className="flex items-center gap-2 text-sm text-text-secondary">
+                      <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-text-secondary">
                         <Clock className="w-4 h-4" />
                         <span>Same day</span>
                       </div>
@@ -384,20 +384,20 @@ const Contact: React.FC = () => {
                   onClick={() => setSelectedMethod('phone')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full p-8 bg-surface border border-graphite rounded-xl hover:border-gold/50 transition-all duration-300 group"
+                  className="w-full p-6 sm:p-8 bg-surface border border-graphite rounded-xl hover:border-gold/50 transition-all duration-300 group"
                 >
-                  <div className="flex items-center space-x-6">
-                    <div className="w-16 h-16 rounded-full bg-accent group-hover:bg-gold/20 flex items-center justify-center transition-all duration-300">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
+                    <div className="w-16 h-16 rounded-full bg-accent group-hover:bg-gold/20 flex items-center justify-center transition-all duration-300 flex-shrink-0">
                       <Phone className="w-8 h-8 text-gold" />
                     </div>
-                    <div className="text-left flex-1">
+                    <div className="flex-1">
                       <h3 className="text-xl font-semibold mb-2 text-text-primary group-hover:text-gold transition-colors">
                         Phone Call
                       </h3>
                       <p className="text-text-secondary mb-2">
                         Direct phone consultation for focused discussion
                       </p>
-                      <div className="flex items-center gap-2 text-sm text-text-secondary">
+                      <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-text-secondary">
                         <Clock className="w-4 h-4" />
                         <span>3-4 hours</span>
                       </div>
@@ -415,18 +415,18 @@ const Contact: React.FC = () => {
               transition={{ duration: 0.3 }}
               className="space-y-8"
             >
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <button
                   onClick={resetForm}
-                  className="p-3 rounded-lg bg-surface border border-graphite hover:border-gold/50 transition-colors"
+                  className="p-3 rounded-lg bg-surface border border-graphite hover:border-gold/50 transition-colors flex-shrink-0"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
-                <div className="flex items-center gap-3">
-                  {selectedMethod === 'email' && <Mail className="w-6 h-6 text-gold" />}
-                  {selectedMethod === 'video' && <Video className="w-6 h-6 text-gold" />}
-                  {selectedMethod === 'phone' && <Phone className="w-6 h-6 text-gold" />}
-                  <h1 className="text-2xl font-bold text-text-primary">
+                <div className="flex items-center gap-3 min-w-0">
+                  {selectedMethod === 'email' && <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-gold flex-shrink-0" />}
+                  {selectedMethod === 'video' && <Video className="w-5 h-5 sm:w-6 sm:h-6 text-gold flex-shrink-0" />}
+                  {selectedMethod === 'phone' && <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-gold flex-shrink-0" />}
+                  <h1 className="text-xl sm:text-2xl font-bold text-text-primary leading-tight">
                     {selectedMethod === 'email' && 'Send Email'}
                     {selectedMethod === 'video' && 'Schedule Video Call'}
                     {selectedMethod === 'phone' && 'Schedule Phone Call'}
@@ -623,13 +623,13 @@ const Contact: React.FC = () => {
                           </p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {availableTimes.map((time) => (
                             <button
                               key={time}
                               type="button"
                               onClick={() => setSelectedTime(time)}
-                              className={`p-4 rounded-lg border-2 transition-all duration-200 text-center ${selectedTime === time
+                              className={`p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 text-center text-sm sm:text-base ${selectedTime === time
                                 ? 'border-gold bg-gold/10 text-gold font-semibold'
                                 : 'border-graphite bg-surface hover:border-gold/50 hover:bg-gold/5 text-text-primary'
                                 }`}
