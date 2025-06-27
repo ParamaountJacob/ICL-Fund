@@ -876,6 +876,83 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $$;
 
+-- 8. Get user active application (Frontend compatibility)
+CREATE OR REPLACE FUNCTION get_user_active_application()
+RETURNS TABLE (
+    id uuid,
+    amount numeric,
+    expected_return_rate numeric,
+    investment_term_months integer,
+    workflow_step text,
+    subscription_agreement_signed_by_user_at timestamptz,
+    subscription_agreement_signed_by_admin_at timestamptz,
+    promissory_note_id uuid,
+    promissory_note_signed_at timestamptz,
+    wire_transfer_confirmed_at timestamptz,
+    plaid_account_id text,
+    created_at timestamptz,
+    updated_at timestamptz
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    -- Return the most recent application for the current user
+    RETURN QUERY
+    SELECT 
+        sa.id,
+        sa.amount,
+        sa.expected_return_rate,
+        sa.investment_term_months,
+        sa.workflow_step::text,
+        sa.subscription_agreement_signed_by_user_at,
+        sa.subscription_agreement_signed_by_admin_at,
+        sa.promissory_note_id,
+        sa.promissory_note_signed_at,
+        sa.wire_transfer_confirmed_at,
+        sa.plaid_account_id,
+        sa.created_at,
+        sa.updated_at
+    FROM simple_applications sa
+    WHERE sa.user_id = auth.uid()
+    AND sa.workflow_step != 'active'  -- Not completed yet
+    ORDER BY sa.created_at DESC
+    LIMIT 1;
+EXCEPTION WHEN OTHERS THEN
+    RAISE NOTICE 'Error in get_user_active_application: %', SQLERRM;
+    RETURN;
+END;
+$$;
+
+-- 9. Create investment application (Frontend compatibility - maps to submit_subscription_agreement)
+CREATE OR REPLACE FUNCTION create_investment_application()
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_application_id uuid;
+BEGIN
+    -- Create a default application (frontend should call submit_subscription_agreement instead)
+    INSERT INTO simple_applications (
+        user_id,
+        amount,
+        workflow_step,
+        subscription_agreement_signed_by_user_at
+    ) VALUES (
+        auth.uid(),
+        0,  -- Default amount, should be updated by frontend
+        'subscription_agreement_pending',
+        now()
+    ) RETURNING id INTO v_application_id;
+    
+    RETURN v_application_id;
+EXCEPTION WHEN OTHERS THEN
+    RAISE NOTICE 'Error in create_investment_application: %', SQLERRM;
+    RETURN NULL;
+END;
+$$;
+
 -- =================================================================
 -- STEP 6: SECURITY & PERMISSIONS
 -- =================================================================
@@ -905,6 +982,8 @@ GRANT EXECUTE ON FUNCTION get_all_users() TO authenticated;
 GRANT EXECUTE ON FUNCTION set_user_role(uuid, text) TO authenticated;
 GRANT EXECUTE ON FUNCTION update_user_verification(uuid, text) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_latest_user_documents(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION get_user_active_application() TO authenticated;
+GRANT EXECUTE ON FUNCTION create_investment_application() TO authenticated;
 
 -- Grant permissions on tables
 GRANT ALL ON simple_applications TO authenticated;
