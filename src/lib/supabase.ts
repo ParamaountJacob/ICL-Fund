@@ -320,15 +320,22 @@ export const updateUserProfile = async (profile: Partial<UserProfile>): Promise<
   if (!userId) return null;
 
   try {
+    console.log('=== UPDATE USER PROFILE START ===');
+    console.log('Updating profile for user ID:', userId);
+    console.log('Profile data to save:', profile);
+
     // First update the auth metadata to ensure first_name and last_name are stored there
     if (profile.first_name || profile.last_name) {
-      await supabase.rpc('update_user_metadata', {
+      console.log('Calling update_user_metadata...');
+      const metadataResult = await supabase.rpc('update_user_metadata', {
         p_first_name: profile.first_name,
         p_last_name: profile.last_name
       });
+      console.log('Metadata update result:', metadataResult);
     }
 
     // Then update the user profile
+    console.log('Calling safe_upsert_user_profile...');
     const { data, error } = await supabase.rpc('safe_upsert_user_profile', {
       p_user_id: userId,
       p_first_name: profile.first_name,
@@ -342,9 +349,18 @@ export const updateUserProfile = async (profile: Partial<UserProfile>): Promise<
       p_annual_income: profile.annual_income
     });
 
-    if (error) throw error;
+    console.log('safe_upsert_user_profile result:', { data, error });
+    if (error) {
+      console.error('Database function error:', error);
+      throw error;
+    }
 
-    return await getUserProfile();
+    console.log('Getting updated profile...');
+    const updatedProfile = await getUserProfile();
+    console.log('Updated profile retrieved:', updatedProfile);
+    console.log('=== UPDATE USER PROFILE END ===');
+
+    return updatedProfile;
   } catch (error) {
     console.error('Error updating user profile:', error);
     throw error;
@@ -1521,4 +1537,54 @@ export const showDatabaseFunctionError = () => {
       notification.remove();
     }
   }, 10000);
+};
+
+// Diagnostic function to check database state
+export const debugDatabaseState = async () => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      console.log('No authenticated user');
+      return;
+    }
+
+    console.log('=== DATABASE DIAGNOSTIC START ===');
+    console.log('Current user ID:', user.id);
+
+    // Check if user_profiles table exists and what columns it has
+    const { data: tableInfo, error: tableError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .limit(0);
+
+    console.log('Table query result:', { data: tableInfo, error: tableError });
+
+    // Try to get the specific user profile by ID
+    const { data: profileById, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', user.id);
+
+    console.log('Profile by ID query:', { data: profileById, error: profileError });
+
+    // Also try by user_id to see if that column exists
+    const { data: profileByUserId, error: userIdError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', user.id);
+
+    console.log('Profile by user_id query:', { data: profileByUserId, error: userIdError });
+
+    // Get all profiles to see the structure
+    const { data: allProfiles, error: allError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .limit(5);
+
+    console.log('All profiles sample:', { data: allProfiles, error: allError });
+
+    console.log('=== DATABASE DIAGNOSTIC END ===');
+  } catch (error) {
+    console.error('Diagnostic error:', error);
+  }
 };

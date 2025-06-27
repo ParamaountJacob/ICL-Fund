@@ -22,7 +22,7 @@ import SubscriptionAgreement from './pages/onboarding-flow/SubscriptionAgreement
 import PromissoryNote from './pages/onboarding-flow/PromissoryNote';
 import WireDetails from './pages/onboarding-flow/WireDetails';
 import PlaidBanking from './pages/onboarding-flow/PlaidBanking';
-import { supabase, getUserProfile } from './lib/supabase';
+import { supabase, getUserProfile, debugDatabaseState } from './lib/supabase';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -62,16 +62,30 @@ function App() {
   const [userLastName, setUserLastName] = useState('');
 
   const checkUserProfile = async () => {
+    console.log('=== CHECKING USER PROFILE START ===');
     const { data: { user } } = await supabase.auth.getUser();
+    console.log('Current user from auth:', user);
     setUser(user);
 
     if (user) {
       console.log('Checking profile for user:', user.id);
+
+      // Run database diagnostic
+      await debugDatabaseState();
+
       const profile = await getUserProfile();
-      console.log('Profile data:', profile);
+      console.log('Profile data retrieved:', profile);
+      console.log('Profile first_name:', profile?.first_name, '(type:', typeof profile?.first_name, ')');
+      console.log('Profile last_name:', profile?.last_name, '(type:', typeof profile?.last_name, ')');
 
       // Check if first_name or last_name is missing
-      if (!profile?.first_name || !profile?.last_name) {
+      const isFirstNameMissing = !profile?.first_name || profile?.first_name.trim() === '';
+      const isLastNameMissing = !profile?.last_name || profile?.last_name.trim() === '';
+
+      console.log('Is first name missing?', isFirstNameMissing);
+      console.log('Is last name missing?', isLastNameMissing);
+
+      if (isFirstNameMissing || isLastNameMissing) {
         console.log('Profile incomplete, showing modal. First name:', profile?.first_name, 'Last name:', profile?.last_name);
         setUserFirstName(profile?.first_name || '');
         setUserLastName(profile?.last_name || '');
@@ -81,6 +95,7 @@ function App() {
         setShowForceProfileUpdate(false);
       }
     }
+    console.log('=== CHECKING USER PROFILE END ===');
   };
 
   useEffect(() => {

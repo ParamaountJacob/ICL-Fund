@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Save } from 'lucide-react';
-import { updateUserProfile } from '../lib/supabase';
+import { updateUserProfile, getUserProfile, supabase } from '../lib/supabase';
 
 interface ForceProfileUpdateModalProps {
   isOpen: boolean;
@@ -40,15 +40,24 @@ const ForceProfileUpdateModal: React.FC<ForceProfileUpdateModalProps> = ({
     setError(null);
 
     try {
+      console.log('=== FORCE PROFILE UPDATE START ===');
       console.log('Saving profile with data:', formData);
+      console.log('Current user from auth:', await supabase.auth.getUser());
+
       const result = await updateUserProfile({
         first_name: formData.first_name,
         last_name: formData.last_name
       });
       console.log('Profile update result:', result);
 
-      // Add a small delay to ensure database transaction completes
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Add a longer delay to ensure database transaction completes
+      console.log('Waiting for database transaction to complete...');
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Check the profile again before closing to verify it saved
+      const verifyProfile = await getUserProfile();
+      console.log('Verification check - profile after save:', verifyProfile);
+      console.log('=== FORCE PROFILE UPDATE END ===');
 
       onClose();
     } catch (err) {
