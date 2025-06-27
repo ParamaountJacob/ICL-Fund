@@ -4,7 +4,8 @@
 -- ===============================================
 
 -- ===============================================
--- STEP 1: DROP ALL UNNECESSARY FUNCTIONS
+-- STEP 1: DROP ADDITIONAL UNNECESSARY FUNCTIONS
+-- (Functions already dropped in first migration are skipped)
 -- ===============================================
 
 -- Drop complex workflow functions (replaced by simple workflow)
@@ -14,9 +15,9 @@ DROP FUNCTION IF EXISTS public.admin_confirm_funds(uuid) CASCADE;
 DROP FUNCTION IF EXISTS public.admin_sign_subscription_agreement(uuid) CASCADE;
 DROP FUNCTION IF EXISTS public.create_investment(uuid, numeric, numeric, payment_frequency_enum, date, integer) CASCADE;
 DROP FUNCTION IF EXISTS public.move_investment_to_bank_details_stage(uuid) CASCADE;
-DROP FUNCTION IF EXISTS public.update_onboarding_step(uuid, text, text, jsonb) CASCADE;
+-- update_onboarding_step already dropped in first migration
 DROP FUNCTION IF EXISTS public.user_complete_plaid_linking(uuid) CASCADE;
-DROP FUNCTION IF EXISTS public.user_sign_promissory_note(uuid) CASCADE;
+-- user_sign_promissory_note will be replaced, not dropped
 
 -- Drop complex document functions (replaced by simple workflow)
 DROP FUNCTION IF EXISTS public.approve_document_request(uuid, request_status) CASCADE;
@@ -39,11 +40,11 @@ DROP FUNCTION IF EXISTS public.notify_on_wire_details_verified(uuid, numeric) CA
 DROP FUNCTION IF EXISTS public.send_admin_notification_on_investor_completion(uuid) CASCADE;
 DROP FUNCTION IF EXISTS public.send_pending_step_notification_to_user(uuid, text, integer, integer, text) CASCADE;
 
--- Drop complex query functions (replaced by simple workflow)
-DROP FUNCTION IF EXISTS public.get_user_investments_with_applications(uuid) CASCADE;
-DROP FUNCTION IF EXISTS public.get_admin_investments_with_users() CASCADE;
-DROP FUNCTION IF EXISTS public.create_promissory_note_signature_record(uuid) CASCADE;
-DROP FUNCTION IF EXISTS public.send_system_notification_to_user(uuid, text, text) CASCADE;
+-- Skip functions already dropped in first migration:
+-- - get_user_investments_with_applications(uuid) 
+-- - get_admin_investments_with_users()
+-- - create_promissory_note_signature_record(uuid)
+-- - send_system_notification_to_user(uuid, text, text)
 
 -- Drop redundant/duplicate functions
 DROP FUNCTION IF EXISTS public.clean_up_duplicate_document_signatures() CASCADE;
