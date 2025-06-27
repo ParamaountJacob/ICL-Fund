@@ -10,9 +10,9 @@ BEGIN;
 
 DO $$
 BEGIN
-    RAISE NOTICE '🔐 STARTING FULLY IDEMPOTENT RLS POLICY SETUP...';
-    RAISE NOTICE '⚠️  This migration is 100% safe to run multiple times';
-    RAISE NOTICE '🛡️  All objects will be checked before creation';
+    RAISE NOTICE 'STARTING FULLY IDEMPOTENT RLS POLICY SETUP...';
+    RAISE NOTICE 'This migration is 100% safe to run multiple times';
+    RAISE NOTICE 'All objects will be checked before creation';
 END $$;
 
 -- =================================================================
@@ -31,9 +31,9 @@ BEGIN
         AND relrowsecurity = true
     ) THEN
         EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', table_name);
-        RAISE NOTICE '✅ Enabled RLS for %', table_name;
+        RAISE NOTICE 'Enabled RLS for table: %', table_name;
     ELSE
-        RAISE NOTICE '⚠️  RLS already enabled for %', table_name;
+        RAISE NOTICE 'RLS already enabled for table: %', table_name;
     END IF;
 END;
 $$;
@@ -57,13 +57,13 @@ BEGIN
             'setup_completed',
             'completed'
         );
-        RAISE NOTICE '✅ Created simple_workflow_step enum';
+        RAISE NOTICE 'Created simple_workflow_step enum';
     ELSE
-        RAISE NOTICE '⚠️  simple_workflow_step enum already exists - skipping';
+        RAISE NOTICE 'simple_workflow_step enum already exists - skipping';
     END IF;
 EXCEPTION
     WHEN duplicate_object THEN
-        RAISE NOTICE '⚠️  simple_workflow_step enum already exists - skipping';
+        RAISE NOTICE 'simple_workflow_step enum already exists - skipping';
 END $$;
 
 -- =================================================================
@@ -515,8 +515,8 @@ COMMIT;
 
 DO $$
 BEGIN
-    RAISE NOTICE '✅ FULLY IDEMPOTENT RLS POLICIES SETUP COMPLETE!';
-    RAISE NOTICE '🔑 Admin user: innercirclelending@gmail.com → Inner Circle Lending';
-    RAISE NOTICE '🛡️  All tables now have proper Row Level Security policies';
-    RAISE NOTICE '🔄 Migration can be run safely multiple times';
+    RAISE NOTICE 'FULLY IDEMPOTENT RLS POLICIES SETUP COMPLETE!';
+    RAISE NOTICE 'Admin user: innercirclelending@gmail.com';
+    RAISE NOTICE 'All tables now have proper Row Level Security policies';
+    RAISE NOTICE 'Migration can be run safely multiple times';
 END $$;
