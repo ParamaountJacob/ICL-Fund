@@ -104,7 +104,7 @@ const Profile: React.FC = () => {
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('user_id', userId)
         .maybeSingle();
 
       if (error) {
