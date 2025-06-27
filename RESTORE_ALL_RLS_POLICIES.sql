@@ -44,12 +44,8 @@ WITH CHECK (user_id = auth.uid());
 CREATE POLICY "document_signatures_user_access" 
 ON public.document_signatures FOR ALL 
 TO authenticated 
-USING (
-    EXISTS (
-        SELECT 1 FROM public.investment_applications ia 
-        WHERE ia.id = application_id AND ia.user_id = auth.uid()
-    )
-);
+USING (user_id = auth.uid()) 
+WITH CHECK (user_id = auth.uid());
 
 CREATE POLICY "funding_sources_user_access" 
 ON public.funding_sources FOR ALL 
@@ -66,12 +62,8 @@ WITH CHECK (user_id = auth.uid());
 CREATE POLICY "investment_documents_user_access" 
 ON public.investment_documents FOR ALL 
 TO authenticated 
-USING (
-    EXISTS (
-        SELECT 1 FROM public.investment_applications ia 
-        WHERE ia.id = application_id AND ia.user_id = auth.uid()
-    )
-);
+USING (user_id = auth.uid()) 
+WITH CHECK (user_id = auth.uid());
 
 CREATE POLICY "investments_user_access" 
 ON public.investments FOR ALL 
@@ -144,11 +136,21 @@ ON public.documents FOR SELECT
 TO authenticated 
 USING (true);
 
-CREATE POLICY "documents_admin_write" 
-ON public.documents FOR INSERT, UPDATE, DELETE 
+CREATE POLICY "documents_admin_insert" 
+ON public.documents FOR INSERT 
+TO authenticated 
+WITH CHECK (auth.jwt() ->> 'role' = 'admin');
+
+CREATE POLICY "documents_admin_update" 
+ON public.documents FOR UPDATE 
 TO authenticated 
 USING (auth.jwt() ->> 'role' = 'admin') 
 WITH CHECK (auth.jwt() ->> 'role' = 'admin');
+
+CREATE POLICY "documents_admin_delete" 
+ON public.documents FOR DELETE 
+TO authenticated 
+USING (auth.jwt() ->> 'role' = 'admin');
 
 CREATE POLICY "newsletter_subscribers_public" 
 ON public.newsletter_subscribers FOR ALL 
