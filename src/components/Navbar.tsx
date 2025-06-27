@@ -119,8 +119,8 @@ const Navbar: React.FC = () => {
             </div>
           )} */}
 
-          {/* Simplified auth - just basic sign in/out */}
-          {user ? (
+          {/* Simplified auth - just basic sign in/out - HIDDEN FOR SIMPLIFIED APP */}
+          {/* {user ? (
             <button
               onClick={handleSignOut}
               className="nav-link"
@@ -158,7 +158,7 @@ const Navbar: React.FC = () => {
             >
               Sign In
             </button>
-          )}
+          )} */}
         </nav>
 
         {/* Mobile: Just Contact + Hamburger */}
@@ -235,7 +235,8 @@ const Navbar: React.FC = () => {
                   >
                     Contact
                   </Link>
-                  {user ? (
+                  {/* Mobile auth section - HIDDEN FOR SIMPLIFIED APP */}
+                  {/* {user ? (
                     <button
                       onClick={handleSignOut}
                       className="py-3 px-4 text-lg text-left text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block w-full"
@@ -278,10 +279,10 @@ const Navbar: React.FC = () => {
                     >
                       Sign In
                     </Link>
-                  )}
+                  )} */}
 
-                  {/* Invest Now Button */}
-                  <div className="mt-6 pt-6 border-t border-graphite">
+                  {/* Invest Now Button - HIDDEN FOR SIMPLIFIED APP */}
+                  {/* <div className="mt-6 pt-6 border-t border-graphite">
                     <Link
                       to="/onboarding-flow/subscription-agreement"
                       className="block w-full py-4 px-4 bg-gold text-background text-lg font-semibold text-center rounded-lg hover:bg-gold/90 transition-all duration-200"
@@ -289,7 +290,7 @@ const Navbar: React.FC = () => {
                     >
                       Invest Now
                     </Link>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </motion.div>

@@ -75,6 +75,19 @@ const Contact: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Auto-select today's date if it's available and no date is selected
+  React.useEffect(() => {
+    if ((selectedMethod === 'video' || selectedMethod === 'phone') && !selectedDate) {
+      const today = new Date();
+      const todayString = today.toISOString().split('T')[0];
+      const isWeekend = today.getDay() === 0 || today.getDay() === 6;
+
+      if (!isWeekend) {
+        setSelectedDate(todayString);
+      }
+    }
+  }, [selectedMethod, selectedDate]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -83,11 +96,11 @@ const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Only require authentication for video/phone consultations
-    if ((selectedMethod === 'video' || selectedMethod === 'phone') && !user) {
-      setShowAuthModal(true);
-      return;
-    }
+    // Allow anonymous call scheduling - no auth required
+    // if ((selectedMethod === 'video' || selectedMethod === 'phone') && !user) {
+    //   setShowAuthModal(true);
+    //   return;
+    // }
 
     if (selectedMethod === 'video' || selectedMethod === 'phone') {
       if (!selectedDate || !selectedTime) {
@@ -104,18 +117,27 @@ const Contact: React.FC = () => {
     try {
       // For video and phone consultations, create consultation request and open Calendly
       if (selectedMethod === 'video' || selectedMethod === 'phone') {
-        await createConsultationRequest({
-          name: `${formData.first_name} ${formData.last_name}`,
-          email: formData.email,
-          phone: formData.phone,
-          suggested_investment_amount: formData.suggested_investment_amount ? parseInt(formData.suggested_investment_amount) : undefined,
-          preferred_date: selectedDate,
-          preferred_time: selectedTime,
-          consultation_type: selectedMethod,
-          notes: formData.message || undefined
-        });
+        // Skip consultation request creation for anonymous users - just create CRM lead
+        // Only create consultation request if user is authenticated
+        if (user) {
+          try {
+            await createConsultationRequest({
+              name: `${formData.first_name} ${formData.last_name}`,
+              email: formData.email,
+              phone: formData.phone,
+              suggested_investment_amount: formData.suggested_investment_amount ? parseInt(formData.suggested_investment_amount) : undefined,
+              preferred_date: selectedDate,
+              preferred_time: selectedTime,
+              consultation_type: selectedMethod,
+              notes: formData.message || undefined
+            });
+          } catch (consultationError) {
+            console.error('Error creating consultation request:', consultationError);
+            // Continue anyway - the Calendly booking is what matters
+          }
+        }
 
-        // Create CRM lead for consultation
+        // Create CRM lead for consultation (works for anonymous users)
         try {
           await createLeadFromConsultation({
             name: `${formData.first_name} ${formData.last_name}`,
@@ -213,6 +235,7 @@ const Contact: React.FC = () => {
 
   const generateCalendarDays = () => {
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of day for proper comparison
     const firstDay = new Date(currentYear, currentMonth, 1);
     const lastDay = new Date(currentYear, currentMonth + 1, 0);
     const daysInMonth = lastDay.getDate();
@@ -228,7 +251,7 @@ const Contact: React.FC = () => {
       const date = new Date(currentYear, currentMonth, day);
       const dateString = date.toISOString().split('T')[0];
       const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-      const isPast = date < today;
+      const isPast = date < today; // Now properly compares dates
 
       if (!isWeekend && !isPast) {
         days.push({
@@ -510,7 +533,7 @@ const Contact: React.FC = () => {
 
                   <div className="space-y-3">
                     <label className="text-sm font-medium text-text-secondary uppercase tracking-wide">
-                      Investment Goals
+                      Investment Goals (Optional)
                     </label>
                     <textarea
                       name="investment_goals"
@@ -518,7 +541,7 @@ const Contact: React.FC = () => {
                       onChange={handleInputChange}
                       rows={3}
                       className="w-full bg-surface border border-graphite rounded-lg px-4 py-4 text-lg focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary resize-none transition-all duration-200"
-                      placeholder="Describe your investment objectives"
+                      placeholder="Describe your investment objectives (optional)"
                     />
                   </div>
                 </div>
