@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
       window.addEventListener('scroll', handleScroll);
     } else {
       // For other pages, we want the scrolled effect immediately
-      setIsScrolled(true); 
+      setIsScrolled(true);
     }
 
     return () => {
@@ -40,7 +40,10 @@ const Navbar: React.FC = () => {
       if (user) {
         checkUserRole().then(setUserRole);
         getUserProfile().then(profile => {
-          if (profile?.first_name && profile?.last_name) {
+          // Prioritize full_name over first_name + last_name
+          if (profile?.full_name) {
+            setUserName(profile.full_name);
+          } else if (profile?.first_name && profile?.last_name) {
             setUserName(`${profile.first_name} ${profile.last_name}`);
           }
         });
@@ -52,7 +55,10 @@ const Navbar: React.FC = () => {
       if (session?.user) {
         checkUserRole().then(setUserRole);
         getUserProfile().then(profile => {
-          if (profile?.first_name && profile?.last_name) {
+          // Prioritize full_name over first_name + last_name
+          if (profile?.full_name) {
+            setUserName(profile.full_name);
+          } else if (profile?.first_name && profile?.last_name) {
             setUserName(`${profile.first_name} ${profile.last_name}`);
           }
         });
@@ -76,23 +82,22 @@ const Navbar: React.FC = () => {
   };
   // Determine if this is the home page
   const isHomePage = pathname === '/';
-  
+
   // Header should be transparent on home page when not scrolled, match progress steps opacity elsewhere
-  const headerClasses = isHomePage 
-    ? `fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-300 ${
-        isScrolled ? 'bg-background/95 shadow-md backdrop-blur-sm' : 'bg-transparent'
-      }`
+  const headerClasses = isHomePage
+    ? `fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-300 ${isScrolled ? 'bg-background/95 shadow-md backdrop-blur-sm' : 'bg-transparent'
+    }`
     : 'fixed top-0 left-0 right-0 z-50 py-4 bg-background/95 backdrop-blur-sm shadow-md';
 
   return (
-    <header 
+    <header
       className={headerClasses}
     >
       <div className="container px-4 md:px-6 mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2 text-text-primary">
-          <img 
-            src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp" 
-            alt="Inner Circle Lending" 
+          <img
+            src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
+            alt="Inner Circle Lending"
             className="h-5 md:h-8 w-auto"
           />
           <span className="font-display font-semibold text-sm md:text-lg uppercase tracking-wide">InnerCircle</span>
@@ -102,8 +107,8 @@ const Navbar: React.FC = () => {
         <nav className="hidden md:flex md:items-center md:gap-8">
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/about" className="nav-link">About</Link>
-          <Link to="/faq" className="nav-link">FAQ</Link>        
-          <Link to="/investor-info" className="nav-link">Investor Info</Link>        
+          <Link to="/faq" className="nav-link">FAQ</Link>
+          <Link to="/investor-info" className="nav-link">Investor Info</Link>
           <Link to="/contact" className="nav-link">Contact</Link>
 
           {(userRole === 'admin' || userRole === 'sub_admin') && (
@@ -117,41 +122,41 @@ const Navbar: React.FC = () => {
                   <User className="w-4 h-4 text-gold" />
                 </Link>
                 <div className="absolute right-0 mt-2 py-2 w-56 bg-surface border border-graphite rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                {userName && (
-                  <div className="px-4 py-2 border-b border-graphite">
-                    <p className="text-sm text-gold font-medium">{userName}</p>
-                    <p className="text-xs text-text-secondary">{user?.email}</p>
-                  </div>
-                )}
-                <Link to="/dashboard" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">Dashboard</Link>
-                <Link to="/profile" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">View Profile</Link>
-                <hr className="my-1 border-graphite" />
-                <button 
-                  onClick={handleSignOut}
-                  className="w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent"
-                >
-                  Sign Out
-                </button>
+                  {userName && (
+                    <div className="px-4 py-2 border-b border-graphite">
+                      <p className="text-sm text-gold font-medium">{userName}</p>
+                      <p className="text-xs text-text-secondary">{user?.email}</p>
+                    </div>
+                  )}
+                  <Link to="/dashboard" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">Dashboard</Link>
+                  <Link to="/profile" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">View Profile</Link>
+                  <hr className="my-1 border-graphite" />
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent"
+                  >
+                    Sign Out
+                  </button>
                 </div>
               </div>
-              <NotificationBell 
-                userRole={userRole} 
+              <NotificationBell
+                userRole={userRole}
                 isMobile={false}
-                onNavigateToAdmin={() => navigate('/admin')} 
+                onNavigateToAdmin={() => navigate('/admin')}
                 onNavigateToDashboard={() => navigate('/dashboard')}
               />
             </>
           ) : (
-            <button 
+            <button
               onClick={() => {
                 const authModal = document.createElement('div');
                 authModal.id = 'auth-modal-container';
                 document.body.appendChild(authModal);
-                
+
                 const root = createRoot(authModal);
                 root.render(
-                  <AuthModal 
-                    isOpen={true} 
+                  <AuthModal
+                    isOpen={true}
                     onClose={() => {
                       root.unmount();
                       document.body.removeChild(authModal);
@@ -178,20 +183,20 @@ const Navbar: React.FC = () => {
         {/* Mobile: Contact + Hamburger */}
         <div className="md:hidden flex items-center gap-4">
           {user && (
-            <NotificationBell 
-              userRole={userRole} 
+            <NotificationBell
+              userRole={userRole}
               isMobile={true}
-              onNavigateToAdmin={() => navigate('/admin')} 
+              onNavigateToAdmin={() => navigate('/admin')}
               onNavigateToDashboard={() => navigate('/dashboard')}
             />
           )}
-          <Link 
-            to="/contact" 
+          <Link
+            to="/contact"
             className="text-text-primary hover:text-gold transition-colors font-medium text-sm"
           >
             Contact
           </Link>
-          <button 
+          <button
             className="flex items-center"
             onClick={() => setIsOpen(!isOpen)}
             aria-label={isOpen ? "Close Menu" : "Open Menu"}
@@ -208,51 +213,50 @@ const Navbar: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className={`fixed top-16 left-0 right-0 border-b border-graphite shadow-2xl md:hidden z-40 ${
-                isHomePage ? 'bg-surface/95 backdrop-blur-md' : 'bg-background/95 backdrop-blur-sm'
-              }`}
+              className={`fixed top-16 left-0 right-0 border-b border-graphite shadow-2xl md:hidden z-40 ${isHomePage ? 'bg-surface/95 backdrop-blur-md' : 'bg-background/95 backdrop-blur-sm'
+                }`}
             >
               <div className="py-6 px-6">
                 <div className="flex flex-col space-y-1 max-w-full">
                   {(userRole === 'admin' || userRole === 'sub_admin') && (
-                    <Link 
-                      to="/admin" 
+                    <Link
+                      to="/admin"
                       className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
                       onClick={() => setIsOpen(false)}
                     >
                       Admin
                     </Link>
                   )}
-                  
+
                   <Link to="/"
                     className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
                     onClick={() => setIsOpen(false)}
                   >
                     Home
                   </Link>
-                  <Link 
-                    to="/about" 
+                  <Link
+                    to="/about"
                     className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
                     onClick={() => setIsOpen(false)}
                   >
                     About
                   </Link>
-                  <Link 
-                    to="/faq" 
+                  <Link
+                    to="/faq"
                     className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
                     onClick={() => setIsOpen(false)}
                   >
                     FAQ
                   </Link>
-                  <Link 
-                    to="/investor-info" 
+                  <Link
+                    to="/investor-info"
                     className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                    onClick={() => setIsOpen(false)} 
+                    onClick={() => setIsOpen(false)}
                   >
                     Investor Info
                   </Link>
-                  <Link 
-                    to="/contact" 
+                  <Link
+                    to="/contact"
                     className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
                     onClick={() => setIsOpen(false)}
                   >
@@ -260,8 +264,8 @@ const Navbar: React.FC = () => {
                   </Link>
                   {user ? (
                     <>
-                      <Link 
-                        to="/profile" 
+                      <Link
+                        to="/profile"
                         className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
                         onClick={() => setIsOpen(false)}
                       >
@@ -275,18 +279,18 @@ const Navbar: React.FC = () => {
                       </button>
                     </>
                   ) : (
-                    <Link 
-                      to="#" 
+                    <Link
+                      to="#"
                       onClick={(e) => {
                         e.preventDefault();
                         const authModal = document.createElement('div');
                         authModal.id = 'auth-modal-container';
                         document.body.appendChild(authModal);
-                        
+
                         const root = createRoot(authModal);
                         root.render(
-                          <AuthModal 
-                            isOpen={true} 
+                          <AuthModal
+                            isOpen={true}
                             onClose={() => {
                               root.unmount();
                               document.body.removeChild(authModal);
@@ -311,7 +315,7 @@ const Navbar: React.FC = () => {
                       Sign In
                     </Link>
                   )}
-                  
+
                   {/* Invest Now Button */}
                   <div className="mt-6 pt-6 border-t border-graphite">
                     <Link

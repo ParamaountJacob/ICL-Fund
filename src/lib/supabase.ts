@@ -207,6 +207,8 @@ export interface UserProfile {
   user_id: string;
   first_name?: string;
   last_name?: string;
+  full_name?: string;
+  role?: UserRole;
   phone?: string;
   address?: string;
   ira_accounts?: string;
@@ -283,9 +285,9 @@ export const checkUserRole = async (): Promise<UserRole> => {
   if (!user) return 'user';
 
   const { data } = await supabase
-    .from('users')
+    .from('user_profiles')
     .select('role')
-    .eq('id', user.id)
+    .eq('user_id', user.id)
     .maybeSingle();
 
   return (data?.role || 'user') as UserRole;
