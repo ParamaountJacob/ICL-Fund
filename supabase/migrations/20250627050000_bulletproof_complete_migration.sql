@@ -611,9 +611,19 @@ ALTER TABLE simple_notifications ENABLE ROW LEVEL SECURITY;
 CREATE POLICY user_applications_policy ON simple_applications
     FOR ALL USING (user_id = auth.uid());
 
--- Users can only see their own notifications
+-- Users can only see their own notifications, or admin notifications if they are admin
 CREATE POLICY user_notifications_policy ON simple_notifications
-    FOR ALL USING (user_id = auth.uid() OR is_admin = true);
+    FOR ALL USING (
+        user_id = auth.uid() 
+        OR (
+            is_admin = true 
+            AND EXISTS (
+                SELECT 1 FROM auth.users 
+                WHERE id = auth.uid() 
+                AND (raw_user_meta_data->>'role' = 'admin' OR email LIKE '%@innercirclelending.com')
+            )
+        )
+    );
 
 COMMIT;
 
