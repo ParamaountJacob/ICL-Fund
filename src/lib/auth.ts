@@ -62,6 +62,16 @@ export const authService = {
         });
     },
 
+    // Sign in with OAuth
+    async signInWithOAuth(provider: 'google' | 'github' | 'apple', redirectTo?: string) {
+        return await supabase.auth.signInWithOAuth({
+            provider,
+            options: {
+                redirectTo: redirectTo || window.location.origin
+            }
+        });
+    },
+
     // Sign out
     async signOut() {
         return await supabase.auth.signOut();
