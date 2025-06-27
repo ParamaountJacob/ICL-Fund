@@ -22,7 +22,7 @@ import SubscriptionAgreement from './pages/onboarding-flow/SubscriptionAgreement
 import PromissoryNote from './pages/onboarding-flow/PromissoryNote';
 import WireDetails from './pages/onboarding-flow/WireDetails';
 import PlaidBanking from './pages/onboarding-flow/PlaidBanking';
-import { supabase, getUserProfile, debugDatabaseState } from './lib/supabase';
+import { supabase, getUserProfile, debugDatabaseState, ensureUserProfileExists } from './lib/supabase';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -69,6 +69,10 @@ function App() {
 
     if (user) {
       console.log('Checking profile for user:', user.id);
+
+      // Ensure the user profile exists in the database
+      const profileExists = await ensureUserProfileExists();
+      console.log('Profile exists check:', profileExists);
 
       // Run database diagnostic
       await debugDatabaseState();

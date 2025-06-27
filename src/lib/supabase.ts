@@ -320,45 +320,41 @@ export const updateUserProfile = async (profile: Partial<UserProfile>): Promise<
   if (!userId) return null;
 
   try {
-    console.log('=== UPDATE USER PROFILE START ===');
+    console.log('=== UPDATE USER PROFILE START (DIRECT APPROACH) ===');
     console.log('Updating profile for user ID:', userId);
     console.log('Profile data to save:', profile);
 
-    // First update the auth metadata to ensure first_name and last_name are stored there
-    if (profile.first_name || profile.last_name) {
-      console.log('Calling update_user_metadata...');
-      const metadataResult = await supabase.rpc('update_user_metadata', {
-        p_first_name: profile.first_name,
-        p_last_name: profile.last_name
+    // DIRECT APPROACH: Skip the problematic database function and use direct table insert
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .upsert({
+        id: userId,
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        phone: profile.phone || null,
+        address: profile.address || null,
+        ira_accounts: profile.ira_accounts || null,
+        investment_goals: profile.investment_goals || null,
+        risk_tolerance: profile.risk_tolerance || null,
+        net_worth: profile.net_worth || null,
+        annual_income: profile.annual_income || null,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'id',
+        ignoreDuplicates: false
       });
-      console.log('Metadata update result:', metadataResult);
-    }
 
-    // Then update the user profile
-    console.log('Calling safe_upsert_user_profile...');
-    const { data, error } = await supabase.rpc('safe_upsert_user_profile', {
-      p_user_id: userId,
-      p_first_name: profile.first_name,
-      p_last_name: profile.last_name,
-      p_phone: profile.phone,
-      p_address: profile.address,
-      p_ira_accounts: profile.ira_accounts,
-      p_investment_goals: profile.investment_goals,
-      p_risk_tolerance: profile.risk_tolerance,
-      p_net_worth: profile.net_worth,
-      p_annual_income: profile.annual_income
-    });
+    console.log('Direct upsert result:', { data, error });
 
-    console.log('safe_upsert_user_profile result:', { data, error });
     if (error) {
-      console.error('Database function error:', error);
+      console.error('Direct upsert error:', error);
       throw error;
     }
 
     console.log('Getting updated profile...');
     const updatedProfile = await getUserProfile();
     console.log('Updated profile retrieved:', updatedProfile);
-    console.log('=== UPDATE USER PROFILE END ===');
+    console.log('=== UPDATE USER PROFILE END (DIRECT APPROACH) ===');
 
     return updatedProfile;
   } catch (error) {
@@ -1586,5 +1582,99 @@ export const debugDatabaseState = async () => {
     console.log('=== DATABASE DIAGNOSTIC END ===');
   } catch (error) {
     console.error('Diagnostic error:', error);
+  }
+};
+
+// Emergency function to ensure the user_profiles table exists
+export const ensureUserProfilesTable = async () => {
+  try {
+    console.log('=== ENSURING USER_PROFILES TABLE EXISTS ===');
+
+    // Try to create the table if it doesn't exist using raw SQL
+    const { data, error } = await supabase.rpc('sql', {
+      query: `
+        CREATE TABLE IF NOT EXISTS user_profiles (
+          id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+          first_name text,
+          last_name text,
+          email text,
+          phone text,
+          address text,
+          ira_accounts jsonb,
+          investment_goals text,
+          risk_tolerance text,
+          net_worth text,
+          annual_income text,
+          role text DEFAULT 'user',
+          verification_status text DEFAULT 'pending',
+          created_at timestamptz DEFAULT now(),
+          updated_at timestamptz DEFAULT now()
+        );
+        
+        ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+        
+        DROP POLICY IF EXISTS user_profiles_policy ON user_profiles;
+        CREATE POLICY user_profiles_policy ON user_profiles FOR ALL USING (id = auth.uid());
+        
+        GRANT ALL ON user_profiles TO authenticated;
+      `
+    });
+
+    console.log('Table creation result:', { data, error });
+    return true;
+  } catch (error) {
+    console.error('Error ensuring table exists:', error);
+    return false;
+  }
+};
+
+// Emergency function to test if user_profiles table works and create a profile manually if needed
+export const ensureUserProfileExists = async (): Promise<boolean> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+
+    console.log('=== ENSURING USER PROFILE EXISTS ===');
+
+    // Test if we can read from the table
+    const { data: testRead, error: readError } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('id', user.id)
+      .limit(1);
+
+    console.log('Table read test:', { data: testRead, error: readError });
+
+    if (readError) {
+      console.error('Cannot read from user_profiles table:', readError);
+      return false;
+    }
+
+    // If we can read but no profile exists, try to create one
+    if (!testRead || testRead.length === 0) {
+      console.log('No profile exists, creating one...');
+
+      const { data: insertData, error: insertError } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: user.id,
+          first_name: null,
+          last_name: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+      console.log('Profile creation result:', { data: insertData, error: insertError });
+
+      if (insertError) {
+        console.error('Failed to create profile:', insertError);
+        return false;
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error ensuring profile exists:', error);
+    return false;
   }
 };
