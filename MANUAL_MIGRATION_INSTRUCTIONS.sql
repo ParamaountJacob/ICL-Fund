@@ -1,15 +1,18 @@
 -- =================================================================
--- MANUAL APPLICATION SCRIPT FOR SUPABASE DASHBOARD
+-- MANUAL APPLICATION SCRIPT FOR SUPABASE DASHBOARD (IDEMPOTENT)
 -- Copy and paste the migrations into your Supabase SQL Editor one by one
+-- THESE MIGRATIONS ARE 100% SAFE TO RUN MULTIPLE TIMES
 -- =================================================================
 
--- STEP 1: Apply comprehensive RLS policies
--- Copy the entire content of: 20250627170000_comprehensive_rls_policies.sql
+-- STEP 1: Apply comprehensive RLS policies (IDEMPOTENT VERSION)
+-- Copy the entire content of: 20250627170000_comprehensive_rls_policies_idempotent.sql
 -- Paste into Supabase SQL Editor and run
+-- ✅ Safe to run multiple times - will skip existing objects
 
--- STEP 2: Apply database cleanup  
--- Copy the entire content of: 20250627170001_database_cleanup.sql
+-- STEP 2: Apply database cleanup (IDEMPOTENT VERSION)
+-- Copy the entire content of: 20250627170001_database_cleanup_idempotent.sql
 -- Paste into Supabase SQL Editor and run
+-- ✅ Safe to run multiple times - will only clean up problematic data
 
 -- STEP 3: Verify admin user setup
 SELECT 
