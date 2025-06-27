@@ -579,12 +579,11 @@ const Contact: React.FC = () => {
                                   <button
                                     type="button"
                                     onClick={() => day.isSelectable && setSelectedDate(day.date)}
-                                    disabled={!day.isSelectable}
                                     className={`w-full h-full rounded-lg text-sm transition-all duration-200 ${day.isSelectable
                                       ? selectedDate === day.date
                                         ? 'bg-gold text-background font-bold shadow-lg ring-2 ring-gold/50'
                                         : 'bg-gold/10 border-2 border-gold/30 text-gold font-semibold hover:bg-gold/20 hover:border-gold/50 hover:shadow-md'
-                                      : 'bg-graphite/20 text-text-secondary/40 cursor-not-allowed opacity-30'
+                                      : 'bg-transparent text-text-secondary/60 hover:bg-surface/50 cursor-default'
                                       }`}
                                   >
                                     {day.display}
