@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { ExternalLink } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 
 interface CalendlyEmbedProps {
     isOpen: boolean;
@@ -27,44 +27,7 @@ const CalendlyEmbed: React.FC<CalendlyEmbedProps> = ({
     calendlyUrl,
     consultationType
 }) => {
-    useEffect(() => {
-        if (isOpen) {
-            // Load Calendly script if not already loaded
-            if (!document.querySelector('script[src*="calendly"]')) {
-                const script = document.createElement('script');
-                script.src = 'https://assets.calendly.com/assets/external/widget.js';
-                script.async = true;
-                document.head.appendChild(script);
-            }
-
-            // Initialize Calendly widget when script loads
-            const initCalendly = () => {
-                const calendlyDiv = document.getElementById('calendly-embed-container');
-                if (calendlyDiv && window.Calendly) {
-                    window.Calendly.initInlineWidget({
-                        url: calendlyUrl,
-                        parentElement: calendlyDiv
-                    });
-                }
-            };
-
-            // Check if Calendly is already loaded
-            if (window.Calendly) {
-                initCalendly();
-            } else {
-                // Wait for script to load
-                const checkCalendly = setInterval(() => {
-                    if (window.Calendly) {
-                        clearInterval(checkCalendly);
-                        initCalendly();
-                    }
-                }, 100);
-
-                return () => clearInterval(checkCalendly);
-            }
-        }
-    }, [isOpen, calendlyUrl]);
-
+    // DEMO MODE - No actual Calendly integration
     if (!isOpen) return null;
 
     return (
@@ -82,7 +45,7 @@ const CalendlyEmbed: React.FC<CalendlyEmbedProps> = ({
                             Schedule Your {consultationType === 'video' ? 'Video' : 'Phone'} Consultation
                         </h2>
                         <p className="text-text-secondary mt-1 text-sm sm:text-base">
-                            Select your preferred time slot below
+                            DEMO MODE - Calendar integration disabled
                         </p>
                     </div>
                     <button
@@ -93,28 +56,26 @@ const CalendlyEmbed: React.FC<CalendlyEmbedProps> = ({
                     </button>
                 </div>
 
-                {/* Calendly Embed Container */}
-                <div className="flex-1 relative overflow-hidden">
-                    <div
-                        id="calendly-embed-container"
-                        className="w-full h-full"
-                        style={{ minHeight: '600px' }}
-                    />
-
-                    {/* Fallback Link */}
-                    <div className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4">
-                        <motion.a
-                            href={calendlyUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="inline-flex items-center gap-2 bg-gold text-background px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-gold/90 transition-colors text-xs sm:text-sm"
-                        >
-                            <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
-                            <span className="hidden sm:inline">Can't see the calendar? Click here</span>
-                            <span className="sm:hidden">Open Calendar</span>
-                        </motion.a>
+                {/* Demo Content */}
+                <div className="flex-1 flex items-center justify-center p-8">
+                    <div className="text-center">
+                        <div className="w-20 h-20 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Calendar className="w-10 h-10 text-gold" />
+                        </div>
+                        <h3 className="text-2xl font-semibold text-text-primary mb-4">
+                            Calendar Integration
+                        </h3>
+                        <p className="text-text-secondary mb-6 max-w-md">
+                            This is where the Calendly scheduling widget would appear.
+                            Currently in demo mode - no backend integration.
+                        </p>
+                        <div className="space-y-3 text-left bg-accent p-4 rounded-lg max-w-md">
+                            <p className="text-sm text-text-secondary">
+                                <strong>Submitted Details:</strong>
+                            </p>
+                            <p className="text-sm text-text-primary">Type: {consultationType}</p>
+                            <p className="text-sm text-text-primary">URL: {calendlyUrl}</p>
+                        </div>
                     </div>
                 </div>
             </motion.div>

@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { supabase, getUserProfile } from '../lib/supabase';
 import {
   FileText,
-  FileCheck,
-  Wallet,
   User,
   Mail,
   Calendar,
@@ -19,21 +16,9 @@ import {
   Settings,
   DollarSign,
   Target,
-  TrendingUp
+  TrendingUp,
+  AlertCircle
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import type { DocumentType } from '../lib/supabase';
-import { SuccessModal } from '../components/SuccessModal';
-import AuthModal from '../components/AuthModal';
-import { useAuth } from '../contexts/AuthContext';
-import { useNotifications } from '../contexts/NotificationContext';
-
-interface DocumentRequest {
-  document_type: DocumentType;
-  status: 'pending' | 'approved' | 'rejected';
-  created_at: string;
-}
 
 interface UserProfile {
   id?: string;
@@ -47,60 +32,32 @@ interface UserProfile {
   annual_income: string;
 }
 
+type DocumentType = 'pitch_deck' | 'ppm' | 'wire_instructions';
+
 const Profile: React.FC = () => {
-  const navigate = useNavigate();
-  const { user, profile: authProfile, refreshProfile } = useAuth();
-  const { success, error: showError } = useNotifications();
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  // Local profile state for editing
+  // Demo profile data - no authentication required
   const [profile, setProfile] = useState<UserProfile>({
-    first_name: '',
-    last_name: '',
-    phone: '',
-    address: '',
-    ira_accounts: '',
-    investment_goals: '',
-    net_worth: '',
-    annual_income: ''
+    first_name: 'John',
+    last_name: 'Demo',
+    phone: '(555) 123-4567',
+    address: '123 Demo Street, Sample City, ST 12345',
+    ira_accounts: 'Traditional IRA with Sample Financial',
+    investment_goals: 'Long-term wealth building and retirement planning',
+    net_worth: '$500,000 - $1,000,000',
+    annual_income: '$150,000 - $200,000'
   });
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'personal' | 'security' | 'documents'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'personal' | 'security'>('overview');
   const [editingPersonal, setEditingPersonal] = useState(false);
   const [editingPassword, setEditingPassword] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-
-  // Update local profile when auth profile changes
-  useEffect(() => {
-    if (authProfile) {
-      setProfile({
-        first_name: authProfile.first_name || '',
-        last_name: authProfile.last_name || '',
-        phone: authProfile.phone || '',
-        address: authProfile.address || '',
-        ira_accounts: authProfile.ira_accounts || '',
-        investment_goals: authProfile.investment_goals || '',
-        net_worth: authProfile.net_worth || '',
-        annual_income: authProfile.annual_income || ''
-      });
-    }
-  }, [authProfile]);
-
-  // Check auth state
-  useEffect(() => {
-    if (!user) {
-      setShowAuthModal(true);
-    } else {
-      setShowAuthModal(false);
-    }
-  }, [user]);
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -112,103 +69,57 @@ const Profile: React.FC = () => {
     setPasswordData(prev => ({ ...prev, [name]: value }));
   };
 
-  const saveProfile = async () => {
-    if (!user) return;
-
+  const saveProfile = () => {
     setLoading(true);
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .upsert({
-          user_id: user.id,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          phone: profile.phone,
-          address: profile.address,
-          ira_accounts: profile.ira_accounts,
-          investment_goals: profile.investment_goals,
-          net_worth: profile.net_worth,
-          annual_income: profile.annual_income,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'user_id' });
-
-      if (error) throw error;
-
-      // Refresh the auth profile
-      await refreshProfile();
-
+    // Demo mode - simulate save delay
+    setTimeout(() => {
       setEditingPersonal(false);
       setShowSuccessModal(true);
-      success('Profile Updated', 'Your profile has been saved successfully.');
-    } catch (error) {
-      console.error('Error saving profile:', error);
-      showError('Save Failed', 'Failed to save profile. Please try again.');
-    } finally {
       setLoading(false);
-    }
+      console.log('DEMO MODE - Profile saved (visual only):', profile);
+      alert('Demo Mode: Profile saved successfully! (Visual only - no real backend)');
+    }, 1000);
   };
 
-  const updatePassword = async () => {
+  const updatePassword = () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      showError('Password Mismatch', 'New passwords do not match.');
+      alert('Demo Mode: New passwords do not match.');
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      showError('Password Too Short', 'Password must be at least 6 characters long.');
+      alert('Demo Mode: Password must be at least 6 characters long.');
       return;
     }
 
     setLoading(true);
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: passwordData.newPassword
-      });
-
-      if (error) throw error;
-
+    // Demo mode - simulate password update
+    setTimeout(() => {
       setPasswordData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       });
       setEditingPassword(false);
-      success('Password Updated', 'Your password has been updated successfully!');
-    } catch (error) {
-      console.error('Error updating password:', error);
-      showError('Update Failed', 'Failed to update password. Please try again.');
-    } finally {
       setLoading(false);
-    }
+      console.log('DEMO MODE - Password updated (visual only)');
+      alert('Demo Mode: Password updated successfully! (Visual only - no real backend)');
+    }, 1000);
   };
 
-  const updateEmail = async () => {
-    const newEmail = prompt('Enter your new email address:');
+  const updateEmail = () => {
+    const newEmail = prompt('Demo Mode: Enter your new email address (visual only):');
     if (!newEmail) return;
 
     setLoading(true);
-    try {
-      const { error } = await supabase.auth.updateUser({
-        email: newEmail
-      });
-
-      if (error) throw error;
-      info('Email Update', 'Email update initiated. Please check your new email for confirmation.');
-    } catch (error) {
-      console.error('Error updating email:', error);
-      showError('Update Failed', 'Failed to update email. Please try again.');
-    } finally {
+    // Demo mode - simulate email update
+    setTimeout(() => {
       setLoading(false);
-    }
+      console.log('DEMO MODE - Email update initiated (visual only):', newEmail);
+      alert('Demo Mode: Email update initiated. This is visual only - no real backend.');
+    }, 1000);
   };
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
   const getDocumentIcon = (type: DocumentType) => {
     switch (type) {
@@ -261,28 +172,6 @@ const Profile: React.FC = () => {
     }
   };
 
-  if (showAuthModal) {
-    return (
-      <div className="pt-28">
-        <section className="py-24 md:py-32">
-          <div className="section">
-            <div className="max-w-md mx-auto">
-              <AuthModal
-                isOpen={true}
-                onClose={() => window.location.href = '/'}
-                onSuccess={() => setShowAuthModal(false)}
-                onSignUpSuccess={() => {
-                  setShowAuthModal(false);
-                  navigate('/verify');
-                }}
-              />
-            </div>
-          </div>
-        </section>
-      </div>
-    );
-  }
-
   return (
     <div className="pt-20 md:pt-28">
       <section className="py-12 md:py-24">
@@ -304,18 +193,16 @@ const Profile: React.FC = () => {
                   <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-text-secondary text-sm md:text-base">
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4" />
-                      <span className="break-all">{user?.email}</span>
+                      <span className="break-all">john.demo@innercirclelending.com</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      <span>Member since {user?.created_at ? formatDate(user.created_at) : 'N/A'}</span>
+                      <span>Member since January 15, 2024</span>
                     </div>
-                    {profile.first_name && profile.last_name && (
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        <span>{profile.first_name} {profile.last_name}</span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      <span>{profile.first_name} {profile.last_name}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -383,7 +270,7 @@ const Profile: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between items-start">
                       <span className="text-text-secondary text-sm">Email</span>
-                      <span className="text-text-primary text-sm text-right break-all">{user?.email}</span>
+                      <span className="text-text-primary text-sm text-right break-all">john.demo@innercirclelending.com</span>
                     </div>
                     <div className="flex justify-between items-start">
                       <span className="text-text-secondary text-sm">Name</span>
@@ -395,15 +282,11 @@ const Profile: React.FC = () => {
                     </div>
                     <div className="flex justify-between items-start">
                       <span className="text-text-secondary text-sm">Member Since</span>
-                      <span className="text-text-primary text-sm text-right">
-                        {user?.created_at ? formatDate(user.created_at) : 'N/A'}
-                      </span>
+                      <span className="text-text-primary text-sm text-right">January 15, 2024</span>
                     </div>
                     <div className="flex justify-between items-start">
                       <span className="text-text-secondary text-sm">Last Updated</span>
-                      <span className="text-text-primary text-sm text-right">
-                        {user?.updated_at ? formatDate(user.updated_at) : 'N/A'}
-                      </span>
+                      <span className="text-text-primary text-sm text-right">December 20, 2024</span>
                     </div>
                   </div>
                 </div>

@@ -22,7 +22,13 @@ const InvestorInfo: React.FC = () => {
   const [showCustomInput, setShowCustomInput] = useState(false);
 
   const handleGetStarted = () => {
-    navigate('/onboarding-flow/subscription-agreement');
+    // DEMO MODE - No navigation to onboarding
+    alert('Demo Mode: Investment process would normally begin here. No backend integration.');
+    console.log('Demo Mode: Get Started clicked', {
+      calculatorAmount,
+      selectedTier,
+      termYears
+    });
   };
 
   const getReturnRate = (amount: number, years: number) => {
@@ -211,8 +217,8 @@ const InvestorInfo: React.FC = () => {
                               key={years}
                               onClick={() => setTermYears(years)}
                               className={`p-4 md:p-4 rounded-lg md:rounded-xl border-2 transition-all duration-300 font-semibold text-base md:text-base ${termYears === years
-                                  ? 'border-gold bg-gold/10 text-gold shadow-lg'
-                                  : 'border-graphite bg-accent text-text-secondary hover:border-gold/50 hover:bg-gold/5'
+                                ? 'border-gold bg-gold/10 text-gold shadow-lg'
+                                : 'border-graphite bg-accent text-text-secondary hover:border-gold/50 hover:bg-gold/5'
                                 }`}
                             >
                               {years} Year{years > 1 ? 's' : ''}
@@ -233,8 +239,8 @@ const InvestorInfo: React.FC = () => {
                                 key={amount}
                                 onClick={() => handleTierSelect(amount)}
                                 className={`p-3 md:p-4 rounded-lg md:rounded-xl border-2 transition-all duration-300 text-center ${selectedTier === amount
-                                    ? 'border-gold bg-gold/10 text-gold shadow-lg'
-                                    : 'border-graphite bg-accent text-text-secondary hover:border-gold/50 hover:bg-gold/5'
+                                  ? 'border-gold bg-gold/10 text-gold shadow-lg'
+                                  : 'border-graphite bg-accent text-text-secondary hover:border-gold/50 hover:bg-gold/5'
                                   }`}
                               >
                                 <div className="font-semibold text-sm md:text-base mb-1">

@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Video, Phone, ArrowLeft, Clock, User, MessageSquare, DollarSign, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
-import { createConsultationRequest } from '../lib/supabase';
-import { createLeadFromContact, createLeadFromConsultation } from '../lib/crm';
-import { supabase } from '../lib/supabase';
 import AuthModal from '../components/AuthModal';
 import { SuccessModal } from '../components/SuccessModal';
 import CalendlyEmbed from '../components/CalendlyEmbed';
@@ -12,7 +9,6 @@ type ContactMethod = 'email' | 'video' | 'phone' | null;
 
 const Contact: React.FC = () => {
   const [selectedMethod, setSelectedMethod] = useState<ContactMethod>(null);
-  const [user, setUser] = useState<any>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCalendlyEmbed, setShowCalendlyEmbed] = useState(false);
@@ -33,46 +29,6 @@ const Contact: React.FC = () => {
     message: ''
   });
 
-  React.useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-      if (user) {
-        setFormData(prev => ({
-          ...prev,
-          email: user.email || ''
-        }));
-
-        supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle()
-          .then(({ data: profile }) => {
-            if (profile) {
-              setFormData(prev => ({
-                ...prev,
-                first_name: profile.first_name || '',
-                last_name: profile.last_name || '',
-                phone: profile.phone || '',
-                address: profile.address || '',
-                investment_goals: profile.investment_goals || ''
-              }));
-            }
-          });
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        setFormData(prev => ({
-          ...prev,
-          email: session.user.email || ''
-        }));
-      }
-    }); return () => subscription.unsubscribe();
-  }, []);
-
   // Ensure calendar starts on current month/year when form loads
   React.useEffect(() => {
     const now = new Date();
@@ -88,12 +44,7 @@ const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Allow anonymous call scheduling - no auth required
-    // if ((selectedMethod === 'video' || selectedMethod === 'phone') && !user) {
-    //   setShowAuthModal(true);
-    //   return;
-    // }
-
+    // Basic validation for demo purposes
     if (selectedMethod === 'video' || selectedMethod === 'phone') {
       if (!selectedDate || !selectedTime) {
         alert('Please select both a date and time for your consultation.');
@@ -106,108 +57,18 @@ const Contact: React.FC = () => {
     }
 
     setLoading(true);
-    try {
-      // For video and phone consultations, create consultation request and open Calendly
-      if (selectedMethod === 'video' || selectedMethod === 'phone') {
-        // Background operations - don't let these block the UI
-        Promise.all([
-          // Only create consultation request if user is authenticated
-          user ? createConsultationRequest({
-            name: `${formData.first_name} ${formData.last_name}`,
-            email: formData.email,
-            phone: formData.phone,
-            suggested_investment_amount: formData.suggested_investment_amount ? parseInt(formData.suggested_investment_amount) : undefined,
-            preferred_date: selectedDate,
-            preferred_time: selectedTime,
-            consultation_type: selectedMethod,
-            notes: formData.message || undefined
-          }).catch(error => console.error('Consultation request error:', error)) : Promise.resolve(),
 
-          // Create CRM lead for consultation (works for anonymous users)
-          createLeadFromConsultation({
-            name: `${formData.first_name} ${formData.last_name}`,
-            email: formData.email,
-            phone: formData.phone,
-            suggested_investment_amount: formData.suggested_investment_amount ? parseInt(formData.suggested_investment_amount) : undefined,
-            preferred_date: selectedDate,
-            preferred_time: selectedTime,
-            consultation_type: selectedMethod,
-            notes: formData.message || undefined
-          }).catch(error => console.error('CRM lead error:', error))
-        ]).catch(error => {
-          console.error('Background operations error:', error);
-          // Don't block the user experience for background operations
-        });
-
-        // Build Calendly URL and show embed immediately
-        const calendlyBaseUrl = selectedMethod === 'video'
-          ? 'https://calendly.com/innercirclelending/30min'
-          : 'https://calendly.com/innercirclelending/q-a-phone-chat';
-
-        const dateTimeString = `${selectedDate}T${convertTimeToISO(selectedTime)}-05:00`;
-        const params = new URLSearchParams();
-
-        if (formData.first_name && formData.last_name) params.append('name', `${formData.first_name} ${formData.last_name}`);
-        if (formData.email) params.append('email', formData.email);
-        if (formData.message) params.append('a1', formData.message);
-        if (formData.suggested_investment_amount) params.append('a2', `$${parseInt(formData.suggested_investment_amount).toLocaleString()}`);
-        if (formData.investment_goals) params.append('a3', formData.investment_goals);
-        if (formData.phone) params.append('phone', formData.phone);
-
-        params.append('date', selectedDate);
-        params.append('month', `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}`);
-
-        const calendlyUrl = `${calendlyBaseUrl}/${dateTimeString}?${params.toString()}`;
-
-        // Show Calendly embed instead of opening new window
-        setCalendlyUrl(calendlyUrl);
-        setShowCalendlyEmbed(true);
-
-        // For consultations, don't show success modal - go straight to Calendly
-        setLoading(false);
-        return;
-      } else {
-        // Create CRM lead for email contact
-        try {
-          await createLeadFromContact({
-            name: `${formData.first_name} ${formData.last_name}`,
-            email: formData.email,
-            phone: formData.phone,
-            message: formData.message
-          });
-        } catch (crmError) {
-          console.error('Error creating CRM lead:', crmError);
-        }
-
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-contact-email`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              name: `${formData.first_name} ${formData.last_name}`,
-              email: formData.email,
-              phone: formData.phone,
-              message: formData.message
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to send email');
-        }
-      }
-
-      setShowSuccessModal(true);
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit form. Please try again.');
-    } finally {
+    // Simulate loading time for demo - NO BACKEND CALLS
+    setTimeout(() => {
       setLoading(false);
-    }
+      setShowSuccessModal(true);
+      console.log('Form submitted (DEMO MODE - NO BACKEND):', {
+        method: selectedMethod,
+        formData,
+        selectedDate,
+        selectedTime
+      });
+    }, 2000);
   };
 
   const convertTimeToISO = (time: string) => {
@@ -300,7 +161,7 @@ const Contact: React.FC = () => {
     setFormData({
       first_name: '',
       last_name: '',
-      email: user?.email || '',
+      email: '',
       phone: '',
       address: '',
       investment_goals: '',

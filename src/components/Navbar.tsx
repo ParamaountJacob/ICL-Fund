@@ -1,23 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut, FileText, Bell } from 'lucide-react';
-import { createRoot } from 'react-dom/client';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase, checkUserRole } from '../lib/supabase';
-import type { UserRole } from '../lib/supabase';
-import AuthModal from './AuthModal';
-import NotificationBell from './NotificationBell';
-import { useAuth } from '../contexts/AuthContext';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { pathname } = useLocation();
-  const navigate = useNavigate();
-
-  // Use the centralized auth context
-  const { user, profile, userRole, signOut } = useAuth();
-  const [userName, setUserName] = useState<string>('');
 
   useEffect(() => {
     // Scroll listener for homepage header transparency
@@ -37,33 +26,10 @@ const Navbar: React.FC = () => {
     };
   }, [pathname]);
 
-  // Update user name when profile changes
-  useEffect(() => {
-    if (profile) {
-      // Prioritize full_name over first_name + last_name
-      if (profile.full_name) {
-        setUserName(profile.full_name);
-      } else if (profile.first_name && profile.last_name) {
-        setUserName(`${profile.first_name} ${profile.last_name}`);
-      } else if (profile.first_name) {
-        setUserName(profile.first_name);
-      } else {
-        setUserName('User');
-      }
-    } else {
-      setUserName('');
-    }
-  }, [profile]);
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
-
   // Determine if this is the home page
   const isHomePage = pathname === '/';
 
-  // Header should be transparent on home page when not scrolled, match progress steps opacity elsewhere
+  // Header should be transparent on home page when not scrolled
   const headerClasses = isHomePage
     ? `fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-300 ${isScrolled ? 'bg-background/95 shadow-md backdrop-blur-sm' : 'bg-transparent'
     }`
@@ -83,95 +49,30 @@ const Navbar: React.FC = () => {
           <span className="font-display font-semibold text-sm md:text-lg uppercase tracking-wide">InnerCircle</span>
         </Link>
 
-        {/* --- Desktop Menu (Corrected) --- */}
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex md:items-center md:gap-8">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/about" className="nav-link">About</Link>
-          <Link to="/faq" className="nav-link">FAQ</Link>
-          <Link to="/investor-info" className="nav-link">Investor Info</Link>
-          <Link to="/contact" className="nav-link">Contact</Link>
-
-          {/* Simplified - removed admin dropdown and user profile features */}
-          {/* {(userRole === 'admin' || userRole === 'sub_admin') && (
-            <div className="relative group">
-              <Link to="/admin" className="nav-link">Admin</Link>
-              <div className="absolute left-0 mt-2 py-2 w-64 bg-surface border border-graphite rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <Link to="/admin" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
-                  Main Dashboard
-                </Link>
-                <Link to="/admin/health" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
-                  System Health
-                </Link>
-                <Link to="/admin/performance" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
-                  Performance Monitor
-                </Link>
-                <hr className="my-1 border-graphite" />
-                <Link to="/admin/business-intelligence" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
-                  Business Intelligence
-                </Link>
-                <Link to="/admin/user-journey" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
-                  User Journey Analytics
-                </Link>
-                <Link to="/admin/monitoring" className="block w-full px-4 py-2 text-left text-sm text-text-secondary hover:text-text-primary hover:bg-accent">
-                  Real-Time Monitoring
-                </Link>
-              </div>
-            </div>
-          )} */}
-
-          {/* Simplified auth - just basic sign in/out - HIDDEN FOR SIMPLIFIED APP */}
-          {/* {user ? (
-            <button
-              onClick={handleSignOut}
-              className="nav-link"
-            >
-              Sign Out
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                const authModal = document.createElement('div');
-                authModal.id = 'auth-modal-container';
-                document.body.appendChild(authModal);
-
-                const root = createRoot(authModal);
-                root.render(
-                  <AuthModal
-                    isOpen={true}
-                    onClose={() => {
-                      root.unmount();
-                      document.body.removeChild(authModal);
-                    }}
-                    onSuccess={() => {
-                      root.unmount();
-                      document.body.removeChild(authModal);
-                    }}
-                    onSignUpSuccess={() => {
-                      root.unmount();
-                      document.body.removeChild(authModal);
-                      navigate('/verify');
-                    }}
-                  />
-                );
-              }}
-              className="nav-link"
-            >
-              Sign In
-            </button>
-          )} */}
+          <Link to="/investor-info" className="nav-link">
+            Investor Info
+          </Link>
+          <Link to="/about" className="nav-link">
+            About
+          </Link>
+          <Link to="/pitch-deck" className="nav-link">
+            Pitch Deck
+          </Link>
+          <Link to="/faq" className="nav-link">
+            FAQ
+          </Link>
+          <Link to="/contact" className="nav-link">
+            Contact
+          </Link>
+          <Link to="/profile" className="nav-link">
+            Profile (Demo)
+          </Link>
         </nav>
 
         {/* Mobile: Just Contact + Hamburger */}
         <div className="md:hidden flex items-center gap-4">
-          {/* Removed notifications */}
-          {/* {user && (
-            <NotificationBell
-              userRole={userRole}
-              isMobile={true}
-              onNavigateToAdmin={() => navigate('/admin')}
-              onNavigateToDashboard={() => navigate('/dashboard')}
-            />
-          )} */}
           <Link
             to="/contact"
             className="text-text-primary hover:text-gold transition-colors font-medium text-sm"
@@ -200,97 +101,48 @@ const Navbar: React.FC = () => {
             >
               <div className="py-6 px-6">
                 <div className="flex flex-col space-y-1 max-w-full">
-                  {/* Simplified mobile menu - removed admin and profile sections */}
                   <Link to="/"
-                    className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
+                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     Home
                   </Link>
-                  <Link
-                    to="/about"
-                    className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    About
-                  </Link>
-                  <Link
-                    to="/faq"
-                    className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    FAQ
-                  </Link>
-                  <Link
-                    to="/investor-info"
-                    className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
+                  <Link to="/investor-info"
+                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     Investor Info
                   </Link>
-                  <Link
-                    to="/contact"
-                    className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
+                  <Link to="/about"
+                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    About
+                  </Link>
+                  <Link to="/pitch-deck"
+                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Pitch Deck
+                  </Link>
+                  <Link to="/faq"
+                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    FAQ
+                  </Link>
+                  <Link to="/contact"
+                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     Contact
                   </Link>
-                  {/* Mobile auth section - HIDDEN FOR SIMPLIFIED APP */}
-                  {/* {user ? (
-                    <button
-                      onClick={handleSignOut}
-                      className="py-3 px-4 text-lg text-left text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block w-full"
-                    >
-                      Sign Out
-                    </button>
-                  ) : (
-                    <Link
-                      to="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const authModal = document.createElement('div');
-                        authModal.id = 'auth-modal-container';
-                        document.body.appendChild(authModal);
-
-                        const root = createRoot(authModal);
-                        root.render(
-                          <AuthModal
-                            isOpen={true}
-                            onClose={() => {
-                              root.unmount();
-                              document.body.removeChild(authModal);
-                            }}
-                            onSuccess={() => {
-                              root.unmount();
-                              document.body.removeChild(authModal);
-                              setIsOpen(false);
-                            }}
-                            onSignUpSuccess={() => {
-                              root.unmount();
-                              document.body.removeChild(authModal);
-                              setIsOpen(false);
-                              navigate('/verify');
-                            }}
-                          />
-                        );
-                      }}
-                      className="py-3 px-4 text-lg text-text-primary hover:text-gold hover:bg-accent rounded-lg transition-all duration-200 block"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Sign In
-                    </Link>
-                  )} */}
-
-                  {/* Invest Now Button - HIDDEN FOR SIMPLIFIED APP */}
-                  {/* <div className="mt-6 pt-6 border-t border-graphite">
-                    <Link
-                      to="/onboarding-flow/subscription-agreement"
-                      className="block w-full py-4 px-4 bg-gold text-background text-lg font-semibold text-center rounded-lg hover:bg-gold/90 transition-all duration-200"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Invest Now
-                    </Link>
-                  </div> */}
+                  <Link to="/profile"
+                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Profile (Demo)
+                  </Link>
                 </div>
               </div>
             </motion.div>
