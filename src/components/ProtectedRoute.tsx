@@ -17,9 +17,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     }
   }, [user, loading]);
 
-  // Debug logging
-  console.log('ProtectedRoute - User:', user, 'Loading:', loading);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

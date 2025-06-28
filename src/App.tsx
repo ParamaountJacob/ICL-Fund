@@ -32,7 +32,6 @@ import { RealTimeMonitoringDashboard } from './components/RealTimeMonitoringDash
 import { AdminPerformanceDashboard } from './components/AdminPerformanceDashboard';
 import { SystemHealthChecker } from './components/SystemHealthChecker';
 import { AdminLayout } from './components/AdminLayout';
-import { AuthDebugger } from './components/AuthDebugger';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -66,7 +65,6 @@ function AppContent() {
   // Simplified - no profile checking or force updates
   return (
     <div className="min-h-screen bg-background text-text-primary">
-      <AuthDebugger />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
