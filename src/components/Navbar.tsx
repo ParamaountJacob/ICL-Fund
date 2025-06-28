@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar: React.FC = () => {
@@ -57,17 +57,14 @@ const Navbar: React.FC = () => {
           <Link to="/about" className="nav-link">
             About
           </Link>
-          <Link to="/pitch-deck" className="nav-link">
-            Pitch Deck
-          </Link>
           <Link to="/faq" className="nav-link">
             FAQ
           </Link>
           <Link to="/contact" className="nav-link">
             Contact
           </Link>
-          <Link to="/profile" className="nav-link">
-            Profile (Demo)
+          <Link to="/profile" className="p-2 rounded-full bg-accent hover:bg-gold/20 transition-all duration-200">
+            <User className="w-5 h-5 text-gold" />
           </Link>
         </nav>
 
@@ -119,12 +116,6 @@ const Navbar: React.FC = () => {
                   >
                     About
                   </Link>
-                  <Link to="/pitch-deck"
-                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Pitch Deck
-                  </Link>
                   <Link to="/faq"
                     className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
                     onClick={() => setIsOpen(false)}
@@ -138,10 +129,11 @@ const Navbar: React.FC = () => {
                     Contact
                   </Link>
                   <Link to="/profile"
-                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                    className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
-                    Profile (Demo)
+                    <User className="w-4 h-4" />
+                    Profile
                   </Link>
                 </div>
               </div>
