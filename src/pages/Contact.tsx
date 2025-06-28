@@ -44,7 +44,7 @@ const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation for demo purposes
+    // Basic validation
     if (selectedMethod === 'video' || selectedMethod === 'phone') {
       if (!selectedDate || !selectedTime) {
         alert('Please select both a date and time for your consultation.');
@@ -58,17 +58,48 @@ const Contact: React.FC = () => {
 
     setLoading(true);
 
-    // Simulate loading time for demo - NO BACKEND CALLS
-    setTimeout(() => {
-      setLoading(false);
-      setShowSuccessModal(true);
-      console.log('Form submitted (DEMO MODE - NO BACKEND):', {
-        method: selectedMethod,
-        formData,
-        selectedDate,
-        selectedTime
-      });
-    }, 2000);
+    // For email - just demo simulation
+    if (selectedMethod === 'email') {
+      setTimeout(() => {
+        setLoading(false);
+        setShowSuccessModal(true);
+        console.log('Form submitted (DEMO MODE - NO BACKEND):', {
+          method: selectedMethod,
+          formData,
+          selectedDate,
+          selectedTime
+        });
+      }, 2000);
+    } else {
+      // For video/phone calls - show Calendly integration
+      setTimeout(() => {
+        setLoading(false);
+        // Set up Calendly URL based on consultation type
+        const baseUrl = selectedMethod === 'video'
+          ? 'https://calendly.com/your-team/video-consultation'
+          : 'https://calendly.com/your-team/phone-consultation';
+
+        // Add prefill data to Calendly URL
+        const urlParams = new URLSearchParams({
+          'prefill[name]': `${formData.first_name} ${formData.last_name}`,
+          'prefill[email]': formData.email,
+          'prefill[a1]': formData.phone,
+          'prefill[a2]': formData.suggested_investment_amount || '',
+          'prefill[a3]': selectedTime,
+          'prefill[a4]': selectedDate
+        });
+
+        setCalendlyUrl(`${baseUrl}?${urlParams.toString()}`);
+        setShowCalendlyEmbed(true);
+
+        console.log('Opening Calendly with data:', {
+          method: selectedMethod,
+          formData,
+          selectedDate,
+          selectedTime
+        });
+      }, 2000);
+    }
   };
 
   const convertTimeToISO = (time: string) => {
@@ -553,16 +584,8 @@ const Contact: React.FC = () => {
             setShowSuccessModal(false);
             resetForm();
           }}
-          title={
-            selectedMethod === 'email'
-              ? "Message Sent Successfully!"
-              : "Consultation Scheduled Successfully!"
-          }
-          message={
-            selectedMethod === 'email'
-              ? "Thank you for your message. We'll respond within 1-2 business days."
-              : "Your consultation request has been submitted. Please complete the scheduling process in the Calendly embed."
-          }
+          title="Message Sent Successfully!"
+          message="Thank you for your message. We'll respond within 1-2 business days."
         />
 
         <CalendlyEmbed
