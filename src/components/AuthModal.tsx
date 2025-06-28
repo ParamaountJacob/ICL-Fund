@@ -131,7 +131,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, onSig
   };
 
   const handleDemoClose = () => {
-    console.log('DEMO MODE: Authentication system disabled');
     onSuccess(); // Simulate successful authentication
     onClose();
   };

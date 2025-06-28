@@ -24,11 +24,6 @@ const InvestorInfo: React.FC = () => {
   const handleGetStarted = () => {
     // DEMO MODE - No navigation to onboarding
     alert('Demo Mode: Investment process would normally begin here. No backend integration.');
-    console.log('Demo Mode: Get Started clicked', {
-      calculatorAmount,
-      selectedTier,
-      termYears
-    });
   };
 
   const getReturnRate = (amount: number, years: number) => {

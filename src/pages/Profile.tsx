@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { supabase } from '../lib/supabase';
+import { logger } from '../utils/logger';
 import {
   FileText,
   User,
@@ -94,7 +95,7 @@ const Profile: React.FC = () => {
         wire_instructions: false
       });
     } catch (error) {
-      console.error('Error fetching document access:', error);
+      logger.error('Error fetching document access:', error);
       // Set default values on error
       setDocumentAccess({
         pitch_deck: false,

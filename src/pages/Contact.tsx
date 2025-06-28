@@ -63,12 +63,6 @@ const Contact: React.FC = () => {
       setTimeout(() => {
         setLoading(false);
         setShowSuccessModal(true);
-        console.log('Form submitted (DEMO MODE - NO BACKEND):', {
-          method: selectedMethod,
-          formData,
-          selectedDate,
-          selectedTime
-        });
       }, 2000);
     } else {
       // For video/phone calls - show Calendly integration
@@ -91,13 +85,6 @@ const Contact: React.FC = () => {
 
         setCalendlyUrl(`${baseUrl}?${urlParams.toString()}`);
         setShowCalendlyEmbed(true);
-
-        console.log('Opening Calendly with data:', {
-          method: selectedMethod,
-          formData,
-          selectedDate,
-          selectedTime
-        });
       }, 2000);
     }
   };

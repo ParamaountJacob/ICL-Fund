@@ -100,7 +100,6 @@ function AppContent() {
       {/* <ForceProfileUpdateModal
         isOpen={showForceProfileUpdate}
         onClose={() => {
-          console.log('Modal closed - profile should be updated');
           setShowForceProfileUpdate(false);
         }}
         firstName={profile?.first_name || ''}

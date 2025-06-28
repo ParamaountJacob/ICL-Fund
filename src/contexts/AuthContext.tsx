@@ -4,6 +4,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase, getUserProfile, checkUserRole, type UserProfile, type UserRole } from '../lib/supabase';
+import { logger } from '../utils/logger';
 
 interface AuthContextType {
     user: User | null;
@@ -39,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                 // Get initial session
                 const { data: { user: initialUser } } = await supabase.auth.getUser();
-                console.log('AuthContext - Initial user:', initialUser);
+                logger.log('AuthContext - Initial user:', initialUser);
                 setUser(initialUser);
 
                 if (initialUser) {
@@ -53,13 +54,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         setProfile(profileData);
                         setUserRole(roleData);
                     } catch (profileError) {
-                        console.warn('Could not fetch profile/role (probably tables don\'t exist yet):', profileError);
+                        logger.warn('Could not fetch profile/role (probably tables don\'t exist yet):', profileError);
                         setProfile(null);
                         setUserRole('user');
                     }
                 }
             } catch (error) {
-                console.error('Error initializing auth:', error);
+                logger.error('Error initializing auth:', error);
             } finally {
                 setLoading(false);
             }
@@ -70,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             const newUser = session?.user ?? null;
-            console.log('AuthContext - Auth state changed:', event, newUser);
+            logger.log('AuthContext - Auth state changed:', event, newUser);
             setUser(newUser);
 
             if (newUser) {
@@ -84,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setProfile(profileData);
                     setUserRole(roleData);
                 } catch (error) {
-                    console.warn('Could not fetch profile/role after login:', error);
+                    logger.warn('Could not fetch profile/role after login:', error);
                     setProfile(null);
                     setUserRole('user');
                 }
@@ -111,7 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const profileData = await getUserProfile();
                 setProfile(profileData);
             } catch (error) {
-                console.error('Error refreshing profile:', error);
+                logger.error('Error refreshing profile:', error);
             }
         }
     };
@@ -122,7 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const roleData = await checkUserRole();
                 setUserRole(roleData);
             } catch (error) {
-                console.error('Error refreshing role:', error);
+                logger.error('Error refreshing role:', error);
             }
         }
     };
