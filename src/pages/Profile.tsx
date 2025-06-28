@@ -84,30 +84,23 @@ const Profile: React.FC = () => {
       });
     }
     fetchDocumentAccess();
-  }, [authProfile]);
-
-  const fetchDocumentAccess = async () => {
+  }, [authProfile]); const fetchDocumentAccess = async () => {
     try {
-      const { data } = await supabase
-        .from('document_access')
-        .select('document_type')
-        .eq('user_id', user?.id);
-
-      if (data) {
-        const access: Record<DocumentType, boolean> = {
-          pitch_deck: false,
-          ppm: false,
-          wire_instructions: false
-        };
-
-        data.forEach((doc: any) => {
-          access[doc.document_type as DocumentType] = true;
-        });
-
-        setDocumentAccess(access);
-      }
+      // Skip document access checking for now since tables may not exist
+      // This will be restored after the database cleanup
+      setDocumentAccess({
+        pitch_deck: false,
+        ppm: false,
+        wire_instructions: false
+      });
     } catch (error) {
       console.error('Error fetching document access:', error);
+      // Set default values on error
+      setDocumentAccess({
+        pitch_deck: false,
+        ppm: false,
+        wire_instructions: false
+      });
     }
   };
 
@@ -119,17 +112,17 @@ const Profile: React.FC = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPasswordData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const saveProfile = async () => {
+  }; const saveProfile = async () => {
     if (!user) return;
 
     setIsLoading(true);
     try {
+      // Try to update profiles table, handle case where it might not exist yet
       const { error } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
+          email: user.email,
           first_name: profile.first_name,
           last_name: profile.last_name,
           phone: profile.phone,
@@ -141,7 +134,14 @@ const Profile: React.FC = () => {
           updated_at: new Date().toISOString()
         });
 
-      if (error) throw error;
+      if (error) {
+        // If profiles table doesn't exist, show a helpful message
+        if (error.code === '42P01') {
+          showError('Database not yet configured. Please run the database migration first.');
+          return;
+        }
+        throw error;
+      }
 
       await refreshProfile();
       setIsEditing(false);

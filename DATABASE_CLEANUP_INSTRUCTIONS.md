@@ -39,12 +39,14 @@ After running the migration, your database should have ONLY:
 - All complex functions
 - All edge cases and legacy code
 
-## STEP 4: EDGE FUNCTIONS CLEANUP
+## STEP 4: EDGE FUNCTIONS CLEANUP (CRITICAL)
 
-You'll still need to manually delete the edge functions:
+**You MUST manually delete these edge functions through Supabase dashboard or CLI:**
+
+### Delete These Functions:
 ```bash
 supabase functions delete approve-document
-supabase functions delete check-document-status
+supabase functions delete check-document-status  
 supabase functions delete exchange-plaid-token
 supabase functions delete check-api-keys
 supabase functions delete send-admin-notification
@@ -54,9 +56,11 @@ supabase functions delete delete-user
 supabase functions delete log-error
 ```
 
-Keep only:
-- `send-email`
-- `send-contact-email`
+### Keep Only These Functions:
+- `send-email` (for contact form)
+- `send-contact-email` (for contact form)
+
+**Why edge functions weren't auto-deleted:** Edge functions are deployed separately from database migrations and must be manually deleted through the Supabase CLI or dashboard. The database migration only cleans up database objects (tables, functions, etc.).
 
 ## SAFETY FEATURES
 

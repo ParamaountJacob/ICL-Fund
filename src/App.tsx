@@ -73,6 +73,7 @@ function AppContent() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/pitch-deck" element={<ProtectedRoute><PitchDeck /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         {/* Disabled investment routes - backend stripped */}
         {/* <Route path="/ppm" element={<ProtectedRoute><PPM /></ProtectedRoute>} />

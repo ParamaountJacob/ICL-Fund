@@ -68,9 +68,11 @@ const Navbar: React.FC = () => {
           <Link to="/contact" className="nav-link">
             CONTACT
           </Link>
-          <Link to="/profile" className="p-2 rounded-full bg-accent hover:bg-gold/20 transition-all duration-200">
-            <User className="w-5 h-5 text-gold" />
-          </Link>
+          {user && (
+            <Link to="/profile" className="p-2 rounded-full bg-accent hover:bg-gold/20 transition-all duration-200">
+              <User className="w-5 h-5 text-gold" />
+            </Link>
+          )}
         </nav>
 
         {/* Mobile: Just Contact + Hamburger */}
@@ -133,13 +135,15 @@ const Navbar: React.FC = () => {
                   >
                     Contact
                   </Link>
-                  <Link to="/profile"
-                    className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <User className="w-4 h-4" />
-                    Profile
-                  </Link>
+                  {user && (
+                    <Link to="/profile"
+                      className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <User className="w-4 h-4" />
+                      Profile
+                    </Link>
+                  )}
                 </div>
               </div>
             </motion.div>
