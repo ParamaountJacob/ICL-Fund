@@ -51,17 +51,20 @@ const Navbar: React.FC = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex md:items-center md:gap-8">
-          <Link to="/investor-info" className="nav-link">
-            Investor Info
+          <Link to="/" className="nav-link">
+            HOME
           </Link>
           <Link to="/about" className="nav-link">
-            About
+            ABOUT
           </Link>
           <Link to="/faq" className="nav-link">
             FAQ
           </Link>
+          <Link to="/investor-info" className="nav-link">
+            INVESTOR INFO
+          </Link>
           <Link to="/contact" className="nav-link">
-            Contact
+            CONTACT
           </Link>
           <Link to="/profile" className="p-2 rounded-full bg-accent hover:bg-gold/20 transition-all duration-200">
             <User className="w-5 h-5 text-gold" />
