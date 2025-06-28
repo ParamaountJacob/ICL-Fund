@@ -39,17 +39,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                 // Get initial session
                 const { data: { user: initialUser } } = await supabase.auth.getUser();
+                console.log('AuthContext - Initial user:', initialUser);
                 setUser(initialUser);
 
                 if (initialUser) {
-                    // Fetch profile and role in parallel
-                    const [profileData, roleData] = await Promise.all([
-                        getUserProfile(),
-                        checkUserRole()
-                    ]);
+                    // Try to fetch profile and role, but handle errors gracefully
+                    try {
+                        const [profileData, roleData] = await Promise.all([
+                            getUserProfile(),
+                            checkUserRole()
+                        ]);
 
-                    setProfile(profileData);
-                    setUserRole(roleData);
+                        setProfile(profileData);
+                        setUserRole(roleData);
+                    } catch (profileError) {
+                        console.warn('Could not fetch profile/role (probably tables don\'t exist yet):', profileError);
+                        setProfile(null);
+                        setUserRole('user');
+                    }
                 }
             } catch (error) {
                 console.error('Error initializing auth:', error);
@@ -63,6 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             const newUser = session?.user ?? null;
+            console.log('AuthContext - Auth state changed:', event, newUser);
             setUser(newUser);
 
             if (newUser) {
@@ -76,7 +84,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setProfile(profileData);
                     setUserRole(roleData);
                 } catch (error) {
-                    console.error('Error fetching user data:', error);
+                    console.warn('Could not fetch profile/role after login:', error);
+                    setProfile(null);
+                    setUserRole('user');
                 }
             } else {
                 // Clear data when user logs out

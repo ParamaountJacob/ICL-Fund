@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './AuthModal';
 
 interface ProtectedRouteProps {
@@ -7,33 +7,18 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { user, loading } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(!user && !loading);
 
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-      if (!session?.user) {
-        setShowAuthModal(true);
-      }
-    });
+  // Update modal state when auth state changes
+  React.useEffect(() => {
+    if (!loading) {
+      setShowAuthModal(!user);
+    }
+  }, [user, loading]);
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-      if (!session?.user && event !== 'SIGNED_OUT') {
-        setShowAuthModal(true);
-      } else {
-        setShowAuthModal(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  // Debug logging
+  console.log('ProtectedRoute - User:', user, 'Loading:', loading);
 
   if (loading) {
     return (
