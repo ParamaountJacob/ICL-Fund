@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
+import { useNotifications } from '../contexts/NotificationContext';
+import { supabase } from '../lib/supabase';
 import {
   FileText,
   User,
@@ -17,7 +20,9 @@ import {
   DollarSign,
   Target,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  FileCheck,
+  Wallet
 } from 'lucide-react';
 
 interface UserProfile {
@@ -35,29 +40,76 @@ interface UserProfile {
 type DocumentType = 'pitch_deck' | 'ppm' | 'wire_instructions';
 
 const Profile: React.FC = () => {
-  // Demo profile data - no authentication required
+  const { user, profile: authProfile, refreshProfile } = useAuth();
+  const { success, error: showError } = useNotifications();
+
   const [profile, setProfile] = useState<UserProfile>({
-    first_name: 'John',
-    last_name: 'Demo',
-    phone: '(555) 123-4567',
-    address: '123 Demo Street, Sample City, ST 12345',
-    ira_accounts: 'Traditional IRA with Sample Financial',
-    investment_goals: 'Long-term wealth building and retirement planning',
-    net_worth: '$500,000 - $1,000,000',
-    annual_income: '$150,000 - $200,000'
+    first_name: authProfile?.first_name || '',
+    last_name: authProfile?.last_name || '',
+    phone: authProfile?.phone || '',
+    address: authProfile?.address || '',
+    ira_accounts: authProfile?.ira_accounts || '',
+    investment_goals: authProfile?.investment_goals || '',
+    net_worth: authProfile?.net_worth || '',
+    annual_income: authProfile?.annual_income || ''
   });
 
   const [activeTab, setActiveTab] = useState<'overview' | 'personal' | 'security'>('overview');
-  const [editingPersonal, setEditingPersonal] = useState(false);
-  const [editingPassword, setEditingPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
+  const [documentAccess, setDocumentAccess] = useState<Record<DocumentType, boolean>>({
+    pitch_deck: false,
+    ppm: false,
+    wire_instructions: false
+  });
+
+  useEffect(() => {
+    if (authProfile) {
+      setProfile({
+        first_name: authProfile.first_name || '',
+        last_name: authProfile.last_name || '',
+        phone: authProfile.phone || '',
+        address: authProfile.address || '',
+        ira_accounts: authProfile.ira_accounts || '',
+        investment_goals: authProfile.investment_goals || '',
+        net_worth: authProfile.net_worth || '',
+        annual_income: authProfile.annual_income || ''
+      });
+    }
+    fetchDocumentAccess();
+  }, [authProfile]);
+
+  const fetchDocumentAccess = async () => {
+    try {
+      const { data } = await supabase
+        .from('document_access')
+        .select('document_type')
+        .eq('user_id', user?.id);
+
+      if (data) {
+        const access: Record<DocumentType, boolean> = {
+          pitch_deck: false,
+          ppm: false,
+          wire_instructions: false
+        };
+
+        data.forEach((doc: any) => {
+          access[doc.document_type as DocumentType] = true;
+        });
+
+        setDocumentAccess(access);
+      }
+    } catch (error) {
+      console.error('Error fetching document access:', error);
+    }
+  };
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -69,55 +121,89 @@ const Profile: React.FC = () => {
     setPasswordData(prev => ({ ...prev, [name]: value }));
   };
 
-  const saveProfile = () => {
-    setLoading(true);
-    // Demo mode - simulate save delay
-    setTimeout(() => {
-      setEditingPersonal(false);
-      setShowSuccessModal(true);
-      setLoading(false);
-      console.log('DEMO MODE - Profile saved (visual only):', profile);
-      alert('Demo Mode: Profile saved successfully! (Visual only - no real backend)');
-    }, 1000);
+  const saveProfile = async () => {
+    if (!user) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          phone: profile.phone,
+          address: profile.address,
+          ira_accounts: profile.ira_accounts,
+          investment_goals: profile.investment_goals,
+          net_worth: profile.net_worth,
+          annual_income: profile.annual_income,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      await refreshProfile();
+      setIsEditing(false);
+      success('Profile updated successfully!');
+    } catch (error: any) {
+      showError('Failed to update profile: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const updatePassword = () => {
+  const updatePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('Demo Mode: New passwords do not match.');
+      showError('New passwords do not match.');
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      alert('Demo Mode: Password must be at least 6 characters long.');
+      showError('Password must be at least 6 characters long.');
       return;
     }
 
-    setLoading(true);
-    // Demo mode - simulate password update
-    setTimeout(() => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: passwordData.newPassword
+      });
+
+      if (error) throw error;
+
       setPasswordData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       });
-      setEditingPassword(false);
-      setLoading(false);
-      console.log('DEMO MODE - Password updated (visual only)');
-      alert('Demo Mode: Password updated successfully! (Visual only - no real backend)');
-    }, 1000);
+      setIsEditing(false);
+      success('Password updated successfully!');
+    } catch (error: any) {
+      showError('Failed to update password: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const updateEmail = () => {
-    const newEmail = prompt('Demo Mode: Enter your new email address (visual only):');
+  const updateEmail = async () => {
+    const newEmail = prompt('Enter your new email address:');
     if (!newEmail) return;
 
-    setLoading(true);
-    // Demo mode - simulate email update
-    setTimeout(() => {
-      setLoading(false);
-      console.log('DEMO MODE - Email update initiated (visual only):', newEmail);
-      alert('Demo Mode: Email update initiated. This is visual only - no real backend.');
-    }, 1000);
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        email: newEmail
+      });
+
+      if (error) throw error;
+
+      success('Email update sent! Please check your email to confirm the change.');
+    } catch (error: any) {
+      showError('Failed to update email: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
@@ -193,7 +279,7 @@ const Profile: React.FC = () => {
                   <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-text-secondary text-sm md:text-base">
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4" />
-                      <span className="break-all">john.demo@innercirclelending.com</span>
+                      <span className="break-all">{user?.email || 'No email provided'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
@@ -270,7 +356,7 @@ const Profile: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between items-start">
                       <span className="text-text-secondary text-sm">Email</span>
-                      <span className="text-text-primary text-sm text-right break-all">john.demo@innercirclelending.com</span>
+                      <span className="text-text-primary text-sm text-right break-all">{user?.email || 'No email provided'}</span>
                     </div>
                     <div className="flex justify-between items-start">
                       <span className="text-text-secondary text-sm">Name</span>
@@ -373,12 +459,12 @@ const Profile: React.FC = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => editingPersonal ? saveProfile() : setEditingPersonal(true)}
-                    disabled={loading}
+                    onClick={() => isEditing ? saveProfile() : setIsEditing(true)}
+                    disabled={isLoading}
                     className="button flex items-center gap-2 w-full md:w-auto justify-center"
                   >
-                    {editingPersonal ? <Save className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
-                    {loading ? 'Saving...' : editingPersonal ? 'Save Changes' : 'Edit Information'}
+                    {isEditing ? <Save className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
+                    {isLoading ? 'Saving...' : isEditing ? 'Save Changes' : 'Edit Information'}
                   </button>
                 </div>
 
@@ -392,7 +478,7 @@ const Profile: React.FC = () => {
                         <User className="w-4 h-4 inline mr-2" />
                         First Name
                       </label>
-                      {editingPersonal ? (
+                      {isEditing ? (
                         <input
                           type="text"
                           name="first_name"
@@ -411,7 +497,7 @@ const Profile: React.FC = () => {
                         <User className="w-4 h-4 inline mr-2" />
                         Last Name
                       </label>
-                      {editingPersonal ? (
+                      {isEditing ? (
                         <input
                           type="text"
                           name="last_name"
@@ -446,7 +532,7 @@ const Profile: React.FC = () => {
                         <Phone className="w-4 h-4 inline mr-2" />
                         Phone Number
                       </label>
-                      {editingPersonal ? (
+                      {isEditing ? (
                         <input
                           type="tel"
                           name="phone"
@@ -465,7 +551,7 @@ const Profile: React.FC = () => {
                         <Building className="w-4 h-4 inline mr-2" />
                         Address
                       </label>
-                      {editingPersonal ? (
+                      {isEditing ? (
                         <textarea
                           name="address"
                           value={profile.address}
@@ -488,7 +574,7 @@ const Profile: React.FC = () => {
                       <label className="block text-sm uppercase tracking-wide text-text-secondary">
                         IRA/401(k) Account Names
                       </label>
-                      {editingPersonal ? (
+                      {isEditing ? (
                         <textarea
                           name="ira_accounts"
                           value={profile.ira_accounts}
@@ -506,7 +592,7 @@ const Profile: React.FC = () => {
                       <label className="block text-sm uppercase tracking-wide text-text-secondary">
                         Investment Goals
                       </label>
-                      {editingPersonal ? (
+                      {isEditing ? (
                         <textarea
                           name="investment_goals"
                           value={profile.investment_goals}
@@ -524,7 +610,7 @@ const Profile: React.FC = () => {
                       <label className="block text-sm uppercase tracking-wide text-text-secondary">
                         Estimated Net Worth
                       </label>
-                      {editingPersonal ? (
+                      {isEditing ? (
                         <select
                           name="net_worth"
                           value={profile.net_worth}
@@ -546,7 +632,7 @@ const Profile: React.FC = () => {
                       <label className="block text-sm uppercase tracking-wide text-text-secondary">
                         Annual Income
                       </label>
-                      {editingPersonal ? (
+                      {isEditing ? (
                         <select
                           name="annual_income"
                           value={profile.annual_income}
@@ -566,22 +652,22 @@ const Profile: React.FC = () => {
                   </div>
                 </div>
 
-                {editingPersonal && (
+                {isEditing && (
                   <div className="mt-6 md:mt-8 pt-6 border-t border-graphite">
                     <div className="flex flex-col md:flex-row gap-4 justify-end">
                       <button
-                        onClick={() => setEditingPersonal(false)}
+                        onClick={() => setIsEditing(false)}
                         className="button-gold px-6 py-2 w-full md:w-auto"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={saveProfile}
-                        disabled={loading}
+                        disabled={isLoading}
                         className="button px-6 py-2 flex items-center justify-center gap-2 w-full md: w-auto"
                       >
                         <Save className="w-4 h-4" />
-                        {loading ? 'Saving...' : 'Save Changes'}
+                        {isLoading ? 'Saving...' : 'Save Changes'}
                       </button>
                     </div>
                   </div>
@@ -622,7 +708,7 @@ const Profile: React.FC = () => {
                       </div>
                       <button
                         onClick={updateEmail}
-                        disabled={loading}
+                        disabled={isLoading}
                         className="button-gold px-4 py-2 w-full md:w-auto"
                       >
                         Change Email
@@ -635,14 +721,14 @@ const Profile: React.FC = () => {
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
                       <h3 className="text-lg font-semibold text-gold">Password</h3>
                       <button
-                        onClick={() => setEditingPassword(!editingPassword)}
+                        onClick={() => setIsEditing(!isEditing)}
                         className="button-gold px-4 py-2 w-full md:w-auto"
                       >
-                        {editingPassword ? 'Cancel' : 'Change Password'}
+                        {isEditing ? 'Cancel' : 'Change Password'}
                       </button>
                     </div>
 
-                    {editingPassword ? (
+                    {isEditing ? (
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <label className="block text-sm uppercase tracking-wide text-text-secondary">

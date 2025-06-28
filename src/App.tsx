@@ -73,7 +73,7 @@ function AppContent() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         {/* Disabled investment routes - backend stripped */}
         {/* <Route path="/ppm" element={<ProtectedRoute><PPM /></ProtectedRoute>} />
         <Route path="/ppm/edit" element={<ProtectedRoute><PPMEdit /></ProtectedRoute>} />
@@ -83,9 +83,8 @@ function AppContent() {
         <Route path="/onboarding-flow/wire-details" element={<ProtectedRoute><WireDetails /></ProtectedRoute>} />
         <Route path="/onboarding-flow/plaid-banking" element={<ProtectedRoute><PlaidBanking /></ProtectedRoute>} />
         <Route path="/promissory-note-flow" element={<ProtectedRoute><PromissoryNoteFlow /></ProtectedRoute>} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} /> */}
+        {/* <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
           <Route index element={<Admin />} />
           <Route path="business-intelligence" element={<BusinessIntelligenceDashboard />} />
           <Route path="user-journey" element={<UserJourneyAnalytics />} />
