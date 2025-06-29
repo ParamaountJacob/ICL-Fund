@@ -23,26 +23,80 @@ const Contact: React.FC = () => {
     last_name: '',
     email: '',
     phone: '',
+    areaCode: '346', // Default to 346 (Houston)
     address: '',
     investment_goals: '',
     suggested_investment_amount: '',
     message: ''
   });
 
-  // Ensure calendar starts on current month/year when form loads
+  // Common US area codes
+  const areaCodes = [
+    '346', '713', '281', // Houston area
+    '214', '469', '972', // Dallas area
+    '512', '737', // Austin area
+    '210', '726', // San Antonio area
+    '817', '682', // Fort Worth area
+    '915', // El Paso
+    '979', '409', // Other Texas
+    '212', '646', '917', // New York
+    '310', '323', '424', // Los Angeles
+    '312', '773', '872', // Chicago
+    '305', '786', '954', // Miami/Fort Lauderdale
+    '404', '470', '678', // Atlanta
+    '206', '253', '425', // Seattle
+    '602', '480', '623', // Phoenix
+    '617', '857', '781', // Boston
+    '415', '628', '650', // San Francisco
+  ];
+
+  // Format phone number with dashes (XXX-XXXX)
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, '');
+
+    // Format as XXX-XXXX (7 digits max after area code)
+    if (digits.length === 0) return '';
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}`;
+  };
+
+  // Initialize date to today for scheduling
   React.useEffect(() => {
     const now = new Date();
     setCurrentMonth(now.getMonth());
     setCurrentYear(now.getFullYear());
+
+    // Set default date to today if it's a selectable day (weekday)
+    const dayOfWeek = now.getDay();
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) { // Monday-Friday
+      const today = now.toISOString().split('T')[0];
+      setSelectedDate(today);
+    }
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'phone') {
+      // Format phone number automatically
+      const formatted = formatPhoneNumber(value);
+      setFormData(prev => ({ ...prev, [name]: formatted }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleAreaCodeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData(prev => ({ ...prev, areaCode: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Combine area code and phone number for full phone number
+    const fullPhoneNumber = `(${formData.areaCode}) ${formData.phone}`;
 
     // Basic validation
     if (selectedMethod === 'video' || selectedMethod === 'phone') {
@@ -77,7 +131,7 @@ const Contact: React.FC = () => {
         const urlParams = new URLSearchParams({
           'prefill[name]': `${formData.first_name} ${formData.last_name}`,
           'prefill[email]': formData.email,
-          'prefill[a1]': formData.phone,
+          'prefill[a1]': fullPhoneNumber, // Use the full formatted phone number
           'prefill[a2]': formData.suggested_investment_amount || '',
           'prefill[a3]': selectedTime,
           'prefill[a4]': selectedDate
@@ -365,15 +419,35 @@ const Contact: React.FC = () => {
                     <label className="text-sm font-medium text-text-secondary uppercase tracking-wide">
                       Phone Number {(selectedMethod === 'video' || selectedMethod === 'phone') ? '*' : '(Optional)'}
                     </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      required={selectedMethod === 'video' || selectedMethod === 'phone'}
-                      className="w-full bg-surface border border-graphite rounded-lg px-4 py-4 text-lg focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200"
-                      placeholder="(555) 123-4567"
-                    />
+                    <div className="flex gap-3">
+                      {/* Area Code Dropdown */}
+                      <select
+                        name="areaCode"
+                        value={formData.areaCode}
+                        onChange={handleAreaCodeChange}
+                        className="bg-surface border border-graphite rounded-lg px-3 py-4 text-lg focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200 flex-shrink-0"
+                        style={{ width: '90px' }}
+                      >
+                        {areaCodes.map(code => (
+                          <option key={code} value={code}>({code})</option>
+                        ))}
+                      </select>
+
+                      {/* Phone Number Input */}
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        required={selectedMethod === 'video' || selectedMethod === 'phone'}
+                        className="flex-1 bg-surface border border-graphite rounded-lg px-4 py-4 text-lg focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200"
+                        placeholder="266-1456"
+                        maxLength={8} // XXX-XXXX format
+                      />
+                    </div>
+                    <p className="text-xs text-text-secondary">
+                      Format: ({formData.areaCode}) {formData.phone || '266-1456'}
+                    </p>
                   </div>
                 </div>
 
