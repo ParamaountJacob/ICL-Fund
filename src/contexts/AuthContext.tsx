@@ -100,10 +100,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const signOut = async () => {
-        await supabase.auth.signOut();
-        setUser(null);
-        setProfile(null);
-        setUserRole('user');
+        try {
+            await supabase.auth.signOut();
+            setUser(null);
+            setProfile(null);
+            setUserRole('user');
+            // Force page reload to clear any cached state
+            window.location.href = '/';
+        } catch (error) {
+            console.error('Error signing out:', error);
+            // Even if there's an error, clear local state
+            setUser(null);
+            setProfile(null);
+            setUserRole('user');
+            window.location.href = '/';
+        }
     };
 
     const refreshProfile = async () => {
