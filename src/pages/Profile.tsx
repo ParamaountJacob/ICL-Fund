@@ -41,7 +41,7 @@ interface UserProfile {
 type DocumentType = 'pitch_deck' | 'ppm' | 'wire_instructions';
 
 const Profile: React.FC = () => {
-  const { user, profile: authProfile, refreshProfile } = useAuth();
+  const { user, profile: authProfile, loading, refreshProfile } = useAuth();
   const { success, error: showError } = useNotifications();
 
   const [profile, setProfile] = useState<UserProfile>({
@@ -85,7 +85,9 @@ const Profile: React.FC = () => {
       });
     }
     fetchDocumentAccess();
-  }, [authProfile]); const fetchDocumentAccess = async () => {
+  }, [authProfile]);
+
+  const fetchDocumentAccess = async () => {
     try {
       // Skip document access checking for now since tables may not exist
       // This will be restored after the database cleanup
@@ -258,6 +260,46 @@ const Profile: React.FC = () => {
         return <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">Pending</span>;
     }
   };
+
+  // Handle loading state - prevents infinite loading on missing database tables
+  if (loading) {
+    return (
+      <div className="pt-20 md:pt-28">
+        <section className="py-12 md:py-24">
+          <div className="px-4 md:px-6 max-w-6xl mx-auto">
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4"></div>
+                <p className="text-text-secondary">Loading profile...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    return (
+      <div className="pt-20 md:pt-28">
+        <section className="py-12 md:py-24">
+          <div className="px-4 md:px-6 max-w-6xl mx-auto">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-text-primary mb-4">Authentication Required</h2>
+              <p className="text-text-secondary mb-6">Please log in to access your profile.</p>
+              <button
+                onClick={() => window.location.href = '/'}
+                className="btn-primary"
+              >
+                Go to Home
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-20 md:pt-28">
@@ -794,11 +836,11 @@ const Profile: React.FC = () => {
                         <div className="flex gap-4 pt-4">
                           <button
                             onClick={updatePassword}
-                            disabled={loading || !passwordData.newPassword || !passwordData.confirmPassword}
+                            disabled={isLoading || !passwordData.newPassword || !passwordData.confirmPassword}
                             className="button px-6 py-2 flex items-center gap-2 w-full md:w-auto"
                           >
                             <Lock className="w-4 h-4" />
-                            {loading ? 'Updating...' : 'Update Password'}
+                            {isLoading ? 'Updating...' : 'Update Password'}
                           </button>
                         </div>
 
