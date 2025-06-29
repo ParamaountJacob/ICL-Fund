@@ -23,43 +23,53 @@ const Contact: React.FC = () => {
     last_name: '',
     email: '',
     phone: '',
-    areaCode: '346', // Default to 346 (Houston)
+    countryCode: '+1', // Default to +1 (US/Canada)
     address: '',
     investment_goals: '',
     suggested_investment_amount: '',
     message: ''
   });
 
-  // Common US area codes
-  const areaCodes = [
-    '346', '713', '281', // Houston area
-    '214', '469', '972', // Dallas area
-    '512', '737', // Austin area
-    '210', '726', // San Antonio area
-    '817', '682', // Fort Worth area
-    '915', // El Paso
-    '979', '409', // Other Texas
-    '212', '646', '917', // New York
-    '310', '323', '424', // Los Angeles
-    '312', '773', '872', // Chicago
-    '305', '786', '954', // Miami/Fort Lauderdale
-    '404', '470', '678', // Atlanta
-    '206', '253', '425', // Seattle
-    '602', '480', '623', // Phoenix
-    '617', '857', '781', // Boston
-    '415', '628', '650', // San Francisco
+  // Country codes for international phone numbers
+  const countryCodes = [
+    { code: '+1', country: 'US/Canada' },
+    { code: '+44', country: 'United Kingdom' },
+    { code: '+33', country: 'France' },
+    { code: '+49', country: 'Germany' },
+    { code: '+39', country: 'Italy' },
+    { code: '+34', country: 'Spain' },
+    { code: '+31', country: 'Netherlands' },
+    { code: '+32', country: 'Belgium' },
+    { code: '+41', country: 'Switzerland' },
+    { code: '+43', country: 'Austria' },
+    { code: '+45', country: 'Denmark' },
+    { code: '+46', country: 'Sweden' },
+    { code: '+47', country: 'Norway' },
+    { code: '+358', country: 'Finland' },
+    { code: '+351', country: 'Portugal' },
+    { code: '+353', country: 'Ireland' },
+    { code: '+61', country: 'Australia' },
+    { code: '+64', country: 'New Zealand' },
+    { code: '+81', country: 'Japan' },
+    { code: '+82', country: 'South Korea' },
+    { code: '+86', country: 'China' },
+    { code: '+91', country: 'India' },
+    { code: '+55', country: 'Brazil' },
+    { code: '+52', country: 'Mexico' },
+    { code: '+27', country: 'South Africa' }
   ];
 
-  // Format phone number with dashes (XXX-XXXX)
+  // Format phone number with dashes and parentheses
   const formatPhoneNumber = (value: string) => {
     // Remove all non-digits
     const digits = value.replace(/\D/g, '');
 
-    // Format as XXX-XXXX (7 digits max after area code)
+    // Format as (XXX) XXX-XXXX for US numbers, or just add dashes for others
     if (digits.length === 0) return '';
     if (digits.length <= 3) return digits;
-    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}`;
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    if (digits.length <= 10) return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
   };
 
   // Initialize date to today for scheduling
@@ -88,20 +98,34 @@ const Contact: React.FC = () => {
     }
   };
 
-  const handleAreaCodeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData(prev => ({ ...prev, areaCode: e.target.value }));
+  const handleCountryCodeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData(prev => ({ ...prev, countryCode: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Combine area code and phone number for full phone number
-    const fullPhoneNumber = `(${formData.areaCode}) ${formData.phone}`;
+    // Combine country code and phone number for full phone number
+    const fullPhoneNumber = `${formData.countryCode} ${formData.phone}`;
 
     // Basic validation
     if (selectedMethod === 'video' || selectedMethod === 'phone') {
-      if (!selectedDate || !selectedTime) {
-        alert('Please select both a date and time for your consultation.');
+      // Auto-select today's date if no date was selected
+      if (!selectedDate) {
+        const now = new Date();
+        const dayOfWeek = now.getDay();
+        if (dayOfWeek >= 1 && dayOfWeek <= 5) { // Monday-Friday
+          const today = now.toISOString().split('T')[0];
+          setSelectedDate(today);
+          // Don't proceed with submission, let user see the date was selected
+          return;
+        } else {
+          alert('Please select a date for your consultation.');
+          return;
+        }
+      }
+      if (!selectedTime) {
+        alert('Please select a time for your consultation.');
         return;
       }
       if (!formData.phone) {
@@ -235,6 +259,7 @@ const Contact: React.FC = () => {
       last_name: '',
       email: '',
       phone: '',
+      countryCode: '+1', // Reset to default country code
       address: '',
       investment_goals: '',
       suggested_investment_amount: '',
@@ -420,16 +445,16 @@ const Contact: React.FC = () => {
                       Phone Number {(selectedMethod === 'video' || selectedMethod === 'phone') ? '*' : '(Optional)'}
                     </label>
                     <div className="flex gap-3">
-                      {/* Area Code Dropdown */}
+                      {/* Country Code Dropdown */}
                       <select
-                        name="areaCode"
-                        value={formData.areaCode}
-                        onChange={handleAreaCodeChange}
+                        name="countryCode"
+                        value={formData.countryCode}
+                        onChange={handleCountryCodeChange}
                         className="bg-surface border border-graphite rounded-lg px-3 py-4 text-lg focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200 flex-shrink-0"
-                        style={{ width: '90px' }}
+                        style={{ width: '110px' }}
                       >
-                        {areaCodes.map(code => (
-                          <option key={code} value={code}>({code})</option>
+                        {countryCodes.map(item => (
+                          <option key={item.code} value={item.code}>{item.code}</option>
                         ))}
                       </select>
 
@@ -441,12 +466,11 @@ const Contact: React.FC = () => {
                         onChange={handleInputChange}
                         required={selectedMethod === 'video' || selectedMethod === 'phone'}
                         className="flex-1 bg-surface border border-graphite rounded-lg px-4 py-4 text-lg focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200"
-                        placeholder="266-1456"
-                        maxLength={8} // XXX-XXXX format
+                        placeholder="(123) 456-7890"
                       />
                     </div>
                     <p className="text-xs text-text-secondary">
-                      Format: ({formData.areaCode}) {formData.phone || '266-1456'}
+                      Format: {formData.countryCode} {formData.phone || '(123) 456-7890'}
                     </p>
                   </div>
                 </div>
@@ -455,7 +479,7 @@ const Contact: React.FC = () => {
                 <div className="space-y-6">
                   <div className="space-y-3">
                     <label className="text-sm font-medium text-text-secondary uppercase tracking-wide">
-                      Investment Interest Level
+                      Investment Interest Level (Optional)
                     </label>
                     <select
                       name="suggested_investment_amount"
@@ -567,12 +591,17 @@ const Contact: React.FC = () => {
 
                         <div className="bg-gold/10 border border-gold/20 p-4 rounded-lg">
                           <p className="text-gold font-medium">
-                            {new Date(selectedDate).toLocaleDateString('en-US', {
-                              weekday: 'long',
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
+                            {(() => {
+                              // Parse date correctly to avoid timezone issues
+                              const [year, month, day] = selectedDate.split('-').map(Number);
+                              const date = new Date(year, month - 1, day); // month is 0-indexed
+                              return date.toLocaleDateString('en-US', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              });
+                            })()}
                           </p>
                         </div>
 
