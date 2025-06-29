@@ -1,14 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X, User, LogOut, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const { pathname } = useLocation();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      setShowProfileDropdown(false);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   useEffect(() => {
     // Scroll listener for homepage header transparency
@@ -68,10 +93,55 @@ const Navbar: React.FC = () => {
           <Link to="/contact" className="nav-link">
             CONTACT
           </Link>
+          <Link to="/pitch-deck" className="nav-link">
+            PITCH DECK
+          </Link>
           {user && (
-            <Link to="/profile" className="p-2 rounded-full bg-accent hover:bg-gold/20 transition-all duration-200">
-              <User className="w-5 h-5 text-gold" />
-            </Link>
+            <div className="relative" ref={profileDropdownRef}>
+              <button
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                className="p-2 rounded-full bg-accent hover:bg-gold/20 transition-all duration-200 flex items-center gap-2"
+              >
+                <User className="w-5 h-5 text-gold" />
+              </button>
+
+              <AnimatePresence>
+                {showProfileDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-48 bg-surface border border-graphite rounded-lg shadow-lg py-2 z-50"
+                  >
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors"
+                      onClick={() => setShowProfileDropdown(false)}
+                    >
+                      <User className="w-4 h-4" />
+                      Profile
+                    </Link>
+                    <Link
+                      to="/pitch-deck"
+                      className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors"
+                      onClick={() => setShowProfileDropdown(false)}
+                    >
+                      <FileText className="w-4 h-4" />
+                      Pitch Deck
+                    </Link>
+                    <hr className="my-1 border-graphite" />
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors text-left"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           )}
         </nav>
 
@@ -135,14 +205,32 @@ const Navbar: React.FC = () => {
                   >
                     Contact
                   </Link>
+                  <Link to="/pitch-deck"
+                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Pitch Deck
+                  </Link>
                   {user && (
-                    <Link to="/profile"
-                      className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <User className="w-4 h-4" />
-                      Profile
-                    </Link>
+                    <>
+                      <Link to="/profile"
+                        className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <User className="w-4 h-4" />
+                        Profile
+                      </Link>
+                      <button
+                        onClick={() => {
+                          handleSignOut();
+                          setIsOpen(false);
+                        }}
+                        className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors w-full text-left"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
