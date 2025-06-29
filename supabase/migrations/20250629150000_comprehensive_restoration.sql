@@ -7,7 +7,25 @@
 BEGIN;
 
 -- =================================================================
--- STEP 1: CREATE MISSING TABLES FOR SIMPLIFIED WORKFLOW
+-- STEP 1: UPDATE PROFILES TABLE FIRST (BEFORE REFERENCING COLUMNS)
+-- =================================================================
+
+-- Add admin-related columns if they don't exist
+DO $$
+BEGIN
+    -- Add role column if it doesn't exist
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'role') THEN
+        ALTER TABLE profiles ADD COLUMN role text DEFAULT 'user';
+    END IF;
+    
+    -- Add email column if it doesn't exist (for admin functions)
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'email') THEN
+        ALTER TABLE profiles ADD COLUMN email text;
+    END IF;
+END $$;
+
+-- =================================================================
+-- STEP 2: CREATE MISSING TABLES FOR SIMPLIFIED WORKFLOW
 -- =================================================================
 
 -- Simplified applications table (core investment workflow)
@@ -65,7 +83,7 @@ CREATE TABLE IF NOT EXISTS document_signatures (
 );
 
 -- =================================================================
--- STEP 2: ENABLE RLS ON NEW TABLES
+-- STEP 3: ENABLE RLS ON NEW TABLES
 -- =================================================================
 
 ALTER TABLE simple_applications ENABLE ROW LEVEL SECURITY;
@@ -74,7 +92,7 @@ ALTER TABLE user_activity ENABLE ROW LEVEL SECURITY;
 ALTER TABLE document_signatures ENABLE ROW LEVEL SECURITY;
 
 -- =================================================================
--- STEP 3: CREATE RLS POLICIES
+-- STEP 4: CREATE RLS POLICIES
 -- =================================================================
 
 -- Simple applications policies
@@ -110,7 +128,7 @@ CREATE POLICY "document_signatures_access" ON document_signatures
     );
 
 -- =================================================================
--- STEP 4: SIMPLE WORKFLOW FUNCTIONS
+-- STEP 5: SIMPLE WORKFLOW FUNCTIONS
 -- =================================================================
 
 -- Function: create_simple_application
@@ -300,7 +318,7 @@ END;
 $$;
 
 -- =================================================================
--- STEP 5: USER WORKFLOW STEP FUNCTIONS
+-- STEP 6: USER WORKFLOW STEP FUNCTIONS
 -- =================================================================
 
 -- Function: user_sign_subscription
@@ -502,7 +520,7 @@ END;
 $$;
 
 -- =================================================================
--- STEP 6: ADMIN WORKFLOW STEP FUNCTIONS
+-- STEP 7: ADMIN WORKFLOW STEP FUNCTIONS
 -- =================================================================
 
 -- Function: admin_sign_subscription
@@ -684,7 +702,7 @@ END;
 $$;
 
 -- =================================================================
--- STEP 7: NOTIFICATION FUNCTIONS  
+-- STEP 8: NOTIFICATION FUNCTIONS  
 -- =================================================================
 
 -- Function: get_user_notifications
@@ -807,7 +825,7 @@ END;
 $$;
 
 -- =================================================================
--- STEP 8: USER ACTIVITY & DOCUMENT FUNCTIONS
+-- STEP 9: USER ACTIVITY & DOCUMENT FUNCTIONS
 -- =================================================================
 
 -- Function: get_user_activity
@@ -907,7 +925,7 @@ END;
 $$;
 
 -- =================================================================
--- STEP 9: BACKWARD COMPATIBILITY FUNCTIONS
+-- STEP 10: BACKWARD COMPATIBILITY FUNCTIONS
 -- =================================================================
 
 -- Function: update_onboarding_step (for compatibility)
@@ -1029,7 +1047,7 @@ END;
 $$;
 
 -- =================================================================
--- STEP 10: GRANT PERMISSIONS
+-- STEP 11: GRANT PERMISSIONS
 -- =================================================================
 
 -- Grant permissions on tables
@@ -1062,7 +1080,7 @@ GRANT EXECUTE ON FUNCTION get_admin_investments_with_users() TO authenticated;
 GRANT EXECUTE ON FUNCTION get_all_investments_with_applications() TO authenticated;
 
 -- =================================================================
--- STEP 11: ADD TRIGGERS FOR USER ACTIVITY TRACKING
+-- STEP 12: ADD TRIGGERS FOR USER ACTIVITY TRACKING
 -- =================================================================
 
 -- Function to log user activity
@@ -1106,26 +1124,38 @@ CREATE TRIGGER profiles_activity_trigger
     FOR EACH ROW EXECUTE FUNCTION log_user_activity();
 
 -- =================================================================
--- STEP 12: UPDATE PROFILES TABLE FOR ADMIN SUPPORT
+-- STEP 13: CREATE CONTACT FORM TABLE AND FUNCTION
 -- =================================================================
 
--- Add admin-related columns if they don't exist
-DO $$
-BEGIN
-    -- Add role column if it doesn't exist
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'role') THEN
-        ALTER TABLE profiles ADD COLUMN role text DEFAULT 'user';
-    END IF;
-    
-    -- Add email column if it doesn't exist (for admin functions)
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'profiles' AND column_name = 'email') THEN
-        ALTER TABLE profiles ADD COLUMN email text;
-    END IF;
-END $$;
+-- Create contact submissions table if it doesn't exist
+CREATE TABLE IF NOT EXISTS contact_submissions (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    first_name text NOT NULL,
+    last_name text NOT NULL,
+    email text NOT NULL,
+    phone text,
+    message text,
+    consultation_type text DEFAULT 'email',
+    preferred_date date,
+    preferred_time time,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);
 
--- =================================================================
--- STEP 13: CREATE HELPER FUNCTION FOR CONTACT FORM
--- =================================================================
+-- Enable RLS on contact submissions
+ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS policy for contact submissions (admin only for reading)
+DROP POLICY IF EXISTS "contact_submissions_admin_access" ON contact_submissions;
+CREATE POLICY "contact_submissions_admin_access" ON contact_submissions 
+    FOR ALL USING (
+        EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND (role = 'admin' OR role = 'super_admin'))
+    );
+
+-- Allow anonymous users to insert contact submissions
+DROP POLICY IF EXISTS "contact_submissions_insert" ON contact_submissions;
+CREATE POLICY "contact_submissions_insert" ON contact_submissions 
+    FOR INSERT WITH CHECK (true);
 
 -- Function to save contact form submissions
 CREATE OR REPLACE FUNCTION save_contact_submission(
@@ -1169,7 +1199,11 @@ BEGIN
 END;
 $$;
 
+-- Grant permissions
+GRANT ALL ON TABLE contact_submissions TO authenticated;
+GRANT ALL ON TABLE contact_submissions TO anon;
 GRANT EXECUTE ON FUNCTION save_contact_submission(text, text, text, text, text, text, date, time) TO authenticated;
+GRANT EXECUTE ON FUNCTION save_contact_submission(text, text, text, text, text, text, date, time) TO anon;
 
 -- =================================================================
 -- STEP 14: VERIFICATION AND COMPLETION
