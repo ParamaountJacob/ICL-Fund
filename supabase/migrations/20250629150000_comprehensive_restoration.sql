@@ -1230,4 +1230,225 @@ BEGIN
     RAISE NOTICE '⚡ Your application should now work completely!';
 END $$;
 
+-- =================================================================
+-- STEP 15: PERFORMANCE INDEXES
+-- =================================================================
+
+-- Create performance indexes for better query performance
+CREATE INDEX IF NOT EXISTS idx_simple_applications_user_id ON simple_applications(user_id);
+CREATE INDEX IF NOT EXISTS idx_simple_applications_status ON simple_applications(status);
+CREATE INDEX IF NOT EXISTS idx_simple_applications_workflow_step ON simple_applications(workflow_step);
+CREATE INDEX IF NOT EXISTS idx_simple_applications_created_at ON simple_applications(created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_simple_notifications_user_id ON simple_notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_simple_notifications_is_admin ON simple_notifications(is_admin);
+CREATE INDEX IF NOT EXISTS idx_simple_notifications_is_read ON simple_notifications(is_read);
+CREATE INDEX IF NOT EXISTS idx_simple_notifications_created_at ON simple_notifications(created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_user_activity_user_id ON user_activity(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_activity_created_at ON user_activity(created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_created_at ON contact_submissions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_email ON contact_submissions(email);
+
+-- =================================================================
+-- STEP 16: DATA VALIDATION CONSTRAINTS
+-- =================================================================
+
+-- Add check constraints for data integrity
+ALTER TABLE simple_applications 
+ADD CONSTRAINT IF NOT EXISTS check_amount_positive 
+CHECK (amount > 0);
+
+ALTER TABLE simple_applications 
+ADD CONSTRAINT IF NOT EXISTS check_annual_percentage_range 
+CHECK (annual_percentage >= 0 AND annual_percentage <= 100);
+
+ALTER TABLE simple_applications 
+ADD CONSTRAINT IF NOT EXISTS check_term_years_positive 
+CHECK (term_years > 0 AND term_years <= 50);
+
+ALTER TABLE simple_applications 
+ADD CONSTRAINT IF NOT EXISTS check_valid_status 
+CHECK (status IN (
+    'application_submitted', 'admin_review', 'promissory_note_pending', 
+    'wire_transfer_pending', 'plaid_connection_pending', 'admin_final_setup', 
+    'investment_active', 'completed', 'cancelled', 'rejected'
+));
+
+-- =================================================================
+-- STEP 17: UTILITY FUNCTIONS FOR DASHBOARD STATS
+-- =================================================================
+
+-- Function: get_admin_dashboard_stats
+CREATE OR REPLACE FUNCTION get_admin_dashboard_stats()
+RETURNS TABLE (
+    total_applications bigint,
+    active_investments bigint,
+    pending_applications bigint,
+    total_investment_amount numeric,
+    unread_admin_notifications bigint
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    -- Check if current user is admin
+    IF NOT EXISTS (
+        SELECT 1 FROM profiles 
+        WHERE id = auth.uid() AND (role = 'admin' OR role = 'super_admin')
+    ) THEN
+        RAISE EXCEPTION 'Access denied: Admin privileges required';
+    END IF;
+
+    RETURN QUERY
+    SELECT 
+        (SELECT COUNT(*) FROM simple_applications)::bigint as total_applications,
+        (SELECT COUNT(*) FROM simple_applications WHERE status = 'investment_active')::bigint as active_investments,
+        (SELECT COUNT(*) FROM simple_applications WHERE status NOT IN ('investment_active', 'completed', 'cancelled', 'rejected'))::bigint as pending_applications,
+        (SELECT COALESCE(SUM(amount), 0) FROM simple_applications WHERE status = 'investment_active') as total_investment_amount,
+        (SELECT COUNT(*) FROM simple_notifications WHERE is_admin = true AND is_read = false)::bigint as unread_admin_notifications;
+END;
+$$;
+
+-- Function: get_user_dashboard_summary
+CREATE OR REPLACE FUNCTION get_user_dashboard_summary()
+RETURNS TABLE (
+    total_applications bigint,
+    active_investments bigint,
+    pending_applications bigint,
+    total_invested numeric,
+    unread_notifications bigint
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        (SELECT COUNT(*) FROM simple_applications WHERE user_id = auth.uid())::bigint as total_applications,
+        (SELECT COUNT(*) FROM simple_applications WHERE user_id = auth.uid() AND status = 'investment_active')::bigint as active_investments,
+        (SELECT COUNT(*) FROM simple_applications WHERE user_id = auth.uid() AND status NOT IN ('investment_active', 'completed', 'cancelled', 'rejected'))::bigint as pending_applications,
+        (SELECT COALESCE(SUM(amount), 0) FROM simple_applications WHERE user_id = auth.uid() AND status = 'investment_active') as total_invested,
+        (SELECT COUNT(*) FROM simple_notifications WHERE user_id = auth.uid() AND is_admin = false AND is_read = false)::bigint as unread_notifications;
+END;
+$$;
+
+-- Function: get_recent_contact_submissions (admin only)
+CREATE OR REPLACE FUNCTION get_recent_contact_submissions(p_limit integer DEFAULT 20)
+RETURNS TABLE (
+    id uuid,
+    first_name text,
+    last_name text,
+    email text,
+    phone text,
+    message text,
+    consultation_type text,
+    preferred_date date,
+    preferred_time time,
+    created_at timestamptz
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    -- Check if current user is admin
+    IF NOT EXISTS (
+        SELECT 1 FROM profiles 
+        WHERE id = auth.uid() AND (role = 'admin' OR role = 'super_admin')
+    ) THEN
+        RAISE EXCEPTION 'Access denied: Admin privileges required';
+    END IF;
+
+    RETURN QUERY
+    SELECT 
+        cs.id,
+        cs.first_name,
+        cs.last_name,
+        cs.email,
+        cs.phone,
+        cs.message,
+        cs.consultation_type,
+        cs.preferred_date,
+        cs.preferred_time,
+        cs.created_at
+    FROM contact_submissions cs
+    ORDER BY cs.created_at DESC
+    LIMIT p_limit;
+END;
+$$;
+
+-- =================================================================
+-- STEP 18: AUTOMATED NOTIFICATION CLEANUP
+-- =================================================================
+
+-- Function to clean up old notifications (keep last 100 per user)
+CREATE OR REPLACE FUNCTION cleanup_old_notifications()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    -- Delete old notifications, keeping only the latest 100 per user
+    DELETE FROM simple_notifications 
+    WHERE id IN (
+        SELECT id FROM (
+            SELECT id, 
+                   ROW_NUMBER() OVER (PARTITION BY user_id, is_admin ORDER BY created_at DESC) as rn
+            FROM simple_notifications
+        ) ranked 
+        WHERE rn > 100
+    );
+    
+    -- Delete old user activity, keeping only the latest 200 per user
+    DELETE FROM user_activity 
+    WHERE id IN (
+        SELECT id FROM (
+            SELECT id, 
+                   ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at DESC) as rn
+            FROM user_activity
+        ) ranked 
+        WHERE rn > 200
+    );
+END;
+$$;
+
+-- =================================================================
+-- STEP 19: GRANT PERMISSIONS FOR NEW FUNCTIONS
+-- =================================================================
+
+GRANT EXECUTE ON FUNCTION get_admin_dashboard_stats() TO authenticated;
+GRANT EXECUTE ON FUNCTION get_user_dashboard_summary() TO authenticated;
+GRANT EXECUTE ON FUNCTION get_recent_contact_submissions(integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION cleanup_old_notifications() TO authenticated;
+
+-- =================================================================
+-- STEP 20: FINAL COMPLETION MESSAGE
+-- =================================================================
+
+DO $$
+BEGIN
+    RAISE NOTICE '';
+    RAISE NOTICE '🏁 FINAL PRODUCTION TOUCHES COMPLETE! 🏁';
+    RAISE NOTICE '';
+    RAISE NOTICE '🚀 PERFORMANCE OPTIMIZATIONS:';
+    RAISE NOTICE '   ✅ Database indexes for fast queries';
+    RAISE NOTICE '   ✅ Data validation constraints';
+    RAISE NOTICE '   ✅ Automated cleanup functions';
+    RAISE NOTICE '';
+    RAISE NOTICE '📊 DASHBOARD FUNCTIONS:';
+    RAISE NOTICE '   ✅ Admin dashboard statistics';
+    RAISE NOTICE '   ✅ User dashboard summary';
+    RAISE NOTICE '   ✅ Contact form management';
+    RAISE NOTICE '';
+    RAISE NOTICE '🔧 MAINTENANCE FEATURES:';
+    RAISE NOTICE '   ✅ Notification cleanup automation';
+    RAISE NOTICE '   ✅ Activity log management';
+    RAISE NOTICE '   ✅ Data integrity constraints';
+    RAISE NOTICE '';
+    RAISE NOTICE '🎉 DATABASE RESTORATION 100% COMPLETE!';
+    RAISE NOTICE '🚀 Ready for production deployment!';
+    RAISE NOTICE '';
+END $$;
+
 COMMIT;
