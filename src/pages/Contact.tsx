@@ -12,6 +12,7 @@ const Contact: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCalendlyEmbed, setShowCalendlyEmbed] = useState(false);
+  const [showDateTimeReminder, setShowDateTimeReminder] = useState(false);
   const [calendlyUrl, setCalendlyUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
@@ -102,6 +103,14 @@ const Contact: React.FC = () => {
     setFormData(prev => ({ ...prev, countryCode: e.target.value }));
   };
 
+  // Function to scroll to date/time section
+  const scrollToDateTimeSection = () => {
+    const dateTimeSection = document.getElementById('date-time-section');
+    if (dateTimeSection) {
+      dateTimeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -110,22 +119,9 @@ const Contact: React.FC = () => {
 
     // Basic validation
     if (selectedMethod === 'video' || selectedMethod === 'phone') {
-      // Auto-select today's date if no date was selected
-      if (!selectedDate) {
-        const now = new Date();
-        const dayOfWeek = now.getDay();
-        if (dayOfWeek >= 1 && dayOfWeek <= 5) { // Monday-Friday
-          const today = now.toISOString().split('T')[0];
-          setSelectedDate(today);
-          // Don't proceed with submission, let user see the date was selected
-          return;
-        } else {
-          alert('Please select a date for your consultation.');
-          return;
-        }
-      }
-      if (!selectedTime) {
-        alert('Please select a time for your consultation.');
+      // Check if date/time is missing and show beautiful popup
+      if (!selectedDate || !selectedTime) {
+        setShowDateTimeReminder(true);
         return;
       }
       if (!formData.phone) {
@@ -254,6 +250,7 @@ const Contact: React.FC = () => {
     setSelectedMethod(null);
     setSelectedDate('');
     setSelectedTime('');
+    setShowDateTimeReminder(false);
     setFormData({
       first_name: '',
       last_name: '',
@@ -392,7 +389,7 @@ const Contact: React.FC = () => {
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-8">
+              <form id="contact-form" onSubmit={handleSubmit} className="space-y-8 pb-20 sm:pb-0">{/* Add bottom padding on mobile for sticky button */}
                 {/* Basic Information */}
                 <div className="space-y-6">
                   <div className="space-y-3">
@@ -444,17 +441,16 @@ const Contact: React.FC = () => {
                     <label className="text-sm font-medium text-text-secondary uppercase tracking-wide">
                       Phone Number {(selectedMethod === 'video' || selectedMethod === 'phone') ? '*' : '(Optional)'}
                     </label>
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       {/* Country Code Dropdown */}
                       <select
                         name="countryCode"
                         value={formData.countryCode}
                         onChange={handleCountryCodeChange}
-                        className="bg-surface border border-graphite rounded-lg px-3 py-4 text-lg focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200 flex-shrink-0"
-                        style={{ width: '110px' }}
+                        className="bg-surface border border-graphite rounded-lg px-3 py-4 text-lg focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200 w-full sm:w-32 flex-shrink-0"
                       >
                         {countryCodes.map(item => (
-                          <option key={item.code} value={item.code}>{item.code}</option>
+                          <option key={item.code} value={item.code}>{item.code} ({item.country})</option>
                         ))}
                       </select>
 
@@ -512,7 +508,7 @@ const Contact: React.FC = () => {
 
                 {/* Date and Time Selection for Video/Phone */}
                 {(selectedMethod === 'video' || selectedMethod === 'phone') && (
-                  <div className="space-y-6">
+                  <div id="date-time-section" className="space-y-6">
                     <h3 className="text-lg font-semibold text-gold">Schedule Your Call</h3>
 
                     {!selectedDate ? (
@@ -643,11 +639,11 @@ const Contact: React.FC = () => {
                   </div>
                 )}
 
-                {/* Submit Button */}
+                {/* Submit Button - Hidden on mobile (shown in sticky footer) */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full button py-5 text-lg flex items-center justify-center gap-3 ${loading ? 'opacity-50 cursor-not-allowed' : ''
+                  className={`hidden sm:flex w-full button py-5 text-lg items-center justify-center gap-3 ${loading ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                 >
                   {selectedMethod === 'email' && <Mail className="w-5 h-5" />}
@@ -658,6 +654,24 @@ const Contact: React.FC = () => {
                   }
                 </button>
               </form>
+
+              {/* Sticky Submit Button for Mobile */}
+              <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-graphite p-4 z-40">
+                <button
+                  type="submit"
+                  form="contact-form"
+                  disabled={loading}
+                  className={`w-full button py-4 text-lg flex items-center justify-center gap-3 ${loading ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                >
+                  {selectedMethod === 'email' && <Mail className="w-5 h-5" />}
+                  {selectedMethod === 'video' && <Video className="w-5 h-5" />}
+                  {selectedMethod === 'phone' && <Phone className="w-5 h-5" />}
+                  {loading ? 'Processing...' :
+                    selectedMethod === 'email' ? 'Send Message' : 'Schedule Call'
+                  }
+                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -684,6 +698,59 @@ const Contact: React.FC = () => {
           calendlyUrl={calendlyUrl}
           consultationType={selectedMethod as 'video' | 'phone'}
         />
+
+        {/* Date/Time Reminder Popup */}
+        <AnimatePresence>
+          {showDateTimeReminder && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              onClick={() => setShowDateTimeReminder(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: "spring", duration: 0.3 }}
+                className="bg-surface border border-gold/20 rounded-2xl p-8 max-w-md w-full shadow-2xl"
+                onClick={e => e.stopPropagation()}
+              >
+                <div className="text-center space-y-6">
+                  <div className="mx-auto w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center">
+                    <Calendar className="w-8 h-8 text-gold" />
+                  </div>
+
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-bold text-text-primary">
+                      Please Choose Date & Time
+                    </h3>
+                    <p className="text-text-secondary leading-relaxed">
+                      {!selectedDate && !selectedTime
+                        ? "To schedule your consultation, please select both a preferred date and time."
+                        : !selectedDate
+                          ? "Please select your preferred date for the consultation."
+                          : "Please select your preferred time for the consultation."
+                      }
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setShowDateTimeReminder(false);
+                      setTimeout(() => scrollToDateTimeSection(), 100);
+                    }}
+                    className="w-full button py-3 px-6 text-base font-medium flex items-center justify-center gap-2"
+                  >
+                    <Clock className="w-4 h-4" />
+                    Choose Date & Time
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
