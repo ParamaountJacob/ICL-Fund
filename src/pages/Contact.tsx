@@ -149,12 +149,12 @@ const Contact: React.FC = () => {
 
         // Add prefill data to Calendly URL
         const urlParams = new URLSearchParams({
-          'prefill[name]': `${formData.first_name} ${formData.last_name}`,
-          'prefill[email]': formData.email,
-          'prefill[a1]': fullPhoneNumber, // Use the full formatted phone number
-          'prefill[a2]': formData.suggested_investment_amount || '',
-          'prefill[a3]': selectedTime,
-          'prefill[a4]': selectedDate
+          'name': `${formData.first_name} ${formData.last_name}`,
+          'email': formData.email,
+          'a1': fullPhoneNumber, // Phone number
+          'a2': formData.suggested_investment_amount || '', // Investment amount
+          'a3': formData.investment_goals || '', // Investment goals
+          'a4': formData.message || '' // Additional message
         });
 
         setCalendlyUrl(`${baseUrl}?${urlParams.toString()}`);

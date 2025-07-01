@@ -40,10 +40,7 @@ const CalendlyEmbed: React.FC<CalendlyEmbedProps> = ({
                 if (window.Calendly && calendlyRef.current) {
                     window.Calendly.initInlineWidget({
                         url: calendlyUrl,
-                        parentElement: calendlyRef.current,
-                        prefill: {
-                            consultationType: consultationType
-                        }
+                        parentElement: calendlyRef.current
                     });
                 }
             };
@@ -54,10 +51,7 @@ const CalendlyEmbed: React.FC<CalendlyEmbedProps> = ({
                 calendlyRef.current.innerHTML = ''; // Clear previous widget
                 window.Calendly.initInlineWidget({
                     url: calendlyUrl,
-                    parentElement: calendlyRef.current,
-                    prefill: {
-                        consultationType: consultationType
-                    }
+                    parentElement: calendlyRef.current
                 });
             }
         }
