@@ -144,8 +144,8 @@ const Contact: React.FC = () => {
         setLoading(false);
         // Set up Calendly URL based on consultation type
         const baseUrl = selectedMethod === 'video'
-          ? 'https://calendly.com/your-team/video-consultation'
-          : 'https://calendly.com/your-team/phone-consultation';
+          ? 'https://calendly.com/innercirclelending/30min'
+          : 'https://calendly.com/innercirclelending/q-a-phone-chat';
 
         // Add prefill data to Calendly URL
         const urlParams = new URLSearchParams({
