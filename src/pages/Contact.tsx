@@ -148,14 +148,64 @@ const Contact: React.FC = () => {
           : 'https://calendly.com/innercirclelending/q-a-phone-chat';
 
         // Add prefill data to Calendly URL
+        // Format investment amount for display
+        const getInvestmentAmountText = (amount: string) => {
+          const amountMap: { [key: string]: string } = {
+            '200000': '$200,000 - $349,999',
+            '350000': '$350,000 - $499,999',
+            '500000': '$500,000 - $999,999',
+            '1000000': '$1,000,000+'
+          };
+          return amountMap[amount] || amount;
+        };
+
+        // Create formatted details for Calendly
+        const detailsParts: string[] = [];
+
+        // Add phone number
+        if (fullPhoneNumber) {
+          detailsParts.push(`Phone: ${fullPhoneNumber}`);
+        }
+
+        // Add investment interest level
+        if (formData.suggested_investment_amount) {
+          detailsParts.push(`Investment Interest: ${getInvestmentAmountText(formData.suggested_investment_amount)}`);
+        }
+
+        // Add investment goals
+        if (formData.investment_goals) {
+          detailsParts.push(`Investment Goals: ${formData.investment_goals}`);
+        }
+
+        // Add selected date and time if available
+        if (selectedDate) {
+          detailsParts.push(`Preferred Date: ${selectedDate}`);
+        }
+        if (selectedTime) {
+          detailsParts.push(`Preferred Time: ${selectedTime}`);
+        }
+
+        // Add custom message
+        if (formData.message) {
+          detailsParts.push(`Additional Notes: ${formData.message}`);
+        }
+
+        const formattedDetails = detailsParts.join('\n');
+
         const urlParams = new URLSearchParams({
           'name': `${formData.first_name} ${formData.last_name}`,
           'email': formData.email,
-          'a1': fullPhoneNumber, // Phone number
-          'a2': formData.suggested_investment_amount || '', // Investment amount
-          'a3': formData.investment_goals || '', // Investment goals
-          'a4': formData.message || '' // Additional message
+          'a1': formattedDetails // All formatted details in one field
         });
+
+        // Add date/time parameters if available for Calendly to auto-select
+        if (selectedDate && selectedTime) {
+          const dateTime = convertTimeToISO(selectedTime);
+          if (dateTime) {
+            urlParams.set('date', selectedDate);
+            urlParams.set('time', selectedTime);
+          }
+        }
 
         setCalendlyUrl(`${baseUrl}?${urlParams.toString()}`);
         setShowCalendlyEmbed(true);
