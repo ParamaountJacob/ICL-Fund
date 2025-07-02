@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import {
   ArrowRight,
   Shield,
@@ -16,14 +17,24 @@ import {
 
 const InvestorInfo: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [calculatorAmount, setCalculatorAmount] = useState('1000000'); // Default to $1M as string
   const [selectedTier, setSelectedTier] = useState('1000000'); // Track selected tier
   const [termYears, setTermYears] = useState(2); // Default to 2 years
   const [showCustomInput, setShowCustomInput] = useState(false);
 
   const handleGetStarted = () => {
-    // DEMO MODE - No navigation to onboarding
-    alert('Demo Mode: Investment process would normally begin here. No backend integration.');
+    // Check if user is logged in
+    if (!user) {
+      // Prompt user to log in first
+      if (window.confirm('You need to be logged in to start investing. Would you like to go to the login page?')) {
+        navigate('/', { state: { showAuth: true } });
+      }
+      return;
+    }
+
+    // User is logged in, proceed with investment process
+    navigate('/onboarding');
   };
 
   const getReturnRate = (amount: number, years: number) => {
@@ -470,14 +481,13 @@ const InvestorInfo: React.FC = () => {
               </p>
 
               <div className="space-y-6">
-                {/* Hidden Start Investing button - focusing on calls/contact only */}
-                {/* <button
+                <button
                   onClick={handleGetStarted}
-                  className="fixed md:relative bottom-4 left-4 right-4 md:bottom-auto md:left-auto md:right-auto bg-gold text-background px-12 py-6 text-xl font-semibold rounded-xl hover:bg-gold/90 transition-all duration-300 flex md:inline-flex items-center justify-center gap-4 shadow-lg hover:shadow-xl transform hover:scale-105 z-10"
+                  className="bg-gold text-background px-12 py-6 text-xl font-semibold rounded-xl hover:bg-gold/90 transition-all duration-300 inline-flex items-center gap-4 shadow-lg hover:shadow-xl transform hover:scale-105 w-full md:w-auto justify-center"
                 >
-                  Start Investing
+                  Start Earning
                   <ArrowRight className="w-6 h-6" />
-                </button> */}
+                </button>
 
                 <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-sm text-text-secondary">
                   <div className="flex items-center gap-2">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { supabase } from '../lib/supabase';
@@ -70,6 +71,15 @@ const Profile: React.FC = () => {
     ppm: false,
     wire_instructions: false
   });
+
+  // Helper function for formatting dates
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
 
   useEffect(() => {
     if (authProfile) {
@@ -312,74 +322,66 @@ const Profile: React.FC = () => {
             className="w-full"
           >
             {/* Header */}
-            <div className="bg-surface p-4 md:p-8 rounded-lg mb-6 md:mb-8 border border-graphite">
+            <div className="bg-gradient-to-r from-surface via-surface to-accent p-6 md:p-8 rounded-xl mb-6 md:mb-8 border border-graphite shadow-lg">
               <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-4 md:mb-6">
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-accent rounded-full flex items-center justify-center">
-                  <User className="w-8 h-8 md:w-10 md:h-10 text-gold" />
+                <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-gold/20 to-gold/10 rounded-full flex items-center justify-center shadow-lg border border-gold/20">
+                  <User className="w-10 h-10 md:w-12 md:h-12 text-gold" />
                 </div>
                 <div className="text-center md:text-left">
-                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">My Profile</h1>
-                  <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-text-secondary text-sm md:text-base">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gold mb-2">My Profile</h1>
+                  <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 text-text-secondary text-sm md:text-base">
                     <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4" />
+                      <Mail className="w-4 h-4 text-gold" />
                       <span className="break-all">{user?.email || 'No email provided'}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
+                      <Calendar className="w-4 h-4 text-gold" />
                       <span>Member since January 15, 2024</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      <span>{profile.first_name} {profile.last_name}</span>
-                    </div>
+                    {(profile.first_name || profile.last_name) && (
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-gold" />
+                        <span>{profile.first_name} {profile.last_name}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex justify-center mb-6 md:mb-8">
-              <div className="bg-surface p-1 rounded-lg border border-graphite w-full max-w-2xl">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
+            <div className="flex justify-center mb-8 md:mb-10">
+              <div className="bg-gradient-to-r from-surface via-surface to-accent p-2 rounded-xl border border-graphite shadow-lg w-full max-w-lg">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={() => setActiveTab('overview')}
-                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'overview'
-                      ? 'bg-gold text-background'
-                      : 'text-text-secondary hover:text-text-primary'
+                    className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 text-sm md:text-base ${activeTab === 'overview'
+                      ? 'bg-gold text-background shadow-lg transform scale-105'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-gold/10'
                       }`}
                   >
-                    <Settings className="w-4 h-4 inline mr-1 md:mr-2" />
-                    <span className="hidden sm:inline">Overview</span>
+                    <Settings className="w-4 h-4 inline mr-2" />
+                    <span>Overview</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('personal')}
-                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'personal'
-                      ? 'bg-gold text-background'
-                      : 'text-text-secondary hover:text-text-primary'
+                    className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 text-sm md:text-base ${activeTab === 'personal'
+                      ? 'bg-gold text-background shadow-lg transform scale-105'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-gold/10'
                       }`}
                   >
-                    <User className="w-4 h-4 inline mr-1 md:mr-2" />
-                    <span className="hidden sm:inline">Personal</span>
+                    <User className="w-4 h-4 inline mr-2" />
+                    <span>Personal</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('security')}
-                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'security'
-                      ? 'bg-gold text-background'
-                      : 'text-text-secondary hover:text-text-primary'
+                    className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 text-sm md:text-base ${activeTab === 'security'
+                      ? 'bg-gold text-background shadow-lg transform scale-105'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-gold/10'
                       }`}
                   >
-                    <Shield className="w-4 h-4 inline mr-1 md:mr-2" />
-                    <span className="hidden sm:inline">Security</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('documents')}
-                    className={`px-3 py-2 rounded-md font-medium transition-colors text-xs md:text-sm ${activeTab === 'documents'
-                      ? 'bg-gold text-background'
-                      : 'text-text-secondary hover:text-text-primary'
-                      }`}
-                  >
-                    <FileText className="w-4 h-4 inline mr-1 md:mr-2" />
-                    <span className="hidden sm:inline">Documents</span>
+                    <Shield className="w-4 h-4 inline mr-2" />
+                    <span>Security</span>
                   </button>
                 </div>
               </div>
@@ -394,93 +396,99 @@ const Profile: React.FC = () => {
                 className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8"
               >
                 {/* Account Summary */}
-                <div className="bg-surface p-4 md:p-6 rounded-lg border border-graphite">
-                  <h3 className="text-lg font-semibold text-gold mb-4">Account Summary</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-start">
-                      <span className="text-text-secondary text-sm">Email</span>
-                      <span className="text-text-primary text-sm text-right break-all">{user?.email || 'No email provided'}</span>
+                <div className="bg-gradient-to-br from-surface to-accent p-6 md:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-gold" />
                     </div>
-                    <div className="flex justify-between items-start">
-                      <span className="text-text-secondary text-sm">Name</span>
-                      <span className="text-text-primary text-sm text-right">{profile.first_name} {profile.last_name}</span>
+                    <h3 className="text-xl font-semibold text-gold">Account Summary</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
+                      <span className="text-text-secondary font-medium">Email</span>
+                      <span className="text-text-primary text-right break-all max-w-[60%]">{user?.email || 'No email provided'}</span>
                     </div>
-                    <div className="flex justify-between items-start">
-                      <span className="text-text-secondary text-sm">Phone</span>
-                      <span className="text-text-primary text-sm text-right">{profile.phone || 'Not provided'}</span>
+                    <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
+                      <span className="text-text-secondary font-medium">Name</span>
+                      <span className="text-text-primary text-right">{profile.first_name} {profile.last_name}</span>
                     </div>
-                    <div className="flex justify-between items-start">
-                      <span className="text-text-secondary text-sm">Member Since</span>
-                      <span className="text-text-primary text-sm text-right">January 15, 2024</span>
+                    <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
+                      <span className="text-text-secondary font-medium">Phone</span>
+                      <span className="text-text-primary text-right">{profile.phone || 'Not provided'}</span>
                     </div>
-                    <div className="flex justify-between items-start">
-                      <span className="text-text-secondary text-sm">Last Updated</span>
-                      <span className="text-text-primary text-sm text-right">December 20, 2024</span>
+                    <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
+                      <span className="text-text-secondary font-medium">Member Since</span>
+                      <span className="text-text-primary text-right">January 15, 2024</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Investment Profile */}
-                <div className="bg-surface p-4 md:p-6 rounded-lg border border-graphite">
-                  <h3 className="text-lg font-semibold text-gold mb-4">Investment Profile</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-gold" />
-                      <span className="text-text-secondary text-sm">Net Worth:</span>
-                      <span className="text-text-primary text-sm">
+                <div className="bg-gradient-to-br from-surface to-accent p-6 md:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
+                      <DollarSign className="w-5 h-5 text-gold" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gold">Investment Profile</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-accent rounded-lg border border-gold/20">
+                      <div className="flex items-center gap-2 mb-2">
+                        <DollarSign className="w-4 h-4 text-gold" />
+                        <span className="text-text-secondary font-medium">Net Worth</span>
+                      </div>
+                      <span className="text-text-primary text-lg font-semibold">
                         {profile.net_worth || 'Not provided'}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-gold" />
-                      <span className="text-text-secondary text-sm">Annual Income:</span>
-                      <span className="text-text-primary text-sm">
+                    <div className="p-4 bg-accent rounded-lg border border-gold/20">
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendingUp className="w-4 h-4 text-gold" />
+                        <span className="text-text-secondary font-medium">Annual Income</span>
+                      </div>
+                      <span className="text-text-primary text-lg font-semibold">
                         {profile.annual_income || 'Not provided'}
                       </span>
                     </div>
                     {profile.ira_accounts && (
-                      <div className="pt-2 border-t border-graphite">
-                        <span className="text-text-secondary text-sm">Retirement Accounts:</span>
-                        <p className="text-text-primary text-sm mt-1">{profile.ira_accounts}</p>
+                      <div className="p-4 bg-gold/10 rounded-lg border border-gold/30">
+                        <span className="text-text-secondary font-medium">Retirement Accounts:</span>
+                        <p className="text-text-primary mt-2">{profile.ira_accounts}</p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {/* Quick Actions */}
-                <div className="bg-surface p-4 md:p-6 rounded-lg border border-graphite lg:col-span-2 xl:col-span-1">
-                  <h3 className="text-lg font-semibold text-gold mb-4">Quick Actions</h3>
+                <div className="bg-gradient-to-br from-surface to-accent p-6 md:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300 lg:col-span-2 xl:col-span-1">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
+                      <Settings className="w-5 h-5 text-gold" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gold">Quick Actions</h3>
+                  </div>
                   <div className="space-y-3">
                     <button
                       onClick={() => setActiveTab('personal')}
-                      className="w-full text-left p-3 bg-accent rounded-lg hover:bg-gold/10 transition-colors flex items-center gap-3"
+                      className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
                     >
-                      <Edit className="w-4 h-4 text-gold" />
-                      <span>Edit Personal Information</span>
+                      <Edit className="w-5 h-5 text-gold" />
+                      <span className="font-medium">Edit Personal Information</span>
                     </button>
                     <button
                       onClick={() => setActiveTab('security')}
-                      className="w-full text-left p-3 bg-accent rounded-lg hover:bg-gold/10 transition-colors flex items-center gap-3"
+                      className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
                     >
-                      <Lock className="w-4 h-4 text-gold" />
-                      <span>Change Password</span>
+                      <Lock className="w-5 h-5 text-gold" />
+                      <span className="font-medium">Change Password</span>
                     </button>
                     <button
                       onClick={updateEmail}
-                      className="w-full text-left p-3 bg-accent rounded-lg hover:bg-gold/10 transition-colors flex items-center gap-3"
+                      className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
                     >
-                      <Mail className="w-4 h-4 text-gold" />
-                      <span>Update Email</span>
+                      <Mail className="w-5 h-5 text-gold" />
+                      <span className="font-medium">Update Email</span>
                     </button>
-                    <Link
-                      to="/investor-info"
-                      className="block w-full text-left p-3 bg-accent rounded-lg hover:bg-gold/10 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <FileText className="w-4 h-4 text-gold" />
-                        <span>View Investment Documents</span>
-                      </div>
-                    </Link>
                   </div>
                 </div>
               </motion.div>
@@ -718,13 +726,6 @@ const Profile: React.FC = () => {
               </motion.div>
             )}
 
-            <SuccessModal
-              isOpen={showSuccessModal}
-              onClose={() => setShowSuccessModal(false)}
-              title="Profile Updated Successfully!"
-              message="Your personal information has been saved and updated in your account."
-            />
-
             {activeTab === 'security' && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -877,26 +878,6 @@ const Profile: React.FC = () => {
                         <span className="text-text-primary">{user?.email_confirmed_at ? 'Yes' : 'No'}</span>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {activeTab === 'documents' && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="bg-surface p-4 md:p-8 rounded-lg border border-graphite"
-              >
-                <h2 className="heading mb-6 md:mb-8">Available Documents</h2>
-                <div className="space-y-4 md:space-y-6">
-                  <div className="text-center py-8 md:py-12 text-text-secondary">
-                    <FileText className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-graphite" />
-                    <p className="mb-6">Access your investment documents</p>
-                    <Link to="/investor-info" className="button">
-                      View Available Documents
-                    </Link>
                   </div>
                 </div>
               </motion.div>
