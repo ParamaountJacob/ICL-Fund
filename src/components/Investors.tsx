@@ -70,7 +70,7 @@ const Investors: React.FC = () => {
             <div className="space-y-4">
               <button
                 onClick={() => navigate('/start-investing')}
-                className="button w-full text-center"
+                className="w-full px-6 py-3 bg-gold text-background hover:bg-gold/90 transition-colors rounded-lg font-medium text-center"
               >
                 Start Investing
               </button>
