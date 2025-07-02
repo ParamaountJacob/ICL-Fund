@@ -67,10 +67,31 @@ const Investors: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mt-8">
               <button
-                onClick={() => navigate('/start-investing')}
-                className="w-full px-6 py-3 bg-gold text-background hover:bg-gold/90 transition-colors rounded-lg font-medium text-center"
+                onClick={() => {
+                  console.log('Start Investing clicked');
+                  navigate('/start-investing');
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px 24px',
+                  backgroundColor: '#D4AF37',
+                  color: '#000000',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: '500',
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  textAlign: 'center' as const,
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#C4A028';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#D4AF37';
+                }}
               >
                 Start Investing
               </button>

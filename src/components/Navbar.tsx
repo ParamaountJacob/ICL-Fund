@@ -121,6 +121,14 @@ const Navbar: React.FC = () => {
                     <FileText className="w-4 h-4" />
                     Pitch Deck
                   </Link>
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors"
+                    onClick={() => setShowProfileDropdown(false)}
+                  >
+                    <User className="w-4 h-4" />
+                    Profile
+                  </Link>
                   <hr className="my-1 border-graphite" />
                   <button
                     onClick={handleSignOut}
