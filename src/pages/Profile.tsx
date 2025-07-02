@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { supabase } from '../lib/supabase';
 import { logger } from '../utils/logger';
+import AuthModal from '../components/AuthModal';
 import {
   FileText,
   User,
@@ -24,7 +25,9 @@ import {
   TrendingUp,
   AlertCircle,
   FileCheck,
-  Wallet
+  Wallet,
+  ArrowRight,
+  MessageCircle
 } from 'lucide-react';
 
 interface UserProfile {
@@ -44,6 +47,7 @@ type DocumentType = 'pitch_deck' | 'ppm' | 'wire_instructions';
 const Profile: React.FC = () => {
   const { user, profile: authProfile, loading, refreshProfile } = useAuth();
   const { success, error: showError } = useNotifications();
+  const navigate = useNavigate();
 
   const [profile, setProfile] = useState<UserProfile>({
     first_name: authProfile?.first_name || '',
@@ -57,10 +61,12 @@ const Profile: React.FC = () => {
   });
 
   const [activeTab, setActiveTab] = useState<'overview' | 'personal' | 'security'>('overview');
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingContact, setIsEditingContact] = useState(false);
+  const [isEditingInvestment, setIsEditingInvestment] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -125,6 +131,24 @@ const Profile: React.FC = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPasswordData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleStartInvesting = () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    navigate('/onboarding');
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+    navigate('/onboarding');
+  };
+
+  const handleScheduleConsultation = () => {
+    // You can implement this to open a calendar link or contact form
+    window.open('mailto:contact@innercirclelending.com?subject=Schedule Investment Consultation', '_blank');
   }; const saveProfile = async () => {
     if (!user) return;
 
@@ -157,7 +181,8 @@ const Profile: React.FC = () => {
       }
 
       await refreshProfile();
-      setIsEditing(false);
+      setIsEditingContact(false);
+      setIsEditingInvestment(false);
       success('Profile updated successfully!');
     } catch (error: any) {
       showError('Failed to update profile: ' + error.message);
@@ -190,7 +215,8 @@ const Profile: React.FC = () => {
         newPassword: '',
         confirmPassword: ''
       });
-      setIsEditing(false);
+      setIsEditingContact(false);
+      setIsEditingInvestment(false);
       success('Password updated successfully!');
     } catch (error: any) {
       showError('Failed to update password: ' + error.message);
@@ -469,25 +495,32 @@ const Profile: React.FC = () => {
                   </div>
                   <div className="space-y-3">
                     <button
+                      onClick={handleStartInvesting}
+                      className="w-full text-left p-4 bg-gradient-to-r from-gold/20 to-gold/10 border-2 border-gold/30 rounded-lg hover:bg-gold/30 hover:border-gold/50 transition-all duration-300 flex items-center gap-3"
+                    >
+                      <TrendingUp className="w-5 h-5 text-gold" />
+                      <span className="font-medium text-gold">Start Investing</span>
+                    </button>
+                    <button
+                      onClick={handleScheduleConsultation}
+                      className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
+                    >
+                      <MessageCircle className="w-5 h-5 text-gold" />
+                      <span className="font-medium">Schedule Consultation</span>
+                    </button>
+                    <button
                       onClick={() => setActiveTab('personal')}
                       className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
                     >
                       <Edit className="w-5 h-5 text-gold" />
-                      <span className="font-medium">Edit Personal Information</span>
+                      <span className="font-medium">Edit Profile</span>
                     </button>
                     <button
                       onClick={() => setActiveTab('security')}
                       className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
                     >
                       <Lock className="w-5 h-5 text-gold" />
-                      <span className="font-medium">Change Password</span>
-                    </button>
-                    <button
-                      onClick={updateEmail}
-                      className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
-                    >
-                      <Mail className="w-5 h-5 text-gold" />
-                      <span className="font-medium">Update Email</span>
+                      <span className="font-medium">Security Settings</span>
                     </button>
                   </div>
                 </div>
@@ -499,230 +532,270 @@ const Profile: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="bg-surface p-4 md:p-8 rounded-lg border border-graphite"
+                className="space-y-8"
               >
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 md:mb-8 gap-4">
-                  <div className="flex items-center gap-4">
-                    <User className="w-6 h-6 md:w-8 md:h-8 text-gold" />
-                    <div>
-                      <h2 className="text-xl md:text-2xl font-semibold">Personal Information</h2>
-                      <p className="text-text-secondary text-sm md:text-base">Manage your profile and investment preferences</p>
+                {/* Contact Information Section */}
+                <div className="bg-gradient-to-br from-surface to-accent p-6 md:p-8 rounded-xl border border-graphite shadow-lg">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center">
+                        <User className="w-6 h-6 text-gold" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl md:text-2xl font-semibold text-gold">Contact Information</h2>
+                        <p className="text-text-secondary text-sm md:text-base">Manage your personal contact details</p>
+                      </div>
                     </div>
+                    <button
+                      onClick={() => isEditingContact ? saveProfile() : setIsEditingContact(true)}
+                      disabled={isLoading}
+                      className="bg-gold text-background px-6 py-3 rounded-lg font-medium hover:bg-gold/90 transition-all duration-300 flex items-center gap-2 shadow-lg"
+                    >
+                      {isEditingContact ? <Save className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
+                      {isLoading ? 'Saving...' : isEditingContact ? 'Save Changes' : 'Edit Contact Info'}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => isEditing ? saveProfile() : setIsEditing(true)}
-                    disabled={isLoading}
-                    className="button flex items-center gap-2 w-full md:w-auto justify-center"
-                  >
-                    {isEditing ? <Save className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
-                    {isLoading ? 'Saving...' : isEditing ? 'Save Changes' : 'Edit Information'}
-                  </button>
-                </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-                  {/* Contact Information */}
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-semibold text-gold mb-4">Contact Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          First Name
+                        </label>
+                        {isEditingContact ? (
+                          <input
+                            type="text"
+                            name="first_name"
+                            value={profile.first_name}
+                            onChange={handleProfileChange}
+                            className="w-full bg-background border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200"
+                            placeholder="Your first name"
+                          />
+                        ) : (
+                          <div className="p-3 bg-accent rounded-lg border border-graphite">
+                            <p className="text-text-primary">{profile.first_name || 'Not provided'}</p>
+                          </div>
+                        )}
+                      </div>
 
-                    <div className="space-y-2">
-                      <label className="block text-sm uppercase tracking-wide text-text-secondary">
-                        <User className="w-4 h-4 inline mr-2" />
-                        First Name
-                      </label>
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          name="first_name"
-                          value={profile.first_name}
-                          onChange={handleProfileChange}
-                          className="w-full bg-white border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-gray-900 transition-all duration-200"
-                          placeholder="Your first name"
-                        />
-                      ) : (
-                        <p className="text-text-primary py-2">{profile.first_name || 'Not provided'}</p>
-                      )}
-                    </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Last Name
+                        </label>
+                        {isEditingContact ? (
+                          <input
+                            type="text"
+                            name="last_name"
+                            value={profile.last_name}
+                            onChange={handleProfileChange}
+                            className="w-full bg-background border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200"
+                            placeholder="Your last name"
+                          />
+                        ) : (
+                          <div className="p-3 bg-accent rounded-lg border border-graphite">
+                            <p className="text-text-primary">{profile.last_name || 'Not provided'}</p>
+                          </div>
+                        )}
+                      </div>
 
-                    <div className="space-y-2">
-                      <label className="block text-sm uppercase tracking-wide text-text-secondary">
-                        <User className="w-4 h-4 inline mr-2" />
-                        Last Name
-                      </label>
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          name="last_name"
-                          value={profile.last_name}
-                          onChange={handleProfileChange}
-                          className="w-full bg-white border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-gray-900 transition-all duration-200"
-                          placeholder="Your last name"
-                        />
-                      ) : (
-                        <p className="text-text-primary py-2">{profile.last_name || 'Not provided'}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm uppercase tracking-wide text-text-secondary">
-                        <Mail className="w-4 h-4 inline mr-2" />
-                        Email Address
-                      </label>
-                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
-                        <p className="text-text-primary py-2 break-all">{user?.email}</p>
-                        <button
-                          onClick={updateEmail}
-                          className="text-gold hover:text-gold/80 text-sm transition-colors whitespace-nowrap"
-                        >
-                          Change Email
-                        </button>
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Email Address
+                        </label>
+                        <div className="p-3 bg-accent rounded-lg border border-graphite flex items-center justify-between">
+                          <span className="text-text-primary break-all">{user?.email}</span>
+                          <button
+                            onClick={updateEmail}
+                            className="text-gold hover:text-gold/80 text-sm font-medium ml-4 whitespace-nowrap"
+                          >
+                            Change
+                          </button>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="block text-sm uppercase tracking-wide text-text-secondary">
-                        <Phone className="w-4 h-4 inline mr-2" />
-                        Phone Number
-                      </label>
-                      {isEditing ? (
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={profile.phone}
-                          onChange={handleProfileChange}
-                          className="w-full bg-white border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-gray-900 transition-all duration-200"
-                          placeholder="(555) 123-4567"
-                        />
-                      ) : (
-                        <p className="text-text-primary py-2">{profile.phone || 'Not provided'}</p>
-                      )}
-                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Phone Number
+                        </label>
+                        {isEditingContact ? (
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={profile.phone}
+                            onChange={handleProfileChange}
+                            className="w-full bg-background border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200"
+                            placeholder="(555) 123-4567"
+                          />
+                        ) : (
+                          <div className="p-3 bg-accent rounded-lg border border-graphite">
+                            <p className="text-text-primary">{profile.phone || 'Not provided'}</p>
+                          </div>
+                        )}
+                      </div>
 
-                    <div className="space-y-2">
-                      <label className="block text-sm uppercase tracking-wide text-text-secondary">
-                        <Building className="w-4 h-4 inline mr-2" />
-                        Address
-                      </label>
-                      {isEditing ? (
-                        <textarea
-                          name="address"
-                          value={profile.address}
-                          onChange={handleProfileChange}
-                          rows={3}
-                          className="w-full bg-white border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-gray-900 resize-none transition-all duration-200"
-                          placeholder="Your mailing address"
-                        />
-                      ) : (
-                        <p className="text-text-primary py-2 whitespace-pre-line">{profile.address || 'Not provided'}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Investment Information */}
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-semibold text-gold mb-4">Investment Profile</h3>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm uppercase tracking-wide text-text-secondary">
-                        IRA/401(k) Account Names
-                      </label>
-                      {isEditing ? (
-                        <textarea
-                          name="ira_accounts"
-                          value={profile.ira_accounts}
-                          onChange={handleProfileChange}
-                          rows={3}
-                          className="w-full bg-white border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-gray-900 resize-none transition-all duration-200"
-                          placeholder="List your retirement account providers"
-                        />
-                      ) : (
-                        <p className="text-text-primary py-2 whitespace-pre-line">{profile.ira_accounts || 'Not provided'}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm uppercase tracking-wide text-text-secondary">
-                        Investment Goals
-                      </label>
-                      {isEditing ? (
-                        <textarea
-                          name="investment_goals"
-                          value={profile.investment_goals}
-                          onChange={handleProfileChange}
-                          rows={3}
-                          className="w-full bg-white border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-gray-900 resize-none transition-all duration-200"
-                          placeholder="Describe your investment objectives"
-                        />
-                      ) : (
-                        <p className="text-text-primary py-2 whitespace-pre-line">{profile.investment_goals || 'Not provided'}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm uppercase tracking-wide text-text-secondary">
-                        Estimated Net Worth
-                      </label>
-                      {isEditing ? (
-                        <select
-                          name="net_worth"
-                          value={profile.net_worth}
-                          onChange={handleProfileChange}
-                          className="w-full bg-white border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-gray-900 transition-all duration-200"
-                        >
-                          <option value="">Select range</option>
-                          <option value="$500K - $1M">$500K - $1M</option>
-                          <option value="$1M - $5M">$1M - $5M</option>
-                          <option value="$5M - $10M">$5M - $10M</option>
-                          <option value="$10M+">$10M+</option>
-                        </select>
-                      ) : (
-                        <p className="text-text-primary py-2">{profile.net_worth || 'Not provided'}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm uppercase tracking-wide text-text-secondary">
-                        Annual Income
-                      </label>
-                      {isEditing ? (
-                        <select
-                          name="annual_income"
-                          value={profile.annual_income}
-                          onChange={handleProfileChange}
-                          className="w-full bg-white border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-gray-900 transition-all duration-200"
-                        >
-                          <option value="">Select range</option>
-                          <option value="$200K - $500K">$200K - $500K</option>
-                          <option value="$500K - $1M">$500K - $1M</option>
-                          <option value="$1M - $2M">$1M - $2M</option>
-                          <option value="$2M+">$2M+</option>
-                        </select>
-                      ) : (
-                        <p className="text-text-primary py-2">{profile.annual_income || 'Not provided'}</p>
-                      )}
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Address
+                        </label>
+                        {isEditingContact ? (
+                          <textarea
+                            name="address"
+                            value={profile.address}
+                            onChange={handleProfileChange}
+                            rows={4}
+                            className="w-full bg-background border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary resize-none transition-all duration-200"
+                            placeholder="Your mailing address"
+                          />
+                        ) : (
+                          <div className="p-3 bg-accent rounded-lg border border-graphite min-h-[100px]">
+                            <p className="text-text-primary whitespace-pre-line">{profile.address || 'Not provided'}</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {isEditing && (
-                  <div className="mt-6 md:mt-8 pt-6 border-t border-graphite">
-                    <div className="flex flex-col md:flex-row gap-4 justify-end">
+                  {isEditingContact && (
+                    <div className="mt-6 pt-6 border-t border-graphite flex justify-end gap-4">
                       <button
-                        onClick={() => setIsEditing(false)}
-                        className="button-gold px-6 py-2 w-full md:w-auto"
+                        onClick={() => setIsEditingContact(false)}
+                        className="px-6 py-2 border border-graphite text-text-secondary rounded-lg hover:bg-accent transition-colors"
                       >
                         Cancel
                       </button>
-                      <button
-                        onClick={saveProfile}
-                        disabled={isLoading}
-                        className="button px-6 py-2 flex items-center justify-center gap-2 w-full md: w-auto"
-                      >
-                        <Save className="w-4 h-4" />
-                        {isLoading ? 'Saving...' : 'Save Changes'}
-                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Investment Profile Section */}
+                <div className="bg-gradient-to-br from-surface to-accent p-6 md:p-8 rounded-xl border border-graphite shadow-lg">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center">
+                        <TrendingUp className="w-6 h-6 text-gold" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl md:text-2xl font-semibold text-gold">Investment Profile</h2>
+                        <p className="text-text-secondary text-sm md:text-base">Manage your investment preferences and financial information</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => isEditingInvestment ? saveProfile() : setIsEditingInvestment(true)}
+                      disabled={isLoading}
+                      className="bg-gold text-background px-6 py-3 rounded-lg font-medium hover:bg-gold/90 transition-all duration-300 flex items-center gap-2 shadow-lg"
+                    >
+                      {isEditingInvestment ? <Save className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
+                      {isLoading ? 'Saving...' : isEditingInvestment ? 'Save Changes' : 'Edit Investment Info'}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Estimated Net Worth
+                        </label>
+                        {isEditingInvestment ? (
+                          <select
+                            name="net_worth"
+                            value={profile.net_worth}
+                            onChange={handleProfileChange}
+                            className="w-full bg-background border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200"
+                          >
+                            <option value="">Select range</option>
+                            <option value="$500K - $1M">$500K - $1M</option>
+                            <option value="$1M - $5M">$1M - $5M</option>
+                            <option value="$5M - $10M">$5M - $10M</option>
+                            <option value="$10M+">$10M+</option>
+                          </select>
+                        ) : (
+                          <div className="p-3 bg-accent rounded-lg border border-graphite">
+                            <p className="text-text-primary">{profile.net_worth || 'Not provided'}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Annual Income
+                        </label>
+                        {isEditingInvestment ? (
+                          <select
+                            name="annual_income"
+                            value={profile.annual_income}
+                            onChange={handleProfileChange}
+                            className="w-full bg-background border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary transition-all duration-200"
+                          >
+                            <option value="">Select range</option>
+                            <option value="$200K - $500K">$200K - $500K</option>
+                            <option value="$500K - $1M">$500K - $1M</option>
+                            <option value="$1M - $2M">$1M - $2M</option>
+                            <option value="$2M+">$2M+</option>
+                          </select>
+                        ) : (
+                          <div className="p-3 bg-accent rounded-lg border border-graphite">
+                            <p className="text-text-primary">{profile.annual_income || 'Not provided'}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          IRA/401(k) Account Names
+                        </label>
+                        {isEditingInvestment ? (
+                          <textarea
+                            name="ira_accounts"
+                            value={profile.ira_accounts}
+                            onChange={handleProfileChange}
+                            rows={3}
+                            className="w-full bg-background border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary resize-none transition-all duration-200"
+                            placeholder="List your retirement account providers"
+                          />
+                        ) : (
+                          <div className="p-3 bg-accent rounded-lg border border-graphite min-h-[80px]">
+                            <p className="text-text-primary whitespace-pre-line">{profile.ira_accounts || 'Not provided'}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Investment Goals
+                        </label>
+                        {isEditingInvestment ? (
+                          <textarea
+                            name="investment_goals"
+                            value={profile.investment_goals}
+                            onChange={handleProfileChange}
+                            rows={6}
+                            className="w-full bg-background border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary resize-none transition-all duration-200"
+                            placeholder="Describe your investment objectives and goals"
+                          />
+                        ) : (
+                          <div className="p-3 bg-accent rounded-lg border border-graphite min-h-[140px]">
+                            <p className="text-text-primary whitespace-pre-line">{profile.investment_goals || 'Not provided'}</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                )}
+
+                  {isEditingInvestment && (
+                    <div className="mt-6 pt-6 border-t border-graphite flex justify-end gap-4">
+                      <button
+                        onClick={() => setIsEditingInvestment(false)}
+                        className="px-6 py-2 border border-graphite text-text-secondary rounded-lg hover:bg-accent transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
               </motion.div>
             )}
 
@@ -885,6 +958,14 @@ const Profile: React.FC = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        mode="signup"
+        onSuccess={handleAuthSuccess}
+      />
     </div>
   );
 };
