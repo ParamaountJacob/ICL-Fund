@@ -22,6 +22,7 @@ import SimpleProfile from './pages/SimpleProfile';
 import StartInvesting from './pages/StartInvesting';
 import PPMEdit from './pages/PPMEdit';
 import PromissoryNoteFlow from './pages/PromissoryNoteFlow';
+import Onboarding from './pages/Onboarding';
 import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
 import SubscriptionAgreement from './pages/onboarding-flow/SubscriptionAgreement';
@@ -78,6 +79,7 @@ function AppContent() {
         <Route path="/pitch-deck" element={<ProtectedRoute><PitchDeck /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><SimpleProfile /></ProtectedRoute>} />
         <Route path="/start-investing" element={<ProtectedRoute><StartInvesting /></ProtectedRoute>} />
+        <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
         {/* Disabled investment routes - backend stripped */}
         {/* <Route path="/ppm" element={<ProtectedRoute><PPM /></ProtectedRoute>} />
         <Route path="/ppm/edit" element={<ProtectedRoute><PPMEdit /></ProtectedRoute>} />

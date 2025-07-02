@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import AuthModal from '../components/AuthModal';
 import {
   ArrowRight,
   Shield,
@@ -22,19 +23,50 @@ const InvestorInfo: React.FC = () => {
   const [selectedTier, setSelectedTier] = useState('1000000'); // Track selected tier
   const [termYears, setTermYears] = useState(2); // Default to 2 years
   const [showCustomInput, setShowCustomInput] = useState(false);
-
-  const handleGetStarted = () => {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'onboarding' | 'pitch-deck' | null>(null); const handleGetStarted = () => {
     // Check if user is logged in
     if (!user) {
-      // Prompt user to log in first
-      if (window.confirm('You need to be logged in to start investing. Would you like to go to the login page?')) {
-        navigate('/', { state: { showAuth: true } });
-      }
+      // Set pending action and show auth modal
+      setPendingAction('onboarding');
+      setShowAuthModal(true);
       return;
     }
 
     // User is logged in, proceed with investment process
     navigate('/onboarding');
+  };
+
+  const handleViewPitchDeck = () => {
+    // Check if user is logged in
+    if (!user) {
+      // Set pending action and show auth modal
+      setPendingAction('pitch-deck');
+      setShowAuthModal(true);
+      return;
+    }
+
+    // User is logged in, proceed to pitch deck
+    navigate('/pitch-deck');
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+
+    // Execute the pending action after successful authentication
+    if (pendingAction === 'onboarding') {
+      navigate('/onboarding');
+    } else if (pendingAction === 'pitch-deck') {
+      navigate('/pitch-deck');
+    }
+
+    // Clear pending action
+    setPendingAction(null);
+  };
+
+  const handleAuthClose = () => {
+    setShowAuthModal(false);
+    setPendingAction(null);
   };
 
   const getReturnRate = (amount: number, years: number) => {
@@ -459,7 +491,7 @@ const InvestorInfo: React.FC = () => {
                 </p>
 
                 <button
-                  onClick={() => navigate('/pitch-deck')}
+                  onClick={handleViewPitchDeck}
                   className="bg-gold text-background px-8 py-4 text-lg font-semibold rounded-xl hover:bg-gold/90 transition-all duration-300 inline-flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   View Pitch Deck
@@ -508,6 +540,14 @@ const InvestorInfo: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={handleAuthClose}
+        onSuccess={handleAuthSuccess}
+        onSignUpSuccess={handleAuthSuccess}
+      />
     </div>
   );
 };
