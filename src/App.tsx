@@ -18,6 +18,8 @@ import PitchDeck from './pages/PitchDeck';
 import PPM from './pages/PPM';
 import PPMView from './pages/PPMView';
 import Profile from './pages/Profile';
+import SimpleProfile from './pages/SimpleProfile';
+import StartInvesting from './pages/StartInvesting';
 import PPMEdit from './pages/PPMEdit';
 import PromissoryNoteFlow from './pages/PromissoryNoteFlow';
 import Admin from './pages/Admin';
@@ -74,7 +76,8 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/pitch-deck" element={<ProtectedRoute><PitchDeck /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><SimpleProfile /></ProtectedRoute>} />
+        <Route path="/start-investing" element={<ProtectedRoute><StartInvesting /></ProtectedRoute>} />
         {/* Disabled investment routes - backend stripped */}
         {/* <Route path="/ppm" element={<ProtectedRoute><PPM /></ProtectedRoute>} />
         <Route path="/ppm/edit" element={<ProtectedRoute><PPMEdit /></ProtectedRoute>} />

@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Video, Phone, ArrowLeft, Clock, User, MessageSquare, DollarSign, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
 import { SuccessModal } from '../components/SuccessModal';
 import CalendlyEmbed from '../components/CalendlyEmbed';
+import { useAuth } from '../contexts/AuthContext';
 
 type ContactMethod = 'email' | 'video' | 'phone' | null;
 
 const Contact: React.FC = () => {
+  const { user, profile } = useAuth();
   const [selectedMethod, setSelectedMethod] = useState<ContactMethod>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -86,6 +88,23 @@ const Contact: React.FC = () => {
       setSelectedDate(today);
     }
   }, []);
+
+  // Auto-populate form from profile data
+  useEffect(() => {
+    if (profile) {
+      setFormData(prev => ({
+        ...prev,
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        phone: profile.phone || '',
+        address: profile.address || '',
+        investment_goals: profile.investment_goals || ''
+      }));
+    }
+    if (user?.email) {
+      setFormData(prev => ({ ...prev, email: user.email }));
+    }
+  }, [profile, user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

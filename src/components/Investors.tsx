@@ -49,7 +49,7 @@ const Investors: React.FC = () => {
                 Fixed returns regardless of market conditions
               </p>
             </div>
-            
+
             <div className="space-y-4 mb-8">
               <div className="flex justify-between items-center">
                 <span className="text-text-secondary">Monthly Payouts</span>
@@ -66,13 +66,21 @@ const Investors: React.FC = () => {
                 <span className="text-gold">Available</span>
               </div>
             </div>
-            
-            <button 
-              onClick={() => navigate('/contact', { state: { consultation: true } })}
-              className="button w-full text-center"
-            >
-              Request Investment Details
-            </button>
+
+            <div className="space-y-4">
+              <button
+                onClick={() => navigate('/start-investing')}
+                className="button w-full text-center"
+              >
+                Start Investing
+              </button>
+              <button
+                onClick={() => navigate('/contact', { state: { consultation: true } })}
+                className="w-full text-center px-6 py-3 border border-gold text-gold hover:bg-gold hover:text-background transition-colors rounded-lg font-medium"
+              >
+                Request Investment Details
+              </button>
+            </div>
           </motion.div>
         </div>
       </div>
