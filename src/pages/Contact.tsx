@@ -143,9 +143,17 @@ const Contact: React.FC = () => {
       setTimeout(() => {
         setLoading(false);
         // Set up Calendly URL based on consultation type
-        const baseUrl = selectedMethod === 'video'
+        let baseUrl = selectedMethod === 'video'
           ? 'https://calendly.com/innercirclelending/30min'
           : 'https://calendly.com/innercirclelending/q-a-phone-chat';
+
+        // If date and time are selected, embed them in the URL path
+        if (selectedDate && selectedTime) {
+          const dateTimeString = convertDateTimeToCalendlyFormat(selectedDate, selectedTime);
+          if (dateTimeString) {
+            baseUrl += `/${dateTimeString}`;
+          }
+        }
 
         // Add prefill data to Calendly URL
         // Format investment amount for display
@@ -167,22 +175,14 @@ const Contact: React.FC = () => {
           detailsParts.push(`Phone: ${fullPhoneNumber}`);
         }
 
-        // Add investment interest level
+        // Add investment range (changed from "Investment Interest")
         if (formData.suggested_investment_amount) {
-          detailsParts.push(`Investment Interest: ${getInvestmentAmountText(formData.suggested_investment_amount)}`);
+          detailsParts.push(`Investment Range: ${getInvestmentAmountText(formData.suggested_investment_amount)}`);
         }
 
-        // Add investment goals
+        // Add note (changed from "Investment Goals")
         if (formData.investment_goals) {
-          detailsParts.push(`Investment Goals: ${formData.investment_goals}`);
-        }
-
-        // Add selected date and time if available
-        if (selectedDate) {
-          detailsParts.push(`Preferred Date: ${selectedDate}`);
-        }
-        if (selectedTime) {
-          detailsParts.push(`Preferred Time: ${selectedTime}`);
+          detailsParts.push(`Note: ${formData.investment_goals}`);
         }
 
         // Add custom message
@@ -198,18 +198,40 @@ const Contact: React.FC = () => {
           'a1': formattedDetails // All formatted details in one field
         });
 
-        // Add date/time parameters if available for Calendly to auto-select
-        if (selectedDate && selectedTime) {
-          const dateTime = convertTimeToISO(selectedTime);
-          if (dateTime) {
-            urlParams.set('date', selectedDate);
-            urlParams.set('time', selectedTime);
-          }
-        }
-
         setCalendlyUrl(`${baseUrl}?${urlParams.toString()}`);
         setShowCalendlyEmbed(true);
       }, 2000);
+    }
+  };
+
+  // Convert date and time to Calendly URL format (YYYY-MM-DDTHH:MM:SS-TZ)
+  const convertDateTimeToCalendlyFormat = (date: string, time: string) => {
+    try {
+      // Parse the date (assume it's in a readable format like "July 9, 2025")
+      const dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) return null;
+
+      // Parse the time
+      const [timePart, period] = time.split(' ');
+      let [hours, minutes] = timePart.split(':').map(Number);
+
+      if (period === 'PM' && hours !== 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+
+      // Set the time on the date
+      dateObj.setHours(hours, minutes, 0, 0);
+
+      // Format as YYYY-MM-DDTHH:MM:SS-05:00 (assuming Central Time)
+      const year = dateObj.getFullYear();
+      const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+      const day = dateObj.getDate().toString().padStart(2, '0');
+      const hourStr = dateObj.getHours().toString().padStart(2, '0');
+      const minuteStr = dateObj.getMinutes().toString().padStart(2, '0');
+
+      return `${year}-${month}-${day}T${hourStr}:${minuteStr}:00-05:00`;
+    } catch (error) {
+      console.error('Error converting date/time:', error);
+      return null;
     }
   };
 
