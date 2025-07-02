@@ -175,11 +175,6 @@ const Contact: React.FC = () => {
           detailsParts.push(`Phone: ${fullPhoneNumber}`);
         }
 
-        // Add investment range (changed from "Investment Interest")
-        if (formData.suggested_investment_amount) {
-          detailsParts.push(`Investment Range: ${getInvestmentAmountText(formData.suggested_investment_amount)}`);
-        }
-
         // Add note (changed from "Investment Goals")
         if (formData.investment_goals) {
           detailsParts.push(`Note: ${formData.investment_goals}`);
