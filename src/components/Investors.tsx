@@ -1,21 +1,11 @@
-import React, { useRef } from 'react';
-import { useInView, motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 const Investors: React.FC = () => {
-  const navigate = useNavigate();
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
-
   return (
     <section id="investor" className="py-12 md:py-32 bg-premium-gradient from-surface to-background bg-premium-pattern">
-      <div className="section" ref={sectionRef}>
+      <div className="section">
         <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
-            transition={{ duration: 0.8 }}
-          >
+          <div>
             <h2 className="heading mb-6">Why Investors Stay:</h2>
             <ul className="space-y-6 text-text-secondary">
               <li className="flex items-start">
@@ -31,14 +21,9 @@ const Investors: React.FC = () => {
                 <p>And they know we deliver.</p>
               </li>
             </ul>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="bg-accent p-8 md:p-10"
-          >
+          <div className="bg-accent p-8 md:p-10">
             <h3 className="text-2xl font-display font-semibold mb-6">Predictable Returns</h3>
             <div className="mb-8">
               <div className="flex items-baseline space-x-2 mb-3">
@@ -70,8 +55,8 @@ const Investors: React.FC = () => {
             <div className="space-y-4 mt-8">
               <button
                 onClick={() => {
-                  console.log('Start Investing clicked');
-                  navigate('/start-investing');
+                  console.log('Start Investing clicked - navigating to /start-investing');
+                  window.location.href = '/start-investing';
                 }}
                 style={{
                   width: '100%',
@@ -80,29 +65,38 @@ const Investors: React.FC = () => {
                   color: '#000000',
                   border: 'none',
                   borderRadius: '8px',
+                  fontWeight: '600',
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  textAlign: 'center' as const,
+                  display: 'block'
+                }}
+              >
+                START INVESTING
+              </button>
+              <button
+                onClick={() => {
+                  console.log('Request Investment Details clicked');
+                  window.location.href = '/contact';
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px 24px',
+                  backgroundColor: 'transparent',
+                  color: '#D4AF37',
+                  border: '2px solid #D4AF37',
+                  borderRadius: '8px',
                   fontWeight: '500',
                   fontSize: '16px',
                   cursor: 'pointer',
                   textAlign: 'center' as const,
-                  transition: 'all 0.2s ease'
+                  display: 'block'
                 }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = '#C4A028';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = '#D4AF37';
-                }}
-              >
-                Start Investing
-              </button>
-              <button
-                onClick={() => navigate('/contact', { state: { consultation: true } })}
-                className="w-full text-center px-6 py-3 border border-gold text-gold hover:bg-gold hover:text-background transition-colors rounded-lg font-medium"
               >
                 Request Investment Details
               </button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

@@ -44,23 +44,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUser(initialUser);
 
                 if (initialUser) {
-                    // Try to fetch profile and role, but handle errors gracefully
-                    try {
-                        const [profileData, roleData] = await Promise.all([
-                            getUserProfile(),
-                            checkUserRole()
-                        ]);
-
-                        setProfile(profileData);
-                        setUserRole(roleData);
-                    } catch (profileError) {
-                        logger.warn('Could not fetch profile/role (probably tables don\'t exist yet):', profileError);
-                        setProfile(null);
-                        setUserRole('user');
-                    }
+                    // Skip profile/role fetching if database is broken
+                    setProfile(null); // Will be populated from forms
+                    setUserRole('user');
                 }
             } catch (error) {
                 logger.error('Error initializing auth:', error);
+                setUser(null);
+                setProfile(null);
+                setUserRole('user');
             } finally {
                 setLoading(false);
             }
@@ -75,20 +67,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(newUser);
 
             if (newUser) {
-                // Fetch profile and role when user logs in
-                try {
-                    const [profileData, roleData] = await Promise.all([
-                        getUserProfile(),
-                        checkUserRole()
-                    ]);
-
-                    setProfile(profileData);
-                    setUserRole(roleData);
-                } catch (error) {
-                    logger.warn('Could not fetch profile/role after login:', error);
-                    setProfile(null);
-                    setUserRole('user');
-                }
+                // Skip profile fetching for now
+                setProfile(null);
+                setUserRole('user');
             } else {
                 // Clear data when user logs out
                 setProfile(null);
