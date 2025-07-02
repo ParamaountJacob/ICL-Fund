@@ -187,13 +187,14 @@ const Contact: React.FC = () => {
 
         const formattedDetails = detailsParts.join('\n');
 
-        const urlParams = new URLSearchParams({
-          'name': `${formData.first_name} ${formData.last_name}`,
-          'email': formData.email,
-          'a1': formattedDetails // All formatted details in one field
-        });
+        // Manually construct URL parameters to avoid + encoding for spaces
+        const nameParam = encodeURIComponent(`${formData.first_name} ${formData.last_name}`);
+        const emailParam = encodeURIComponent(formData.email);
+        const detailsParam = encodeURIComponent(formattedDetails);
 
-        setCalendlyUrl(`${baseUrl}?${urlParams.toString()}`);
+        const urlString = `${baseUrl}?name=${nameParam}&email=${emailParam}&a1=${detailsParam}`;
+
+        setCalendlyUrl(urlString);
         setShowCalendlyEmbed(true);
       }, 2000);
     }
