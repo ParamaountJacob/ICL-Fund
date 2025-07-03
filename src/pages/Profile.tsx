@@ -28,7 +28,8 @@ import {
   FileCheck,
   Wallet,
   ArrowRight,
-  MessageCircle
+  MessageCircle,
+  Clock
 } from 'lucide-react';
 
 interface UserProfile {
@@ -86,6 +87,15 @@ const Profile: React.FC = () => {
   const [allUsers, setAllUsers] = useState<AdminUser[]>([]);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
+  const [showVerificationForm, setShowVerificationForm] = useState(false);
+  const [verificationFormData, setVerificationFormData] = useState({
+    first_name: '',
+    last_name: '',
+    phone: '',
+    net_worth: '',
+    annual_income: '',
+    investment_goals: ''
+  });
   const [isEditingContact, setIsEditingContact] = useState(false);
   const [isEditingInvestment, setIsEditingInvestment] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -290,6 +300,98 @@ const Profile: React.FC = () => {
       success('Verification request sent successfully!');
     } catch (error: any) {
       showError('Failed to request verification: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const submitVerificationRequest = async () => {
+    if (!user) return;
+
+    // Validate required fields
+    if (!verificationFormData.first_name || !verificationFormData.last_name || !verificationFormData.phone ||
+      !verificationFormData.net_worth || !verificationFormData.annual_income || !verificationFormData.investment_goals) {
+      showError('Please fill in all required fields.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Update profile with verification data and request verification
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: verificationFormData.first_name,
+          last_name: verificationFormData.last_name,
+          phone: verificationFormData.phone,
+          net_worth: verificationFormData.net_worth,
+          annual_income: verificationFormData.annual_income,
+          investment_goals: verificationFormData.investment_goals,
+          verification_requested: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      await refreshProfile();
+      setShowVerificationForm(false);
+      setVerificationFormData({
+        first_name: '',
+        last_name: '',
+        phone: '',
+        net_worth: '',
+        annual_income: '',
+        investment_goals: ''
+      });
+      success('Verification request submitted successfully! An admin will review your information.');
+    } catch (error: any) {
+      showError('Failed to submit verification request: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyUser = async (userId: string) => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          is_verified: true,
+          verification_requested: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      await loadUsers();
+      success('User verified successfully!');
+    } catch (error: any) {
+      showError('Failed to verify user: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRejectVerification = async (userId: string) => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          verification_requested: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      await loadUsers();
+      success('Verification request rejected.');
+    } catch (error: any) {
+      showError('Failed to reject verification: ' + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -787,6 +889,27 @@ const Profile: React.FC = () => {
                           <div className="text-xs text-text-secondary">Begin your journey</div>
                         </div>
                       </button>
+                      {profile && !profile.is_verified && !profile.verification_requested && (
+                        <button
+                          onClick={() => setShowVerificationForm(true)}
+                          className="w-full text-left p-4 bg-gradient-to-r from-blue-500/20 to-blue-500/10 border-2 border-blue-500/30 rounded-lg hover:bg-blue-500/30 hover:border-blue-500/50 transition-all duration-300 flex items-center gap-3"
+                        >
+                          <Shield className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                          <div>
+                            <div className="font-medium text-blue-500 text-sm">Get Verified</div>
+                            <div className="text-xs text-text-secondary">Complete verification</div>
+                          </div>
+                        </button>
+                      )}
+                      {profile && profile.verification_requested && !profile.is_verified && (
+                        <div className="w-full text-left p-4 bg-gradient-to-r from-yellow-500/20 to-yellow-500/10 border-2 border-yellow-500/30 rounded-lg flex items-center gap-3">
+                          <Clock className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+                          <div>
+                            <div className="font-medium text-yellow-500 text-sm">Verification Pending</div>
+                            <div className="text-xs text-text-secondary">Admin review in progress</div>
+                          </div>
+                        </div>
+                      )}
                       <button
                         onClick={handleScheduleConsultation}
                         className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
@@ -820,6 +943,161 @@ const Profile: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              )}
+
+              {/* Verification Form Modal */}
+              {showVerificationForm && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 rounded-xl border border-graphite shadow-lg"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                      <Shield className="w-4 h-4 text-blue-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-blue-500">Account Verification Request</h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          First Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={verificationFormData.first_name}
+                          onChange={(e) => setVerificationFormData(prev => ({
+                            ...prev,
+                            first_name: e.target.value
+                          }))}
+                          className="w-full px-3 py-2 bg-accent border border-graphite rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-text-primary"
+                          placeholder="Enter your first name"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Last Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={verificationFormData.last_name}
+                          onChange={(e) => setVerificationFormData(prev => ({
+                            ...prev,
+                            last_name: e.target.value
+                          }))}
+                          className="w-full px-3 py-2 bg-accent border border-graphite rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-text-primary"
+                          placeholder="Enter your last name"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Phone Number <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          value={verificationFormData.phone}
+                          onChange={(e) => setVerificationFormData(prev => ({
+                            ...prev,
+                            phone: e.target.value
+                          }))}
+                          className="w-full px-3 py-2 bg-accent border border-graphite rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-text-primary"
+                          placeholder="Enter your phone number"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Net Worth <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={verificationFormData.net_worth}
+                          onChange={(e) => setVerificationFormData(prev => ({
+                            ...prev,
+                            net_worth: e.target.value
+                          }))}
+                          className="w-full px-3 py-2 bg-accent border border-graphite rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-text-primary"
+                          required
+                        >
+                          <option value="">Select net worth range</option>
+                          <option value="$0 - $100k">$0 - $100k</option>
+                          <option value="$100k - $500k">$100k - $500k</option>
+                          <option value="$500k - $1M">$500k - $1M</option>
+                          <option value="$1M - $5M">$1M - $5M</option>
+                          <option value="$5M+">$5M+</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Annual Income <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={verificationFormData.annual_income}
+                          onChange={(e) => setVerificationFormData(prev => ({
+                            ...prev,
+                            annual_income: e.target.value
+                          }))}
+                          className="w-full px-3 py-2 bg-accent border border-graphite rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-text-primary"
+                          required
+                        >
+                          <option value="">Select income range</option>
+                          <option value="$0 - $50k">$0 - $50k</option>
+                          <option value="$50k - $100k">$50k - $100k</option>
+                          <option value="$100k - $200k">$100k - $200k</option>
+                          <option value="$200k - $500k">$200k - $500k</option>
+                          <option value="$500k+">$500k+</option>
+                        </select>
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block text-sm font-medium text-text-secondary mb-2">
+                          Investment Goals <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          value={verificationFormData.investment_goals}
+                          onChange={(e) => setVerificationFormData(prev => ({
+                            ...prev,
+                            investment_goals: e.target.value
+                          }))}
+                          rows={4}
+                          className="w-full px-3 py-2 bg-accent border border-graphite rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-text-primary resize-none"
+                          placeholder="Tell us about your investment goals, experience, and what you hope to achieve..."
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <button
+                        onClick={submitVerificationRequest}
+                        disabled={isLoading}
+                        className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {isLoading ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            Submitting...
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="w-4 h-4" />
+                            Submit Request
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setShowVerificationForm(false)}
+                        className="flex-1 bg-graphite hover:bg-graphite/80 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
               )}
 
               {/* Personal Tab */}
@@ -1028,30 +1306,52 @@ const Profile: React.FC = () => {
 
                       <div className="space-y-3">
                         {allUsers.map((user) => (
-                          <div key={user.id} className="flex justify-between items-center p-3 bg-accent rounded-lg">
-                            <div className="flex-1">
-                              <div className="font-medium text-text-primary">
-                                {user.first_name} {user.last_name}
-                                {!user.first_name && !user.last_name && 'Unnamed User'}
+                          <div
+                            key={user.id}
+                            onClick={() => setSelectedUser(user)}
+                            className="p-3 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-200 cursor-pointer border border-transparent"
+                          >
+                            <div className="flex justify-between items-center">
+                              <div className="flex-1">
+                                <div className="font-medium text-text-primary">
+                                  {user.first_name} {user.last_name}
+                                  {!user.first_name && !user.last_name && 'Unnamed User'}
+                                </div>
+                                <div className="text-sm text-text-secondary">{user.email}</div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className={`px-2 py-1 text-xs rounded-full ${user.is_verified ? 'bg-green-100 text-green-800' :
+                                      user.verification_requested ? 'bg-yellow-100 text-yellow-800' :
+                                        'bg-gray-100 text-gray-800'
+                                    }`}>
+                                    {user.is_verified ? 'Verified' :
+                                      user.verification_requested ? 'Verification Requested' : 'Not Verified'}
+                                  </span>
+                                  {user.verification_requested && !user.is_verified && (
+                                    <div className="flex gap-1">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleVerifyUser(user.id);
+                                        }}
+                                        className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 text-xs rounded transition-colors"
+                                      >
+                                        Approve
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleRejectVerification(user.id);
+                                        }}
+                                        className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 text-xs rounded transition-colors"
+                                      >
+                                        Reject
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                              <div className="text-sm text-text-secondary">{user.email}</div>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className={`px-2 py-1 text-xs rounded-full ${(user.verification_status || 'pending') === 'verified' ? 'bg-green-100 text-green-800' :
-                                  (user.verification_status || 'pending') === 'denied' ? 'bg-red-100 text-red-800' :
-                                    'bg-yellow-100 text-yellow-800'
-                                  }`}>
-                                  {(user.verification_status || 'pending') === 'verified' ? 'Verified' :
-                                    (user.verification_status || 'pending') === 'denied' ? 'Denied' :
-                                      (user.verification_requested || false) ? 'Verification Requested' : 'Not Verified'}
-                                </span>
-                              </div>
+                              <ChevronRight className="w-5 h-5 text-text-secondary" />
                             </div>
-                            <button
-                              onClick={() => setSelectedUser(user)}
-                              className="ml-3 bg-gold text-background px-3 py-1 rounded-lg text-sm font-medium hover:bg-gold/90 transition-colors"
-                            >
-                              Manage
-                            </button>
                           </div>
                         ))}
                         {allUsers.length === 0 && (
@@ -1059,6 +1359,32 @@ const Profile: React.FC = () => {
                             No users found.
                           </div>
                         )}
+                      </div>
+
+                      {/* Quick Verification Section */}
+                      <div className="mt-6 p-4 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border border-blue-500/20 rounded-lg">
+                        <h4 className="font-medium text-blue-500 mb-3 flex items-center gap-2">
+                          <Shield className="w-4 h-4" />
+                          Quick Verification Actions
+                        </h4>
+                        <p className="text-sm text-text-secondary mb-3">
+                          Click on any user above to view their profile and manage verification status.
+                          Users with pending verification requests have approve/reject buttons available.
+                        </p>
+                        <div className="flex flex-wrap gap-2 text-xs">
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                            <span className="text-text-secondary">Verified Users</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                            <span className="text-text-secondary">Pending Verification</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                            <span className="text-text-secondary">Not Verified</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
