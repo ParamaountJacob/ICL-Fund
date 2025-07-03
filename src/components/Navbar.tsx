@@ -4,11 +4,13 @@ import { Menu, X, User, LogOut, FileText, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useUnreadNotifications } from '../hooks/useUnreadNotifications';
+import NotificationModal from './NotificationModal';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
   const { pathname } = useLocation();
   const { user, signOut } = useAuth();
   const { unreadCount } = useUnreadNotifications();
@@ -128,10 +130,12 @@ const Navbar: React.FC = () => {
                     <FileText className="w-4 h-4" />
                     Pitch Deck
                   </Link>
-                  <Link
-                    to="/notifications"
-                    className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors relative"
-                    onClick={() => setShowProfileDropdown(false)}
+                  <button
+                    onClick={() => {
+                      setShowProfileDropdown(false);
+                      setShowNotificationModal(true);
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors text-left"
                   >
                     <Bell className="w-4 h-4" />
                     Notifications
@@ -140,7 +144,7 @@ const Navbar: React.FC = () => {
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </div>
                     )}
-                  </Link>
+                  </button>
                   <Link
                     to="/profile"
                     className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors"
@@ -242,6 +246,12 @@ const Navbar: React.FC = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Notification Modal */}
+      <NotificationModal
+        isOpen={showNotificationModal}
+        onClose={() => setShowNotificationModal(false)}
+      />
     </header>
   );
 };
