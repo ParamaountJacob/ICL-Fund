@@ -54,8 +54,8 @@ interface AdminUser {
   net_worth: string;
   annual_income: string;
   investment_goals: string;
-  verification_status: 'pending' | 'verified' | 'denied';
-  verification_requested: boolean;
+  verification_status?: 'pending' | 'verified' | 'denied';
+  verification_requested?: boolean;
   created_at: string;
 }
 
@@ -138,7 +138,8 @@ const Profile: React.FC = () => {
     if (!isAdmin) return;
 
     try {
-      const { data, error } = await supabase
+      // First try with verification columns
+      let { data, error } = await supabase
         .from('profiles')
         .select(`
           id,
@@ -154,6 +155,42 @@ const Profile: React.FC = () => {
           created_at
         `)
         .order('created_at', { ascending: false });
+
+      // If verification columns don't exist, fetch without them
+      if (error && error.code === '42703') {
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('profiles')
+          .select(`
+            id,
+            email,
+            first_name,
+            last_name,
+            phone,
+            net_worth,
+            annual_income,
+            investment_goals,
+            created_at
+          `)
+          .order('created_at', { ascending: false });
+
+        if (fallbackError) {
+          if (fallbackError.code === '42P01') {
+            showError('Database not yet configured. Please run the database migration first.');
+            return;
+          }
+          throw fallbackError;
+        }
+
+        // Add default verification values
+        const usersWithDefaults = (fallbackData || []).map(user => ({
+          ...user,
+          verification_status: 'pending' as const,
+          verification_requested: false
+        }));
+
+        setAllUsers(usersWithDefaults);
+        return;
+      }
 
       if (error) {
         if (error.code === '42P01') {
@@ -175,13 +212,20 @@ const Profile: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
+      // Try to update with verification_requested column
+      let { error } = await supabase
         .from('profiles')
         .update({
           verification_requested: true,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
+
+      // If verification columns don't exist, show a message
+      if (error && error.code === '42703') {
+        showError('Verification system not yet configured. Please contact support.');
+        return;
+      }
 
       if (error) throw error;
 
@@ -199,7 +243,8 @@ const Profile: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
+      // Try to update with verification columns
+      let { error } = await supabase
         .from('profiles')
         .update({
           verification_status: status,
@@ -207,6 +252,12 @@ const Profile: React.FC = () => {
           updated_at: new Date().toISOString()
         })
         .eq('id', userId);
+
+      // If verification columns don't exist, show a message
+      if (error && error.code === '42703') {
+        showError('Verification system not yet configured. Database migration needed.');
+        return;
+      }
 
       if (error) throw error;
 
@@ -569,8 +620,8 @@ const Profile: React.FC = () => {
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-300 ${activeTab === tab.id
-                          ? 'bg-gold text-background shadow-lg'
-                          : 'text-text-secondary hover:bg-gold/10 hover:text-gold'
+                        ? 'bg-gold text-background shadow-lg'
+                        : 'text-text-secondary hover:bg-gold/10 hover:text-gold'
                         }`}
                     >
                       <Icon className="w-5 h-5" />
@@ -921,13 +972,13 @@ const Profile: React.FC = () => {
                               </div>
                               <div className="text-sm text-text-secondary">{user.email}</div>
                               <div className="flex items-center gap-2 mt-1">
-                                <span className={`px-2 py-1 text-xs rounded-full ${user.verification_status === 'verified' ? 'bg-green-100 text-green-800' :
-                                    user.verification_status === 'denied' ? 'bg-red-100 text-red-800' :
-                                      'bg-yellow-100 text-yellow-800'
+                                <span className={`px-2 py-1 text-xs rounded-full ${(user.verification_status || 'pending') === 'verified' ? 'bg-green-100 text-green-800' :
+                                  (user.verification_status || 'pending') === 'denied' ? 'bg-red-100 text-red-800' :
+                                    'bg-yellow-100 text-yellow-800'
                                   }`}>
-                                  {user.verification_status === 'verified' ? 'Verified' :
-                                    user.verification_status === 'denied' ? 'Denied' :
-                                      user.verification_requested ? 'Verification Requested' : 'Not Verified'}
+                                  {(user.verification_status || 'pending') === 'verified' ? 'Verified' :
+                                    (user.verification_status || 'pending') === 'denied' ? 'Denied' :
+                                      (user.verification_requested || false) ? 'Verification Requested' : 'Not Verified'}
                                 </span>
                               </div>
                             </div>
@@ -968,13 +1019,13 @@ const Profile: React.FC = () => {
                           </div>
                           <div className="p-3 bg-accent rounded-lg">
                             <div className="text-sm text-text-secondary">Status</div>
-                            <div className={`font-medium ${selectedUser.verification_status === 'verified' ? 'text-green-600' :
-                                selectedUser.verification_status === 'denied' ? 'text-red-600' :
-                                  'text-yellow-600'
+                            <div className={`font-medium ${(selectedUser.verification_status || 'pending') === 'verified' ? 'text-green-600' :
+                              (selectedUser.verification_status || 'pending') === 'denied' ? 'text-red-600' :
+                                'text-yellow-600'
                               }`}>
-                              {selectedUser.verification_status === 'verified' ? 'Verified' :
-                                selectedUser.verification_status === 'denied' ? 'Denied' :
-                                  selectedUser.verification_requested ? 'Verification Requested' : 'Not Verified'}
+                              {(selectedUser.verification_status || 'pending') === 'verified' ? 'Verified' :
+                                (selectedUser.verification_status || 'pending') === 'denied' ? 'Denied' :
+                                  (selectedUser.verification_requested || false) ? 'Verification Requested' : 'Not Verified'}
                             </div>
                           </div>
                         </div>
@@ -987,7 +1038,7 @@ const Profile: React.FC = () => {
                             Edit Profile
                           </button>
 
-                          {selectedUser.verification_requested && selectedUser.verification_status !== 'verified' && (
+                          {(selectedUser.verification_requested || false) && (selectedUser.verification_status || 'pending') !== 'verified' && (
                             <>
                               <button
                                 onClick={() => updateUserVerification(selectedUser.id, 'verified')}
