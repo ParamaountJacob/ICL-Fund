@@ -134,10 +134,75 @@ const Profile: React.FC = () => {
     }
   }, [authProfile, isAdmin]);
 
+  const syncUsersFromAuth = async () => {
+    if (!isAdmin) return;
+
+    setIsLoading(true);
+    try {
+      console.log('Starting user sync from Auth to Profiles...');
+
+      // Try to use the sync function if it exists, otherwise manual sync
+      const { data, error } = await supabase.rpc('sync_auth_users_to_profiles');
+
+      if (error) {
+        console.log('RPC function not available, attempting manual sync...');
+
+        // Manual sync approach - fetch auth users and insert/update profiles
+        const { data: authResponse, error: authError } = await supabase.auth.admin.listUsers();
+
+        if (authError) {
+          throw new Error(`Could not fetch users from Auth: ${authError.message}`);
+        }
+
+        if (authResponse?.users) {
+          console.log(`Found ${authResponse.users.length} users in Auth system`);
+
+          for (const authUser of authResponse.users) {
+            // Insert or update each user in profiles table
+            const { error: upsertError } = await supabase
+              .from('profiles')
+              .upsert({
+                id: authUser.id,
+                email: authUser.email,
+                first_name: authUser.user_metadata?.first_name || '',
+                last_name: authUser.user_metadata?.last_name || '',
+                phone: authUser.user_metadata?.phone || '',
+                created_at: authUser.created_at,
+                updated_at: new Date().toISOString()
+              }, {
+                onConflict: 'id'
+              });
+
+            if (upsertError) {
+              console.error(`Error syncing user ${authUser.id}:`, upsertError);
+            }
+          }
+
+          success(`Successfully synced ${authResponse.users.length} users from Auth to Profiles table!`);
+        } else {
+          showError('No users found in Auth system to sync.');
+        }
+      } else {
+        success('Users synced successfully using database function!');
+      }
+
+      // Refresh the user list
+      await fetchAllUsers();
+
+    } catch (error: any) {
+      console.error('Error syncing users:', error);
+      showError(`Failed to sync users: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const fetchAllUsers = async () => {
     if (!isAdmin) return;
 
     try {
+      console.log('Fetching users as admin...');
+
       // First try with verification columns
       let { data, error } = await supabase
         .from('profiles')
@@ -156,8 +221,11 @@ const Profile: React.FC = () => {
         `)
         .order('created_at', { ascending: false });
 
+      console.log('Profiles query result:', { data, error });
+
       // If verification columns don't exist, fetch without them
       if (error && error.code === '42703') {
+        console.log('Verification columns not found, trying without them...');
         const { data: fallbackData, error: fallbackError } = await supabase
           .from('profiles')
           .select(`
@@ -173,9 +241,41 @@ const Profile: React.FC = () => {
           `)
           .order('created_at', { ascending: false });
 
+        console.log('Fallback profiles query result:', { fallbackData, fallbackError });
+
         if (fallbackError) {
           if (fallbackError.code === '42P01') {
-            showError('Database not yet configured. Please run the database migration first.');
+            console.log('Profiles table does not exist');
+            showError('Profiles table not found. The database migration needs to be run, or users need to be synced from Auth to Profiles table.');
+
+            // Try to fetch from auth.users as a last resort (this may not work due to RLS)
+            try {
+              const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+              console.log('Auth users result:', { authUsers, authError });
+
+              if (authUsers && authUsers.users && authUsers.users.length > 0) {
+                const usersWithDefaults = authUsers.users.map(user => ({
+                  id: user.id,
+                  email: user.email || '',
+                  first_name: user.user_metadata?.first_name || '',
+                  last_name: user.user_metadata?.last_name || '',
+                  phone: user.user_metadata?.phone || '',
+                  net_worth: '',
+                  annual_income: '',
+                  investment_goals: '',
+                  verification_status: 'pending' as const,
+                  verification_requested: false,
+                  created_at: user.created_at
+                }));
+
+                setAllUsers(usersWithDefaults);
+                showError(`Found ${authUsers.users.length} users in Auth system, but they need to be synced to profiles table. Please run the database migration.`);
+                return;
+              }
+            } catch (authError) {
+              console.error('Could not fetch from auth.users:', authError);
+            }
+
             return;
           }
           throw fallbackError;
@@ -188,11 +288,17 @@ const Profile: React.FC = () => {
           verification_requested: false
         }));
 
+        console.log('Setting users from fallback data:', usersWithDefaults);
         setAllUsers(usersWithDefaults);
+
+        if (usersWithDefaults.length === 0) {
+          showError('No users found in profiles table. Users may need to be synced from the Auth system.');
+        }
         return;
       }
 
       if (error) {
+        console.error('Error fetching users:', error);
         if (error.code === '42P01') {
           showError('Database not yet configured. Please run the database migration first.');
           return;
@@ -200,8 +306,15 @@ const Profile: React.FC = () => {
         throw error;
       }
 
+      console.log('Setting users from main query:', data);
       setAllUsers(data || []);
+
+      if (!data || data.length === 0) {
+        showError('No users found in profiles table. Users may need to be synced from the Auth system.');
+      }
+
     } catch (error: any) {
+      console.error('Error in fetchAllUsers:', error);
       logger.error('Error fetching users:', error);
       showError('Failed to fetch users: ' + error.message);
     }
@@ -960,6 +1073,13 @@ const Profile: React.FC = () => {
                           <Settings className="w-4 h-4 text-red-500" />
                         </div>
                         <h3 className="text-lg font-semibold text-red-500">User Management</h3>
+                        <button
+                          onClick={syncUsersFromAuth}
+                          disabled={isLoading}
+                          className="ml-auto bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                        >
+                          {isLoading ? 'Syncing...' : 'Sync Users from Auth'}
+                        </button>
                       </div>
 
                       <div className="space-y-3">
