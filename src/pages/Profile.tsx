@@ -343,7 +343,7 @@ const Profile: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-surface">
       {/* Professional Header */}
-      <section className="relative bg-gradient-to-r from-surface via-accent to-surface border-b border-graphite">
+      <section className="relative bg-gradient-to-r from-surface via-accent to-surface border-b border-graphite pt-20 md:pt-28">
         <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-transparent to-gold/5"></div>
         <div className="relative max-w-7xl mx-auto px-6 py-16">
           <div className="text-center">
@@ -363,46 +363,42 @@ const Profile: React.FC = () => {
         </div>
       </section>
 
-      <section className="py-16">
+      <section className="py-8 sm:py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
-            {/* Professional Sidebar */}
-            <div className="lg:col-span-1 order-2 lg:order-1">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 lg:p-8 rounded-2xl border border-graphite shadow-xl lg:sticky lg:top-8"
-              >
-                {/* Professional Avatar Section */}
-                <div className="text-center mb-6 lg:mb-8">
-                  <div className="relative inline-block">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-gold to-gold/80 rounded-full flex items-center justify-center shadow-lg ring-4 ring-gold/20">
-                      <User className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-background" />
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 bg-green-500 rounded-full border-4 border-surface flex items-center justify-center">
-                      <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3 bg-green-300 rounded-full animate-pulse"></div>
-                    </div>
+          {/* Mobile-First Profile Header */}
+          <div className="mb-6 sm:mb-8">
+            <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 rounded-2xl border border-graphite shadow-xl">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-gold to-gold/80 rounded-full flex items-center justify-center shadow-lg ring-4 ring-gold/20">
+                    <User className="w-8 h-8 sm:w-10 sm:h-10 text-background" />
                   </div>
-                  <div className="mt-3 lg:mt-4">
-                    <h3 className="text-lg sm:text-xl font-semibold text-text-primary">
-                      {profile.first_name && profile.last_name
-                        ? `${profile.first_name} ${profile.last_name}`
-                        : 'Investment Profile'
-                      }
-                    </h3>
-                    <p className="text-text-secondary text-sm break-words max-w-full overflow-hidden">{user?.email}</p>
-                    <div className="mt-3">
-                      <button className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gold/10 text-gold border border-gold/20 hover:bg-gold/20 transition-colors duration-200">
-                        <Shield className="w-3 h-3 mr-1" />
-                        Verify Account
-                      </button>
-                    </div>
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-3 border-surface flex items-center justify-center">
+                    <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
                   </div>
                 </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-text-primary truncate">
+                    {profile.first_name && profile.last_name
+                      ? `${profile.first_name} ${profile.last_name}`
+                      : 'Investment Profile'
+                    }
+                  </h3>
+                  <p className="text-text-secondary text-sm truncate">{user?.email}</p>
+                  <button className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gold/10 text-gold border border-gold/20 hover:bg-gold/20 transition-colors duration-200">
+                    <Shield className="w-3 h-3 mr-1" />
+                    Verify Account
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
-                {/* Navigation Tabs */}
-                <div className="space-y-2">                {[
+          {/* Mobile-First Navigation Tabs */}
+          <div className="mb-6 sm:mb-8">
+            <div className="bg-gradient-to-br from-surface to-accent p-2 rounded-2xl border border-graphite shadow-lg">
+              <div className="grid grid-cols-3 gap-1">
+                {[
                   { id: 'overview', label: 'Overview', icon: TrendingUp },
                   { id: 'personal', label: 'Personal', icon: User },
                   { id: 'security', label: 'Security', icon: Shield }
@@ -412,177 +408,167 @@ const Profile: React.FC = () => {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
-                      className={`w-full text-left p-3 rounded-xl transition-all duration-300 flex items-center gap-2 text-sm ${activeTab === tab.id
-                        ? 'bg-gold text-background shadow-lg scale-105'
-                        : 'text-text-secondary hover:bg-gold/10 hover:text-gold border border-transparent hover:border-gold/20'
+                      className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-300 ${activeTab === tab.id
+                          ? 'bg-gold text-background shadow-lg'
+                          : 'text-text-secondary hover:bg-gold/10 hover:text-gold'
                         }`}
                     >
                       <Icon className="w-5 h-5" />
-                      <span className="font-medium text-xs sm:text-sm">{tab.label}</span>
+                      <span className="text-xs font-medium">{tab.label}</span>
                     </button>
                   );
                 })}
-                </div>
-
-                {/* Quick Actions */}
-                <div className="mt-6 lg:mt-8 pt-4 lg:pt-6 border-t border-graphite">
-                  <h4 className="text-xs sm:text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3 lg:mb-4">Quick Actions</h4>
-                  <div className="space-y-2 lg:space-y-3">
-                    <button
-                      onClick={handleStartInvesting}
-                      className="w-full bg-gradient-to-r from-gold to-gold/90 text-background px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-semibold hover:from-gold/90 hover:to-gold transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm"
-                    >
-                      <DollarSign className="w-4 h-4" />
-                      Start Investing
-                    </button>
-                    <button
-                      onClick={handleScheduleConsultation}
-                      className="w-full bg-surface border border-gold/30 text-gold px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium hover:bg-gold/10 transition-all duration-300 flex items-center gap-2 text-sm"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Schedule Call
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
+              </div>
             </div>
+          </div>
 
-            {/* Main Content */}
-            <div className="lg:col-span-3 order-1 lg:order-2">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                {/* Overview Tab */}
-                {activeTab === 'overview' && (
-                  <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                    {/* Account Summary */}
-                    <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 lg:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300">
-                      <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gold/20 rounded-full flex items-center justify-center">
-                          <User className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
-                        </div>
-                        <h3 className="text-lg sm:text-xl font-semibold text-gold">Account Summary</h3>
+          {/* Main Content */}
+          <div className="space-y-6">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              {/* Overview Tab */}
+              {activeTab === 'overview' && (
+                <div className="space-y-4 sm:space-y-6">
+                  {/* Account Summary */}
+                  <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 rounded-xl border border-graphite shadow-lg">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-8 h-8 bg-gold/20 rounded-full flex items-center justify-center">
+                        <User className="w-4 h-4 text-gold" />
                       </div>
-                      <div className="space-y-3 sm:space-y-4">
-                        <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
-                          <span className="text-text-secondary font-medium text-sm">Email</span>
-                          <span className="text-text-primary text-right text-sm break-words max-w-[60%] leading-tight">{user?.email || 'No email provided'}</span>
-                        </div>
-                        <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
-                          <span className="text-text-secondary font-medium text-sm">Name</span>
-                          <span className="text-text-primary text-right text-sm">{profile.first_name} {profile.last_name}</span>
-                        </div>
-                        <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
-                          <span className="text-text-secondary font-medium text-sm">Phone</span>
-                          <span className="text-text-primary text-right text-sm">{profile.phone || 'Not provided'}</span>
-                        </div>
-                        <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
-                          <span className="text-text-secondary font-medium text-sm">Member Since</span>
-                          <span className="text-text-primary text-right text-sm">{user?.created_at ? formatDate(user.created_at) : 'N/A'}</span>
-                        </div>
-                      </div>
+                      <h3 className="text-lg font-semibold text-gold">Account Summary</h3>
                     </div>
-
-                    {/* Investment Profile */}
-                    <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 lg:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300">
-                      <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gold/20 rounded-full flex items-center justify-center">
-                          <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
-                        </div>
-                        <h3 className="text-lg sm:text-xl font-semibold text-gold">Investment Profile</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
+                        <span className="text-text-secondary font-medium text-sm">Email</span>
+                        <span className="text-text-primary text-right text-sm break-words max-w-[60%] leading-tight">{user?.email || 'No email provided'}</span>
                       </div>
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div className="p-3 bg-accent rounded-lg border border-gold/20">
-                            <div className="flex items-center gap-2 mb-1">
-                              <DollarSign className="w-4 h-4 text-gold" />
-                              <span className="text-text-secondary font-medium text-sm">Net Worth</span>
-                            </div>
-                            <span className="text-text-primary text-sm font-semibold">
-                              {profile.net_worth || 'Not provided'}
-                            </span>
-                          </div>
-                          <div className="p-3 bg-accent rounded-lg border border-gold/20">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Target className="w-4 h-4 text-gold" />
-                              <span className="text-text-secondary font-medium text-sm">Annual Income</span>
-                            </div>
-                            <span className="text-text-primary text-sm font-semibold">
-                              {profile.annual_income || 'Not provided'}
-                            </span>
-                          </div>
-                          <div className="p-3 bg-accent rounded-lg border border-gold/20 md:col-span-2">
-                            <div className="flex items-center gap-2 mb-1">
-                              <TrendingUp className="w-4 h-4 text-gold" />
-                              <span className="text-text-secondary font-medium text-sm">Investment Goals</span>
-                            </div>
-                            <span className="text-text-primary text-sm leading-relaxed">
-                              {profile.investment_goals || 'Not provided'}
-                            </span>
-                          </div>
-                        </div>
+                      <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
+                        <span className="text-text-secondary font-medium text-sm">Name</span>
+                        <span className="text-text-primary text-right text-sm">{profile.first_name} {profile.last_name}</span>
                       </div>
-                    </div>
-
-                    {/* Quick Actions */}
-                    <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 lg:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300">
-                      <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gold/20 rounded-full flex items-center justify-center">
-                          <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
-                        </div>
-                        <h3 className="text-lg sm:text-xl font-semibold text-gold">Quick Actions</h3>
+                      <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
+                        <span className="text-text-secondary font-medium text-sm">Phone</span>
+                        <span className="text-text-primary text-right text-sm">{profile.phone || 'Not provided'}</span>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <button
-                          onClick={handleStartInvesting}
-                          className="w-full text-left p-3 bg-gradient-to-r from-gold/20 to-gold/10 border-2 border-gold/30 rounded-lg hover:bg-gold/30 hover:border-gold/50 transition-all duration-300 flex items-center gap-2"
-                        >
-                          <TrendingUp className="w-4 h-4 text-gold flex-shrink-0" />
-                          <span className="font-medium text-gold text-sm">Start Investing</span>
-                        </button>
-                        <button
-                          onClick={handleScheduleConsultation}
-                          className="w-full text-left p-3 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-2 border border-transparent"
-                        >
-                          <MessageCircle className="w-4 h-4 text-gold flex-shrink-0" />
-                          <span className="font-medium text-sm">Schedule Call</span>
-                        </button>
-                        <button
-                          onClick={() => setActiveTab('personal')}
-                          className="w-full text-left p-3 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-2 border border-transparent"
-                        >
-                          <Edit className="w-4 h-4 text-gold flex-shrink-0" />
-                          <span className="font-medium text-sm">Edit Profile</span>
-                        </button>
-                        <button
-                          onClick={() => setActiveTab('security')}
-                          className="w-full text-left p-3 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-2 border border-transparent"
-                        >
-                          <Lock className="w-4 h-4 text-gold flex-shrink-0" />
-                          <span className="font-medium text-sm">Security</span>
-                        </button>
+                      <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
+                        <span className="text-text-secondary font-medium text-sm">Member Since</span>
+                        <span className="text-text-primary text-right text-sm">{user?.created_at ? formatDate(user.created_at) : 'N/A'}</span>
                       </div>
                     </div>
                   </div>
-                )}
 
-                {/* Personal Tab */}
-                {activeTab === 'personal' && (
-                  <div className="bg-gradient-to-br from-surface to-accent p-6 md:p-8 rounded-xl border border-graphite shadow-lg">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
-                        <Edit className="w-5 h-5 text-gold" />
+                  {/* Investment Profile */}
+                  <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 rounded-xl border border-graphite shadow-lg">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-8 h-8 bg-gold/20 rounded-full flex items-center justify-center">
+                        <DollarSign className="w-4 h-4 text-gold" />
                       </div>
-                      <h3 className="text-xl font-semibold text-gold">Edit Profile</h3>
+                      <h3 className="text-lg font-semibold text-gold">Investment Profile</h3>
                     </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="p-3 bg-accent rounded-lg border border-gold/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <DollarSign className="w-4 h-4 text-gold" />
+                          <span className="text-text-secondary font-medium text-sm">Net Worth</span>
+                        </div>
+                        <span className="text-text-primary text-sm font-semibold">
+                          {profile.net_worth || 'Not provided'}
+                        </span>
+                      </div>
+                      <div className="p-3 bg-accent rounded-lg border border-gold/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Target className="w-4 h-4 text-gold" />
+                          <span className="text-text-secondary font-medium text-sm">Annual Income</span>
+                        </div>
+                        <span className="text-text-primary text-sm font-semibold">
+                          {profile.annual_income || 'Not provided'}
+                        </span>
+                      </div>
+                      <div className="p-3 bg-accent rounded-lg border border-gold/20 sm:col-span-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <TrendingUp className="w-4 h-4 text-gold" />
+                          <span className="text-text-secondary font-medium text-sm">Investment Goals</span>
+                        </div>
+                        <span className="text-text-primary text-sm leading-relaxed">
+                          {profile.investment_goals || 'Not provided'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
-                    <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }} className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Quick Actions */}
+                  <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 rounded-xl border border-graphite shadow-lg">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-8 h-8 bg-gold/20 rounded-full flex items-center justify-center">
+                        <Settings className="w-4 h-4 text-gold" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gold">Quick Actions</h3>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <button
+                        onClick={handleStartInvesting}
+                        className="w-full text-left p-4 bg-gradient-to-r from-gold/20 to-gold/10 border-2 border-gold/30 rounded-lg hover:bg-gold/30 hover:border-gold/50 transition-all duration-300 flex items-center gap-3"
+                      >
+                        <TrendingUp className="w-5 h-5 text-gold flex-shrink-0" />
                         <div>
-                          <label className="block text-text-secondary font-medium mb-2">First Name</label>
+                          <div className="font-medium text-gold text-sm">Start Investing</div>
+                          <div className="text-xs text-text-secondary">Begin your journey</div>
+                        </div>
+                      </button>
+                      <button
+                        onClick={handleScheduleConsultation}
+                        className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
+                      >
+                        <MessageCircle className="w-5 h-5 text-gold flex-shrink-0" />
+                        <div>
+                          <div className="font-medium text-sm">Schedule Call</div>
+                          <div className="text-xs text-text-secondary">Talk to advisor</div>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('personal')}
+                        className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
+                      >
+                        <Edit className="w-5 h-5 text-gold flex-shrink-0" />
+                        <div>
+                          <div className="font-medium text-sm">Edit Profile</div>
+                          <div className="text-xs text-text-secondary">Update details</div>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('security')}
+                        className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
+                      >
+                        <Lock className="w-5 h-5 text-gold flex-shrink-0" />
+                        <div>
+                          <div className="font-medium text-sm">Security</div>
+                          <div className="text-xs text-text-secondary">Manage security</div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Personal Tab */}
+              {activeTab === 'personal' && (
+                <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 rounded-xl border border-graphite shadow-lg">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 bg-gold/20 rounded-full flex items-center justify-center">
+                      <Edit className="w-4 h-4 text-gold" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gold">Edit Profile</h3>
+                  </div>
+
+                  <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }} className="space-y-4">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-text-secondary font-medium mb-2 text-sm">First Name</label>
                           <input
                             type="text"
                             value={profile.first_name || ''}
@@ -592,7 +578,7 @@ const Profile: React.FC = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-text-secondary font-medium mb-2">Last Name</label>
+                          <label className="block text-text-secondary font-medium mb-2 text-sm">Last Name</label>
                           <input
                             type="text"
                             value={profile.last_name || ''}
@@ -601,18 +587,20 @@ const Profile: React.FC = () => {
                             placeholder="Enter your last name"
                           />
                         </div>
+                      </div>
+                      <div>
+                        <label className="block text-text-secondary font-medium mb-2 text-sm">Phone</label>
+                        <input
+                          type="tel"
+                          value={profile.phone || ''}
+                          onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                          className="w-full p-3 bg-accent border border-graphite rounded-lg text-text-primary focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-200"
+                          placeholder="Enter your phone number"
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-text-secondary font-medium mb-2">Phone</label>
-                          <input
-                            type="tel"
-                            value={profile.phone || ''}
-                            onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                            className="w-full p-3 bg-accent border border-graphite rounded-lg text-text-primary focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-200"
-                            placeholder="Enter your phone number"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-text-secondary font-medium mb-2">Net Worth</label>
+                          <label className="block text-text-secondary font-medium mb-2 text-sm">Net Worth</label>
                           <input
                             type="text"
                             value={profile.net_worth || ''}
@@ -622,7 +610,7 @@ const Profile: React.FC = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-text-secondary font-medium mb-2">Annual Income</label>
+                          <label className="block text-text-secondary font-medium mb-2 text-sm">Annual Income</label>
                           <input
                             type="text"
                             value={profile.annual_income || ''}
@@ -631,134 +619,126 @@ const Profile: React.FC = () => {
                             placeholder="Enter your annual income"
                           />
                         </div>
-                        <div className="md:col-span-2">
-                          <label className="block text-text-secondary font-medium mb-2">Investment Goals</label>
-                          <textarea
-                            value={profile.investment_goals || ''}
-                            onChange={(e) => setProfile({ ...profile, investment_goals: e.target.value })}
-                            className="w-full p-3 bg-accent border border-graphite rounded-lg text-text-primary focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-200 resize-none"
-                            rows={4}
-                            placeholder="Describe your investment goals and objectives"
-                          />
-                        </div>
                       </div>
-
-                      <div className="flex justify-end pt-6 border-t border-graphite">
-                        <motion.button
-                          type="submit"
-                          disabled={isLoading}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="px-8 py-3 bg-gradient-to-r from-gold to-gold/80 text-dark font-semibold rounded-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2"
-                        >
-                          {isLoading ? (
-                            <>
-                              <div className="w-4 h-4 border-2 border-dark border-t-transparent rounded-full animate-spin"></div>
-                              Saving...
-                            </>
-                          ) : (
-                            <>
-                              <Save className="w-4 h-4" />
-                              Save Changes
-                            </>
-                          )}
-                        </motion.button>
-                      </div>
-                    </form>
-                  </div>
-                )}
-
-                {/* Security Tab */}
-                {activeTab === 'security' && (
-                  <div className="space-y-8">
-                    <div className="bg-gradient-to-br from-surface to-accent p-6 md:p-8 rounded-xl border border-graphite shadow-lg">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center">
-                          <Lock className="w-6 h-6 text-gold" />
-                        </div>
-                        <div>
-                          <h2 className="text-xl md:text-2xl font-semibold text-gold">Account Security</h2>
-                          <p className="text-text-secondary text-sm md:text-base">Keep your account safe and secure</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-6">
-                        <div className="p-4 bg-accent rounded-lg border border-graphite">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-lg font-semibold text-text-primary">Change Password</h3>
-                              <p className="text-text-secondary text-sm">Update your account password</p>
-                            </div>
-                            <button
-                              onClick={updatePassword}
-                              className="bg-gold text-background px-4 py-2 rounded-lg font-medium hover:bg-gold/90 transition-all duration-300"
-                            >
-                              Change Password
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="p-4 bg-accent rounded-lg border border-graphite">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-lg font-semibold text-text-primary">Two-Factor Authentication</h3>
-                              <p className="text-text-secondary text-sm">Add an extra layer of security to your account</p>
-                            </div>
-                            <button className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-all duration-300">
-                              Enable 2FA
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="p-4 bg-accent rounded-lg border border-graphite">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="text-lg font-semibold text-text-primary">Update Email</h3>
-                              <p className="text-text-secondary text-sm">Change your account email address</p>
-                            </div>
-                            <button
-                              onClick={updateEmail}
-                              className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-all duration-300"
-                            >
-                              Update Email
-                            </button>
-                          </div>
-                        </div>
+                      <div>
+                        <label className="block text-text-secondary font-medium mb-2 text-sm">Investment Goals</label>
+                        <textarea
+                          value={profile.investment_goals || ''}
+                          onChange={(e) => setProfile({ ...profile, investment_goals: e.target.value })}
+                          className="w-full p-3 bg-accent border border-graphite rounded-lg text-text-primary focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-200 resize-none"
+                          rows={4}
+                          placeholder="Describe your investment goals and objectives"
+                        />
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-surface to-accent p-6 md:p-8 rounded-xl border border-graphite shadow-lg">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-gold/20 rounded-full flex items-center justify-center">
-                          <User className="w-6 h-6 text-gold" />
-                        </div>
-                        <div>
-                          <h2 className="text-xl md:text-2xl font-semibold text-gold">Account Information</h2>
-                          <p className="text-text-secondary text-sm md:text-base">Account details and activity</p>
+                    <div className="pt-4 border-t border-graphite">
+                      <motion.button
+                        type="submit"
+                        disabled={isLoading}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full sm:w-auto sm:ml-auto sm:flex px-6 py-3 bg-gradient-to-r from-gold to-gold/80 text-dark font-semibold rounded-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+                      >
+                        {isLoading ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-dark border-t-transparent rounded-full animate-spin"></div>
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4" />
+                            Save Changes
+                          </>
+                        )}
+                      </motion.button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* Security Tab */}
+              {activeTab === 'security' && (
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 rounded-xl border border-graphite shadow-lg">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-8 h-8 bg-gold/20 rounded-full flex items-center justify-center">
+                        <Lock className="w-4 h-4 text-gold" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gold">Account Security</h3>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="p-4 bg-accent rounded-lg border border-graphite">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-text-primary">Change Password</h4>
+                            <p className="text-text-secondary text-sm">Update your account password</p>
+                          </div>
+                          <button
+                            onClick={updatePassword}
+                            className="w-full sm:w-auto bg-gold text-background px-4 py-2 rounded-lg font-medium hover:bg-gold/90 transition-all duration-300 text-sm"
+                          >
+                            Change Password
+                          </button>
                         </div>
                       </div>
 
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="flex justify-between">
-                            <span className="text-text-secondary">Account Created:</span>
-                            <span className="text-text-primary">{user?.created_at ? formatDate(user.created_at) : 'N/A'}</span>
+                      <div className="p-4 bg-accent rounded-lg border border-graphite">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-text-primary">Two-Factor Authentication</h4>
+                            <p className="text-text-secondary text-sm">Add an extra layer of security</p>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-text-secondary">Last Sign In:</span>
-                            <span className="text-text-primary">{user?.last_sign_in_at ? formatDate(user.last_sign_in_at) : 'N/A'}</span>
+                          <button className="w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-all duration-300 text-sm">
+                            Enable 2FA
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="p-4 bg-accent rounded-lg border border-graphite">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-text-primary">Update Email</h4>
+                            <p className="text-text-secondary text-sm">Change your account email address</p>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-text-secondary">Email Confirmed:</span>
-                            <span className="text-text-primary">{user?.email_confirmed_at ? 'Yes' : 'No'}</span>
-                          </div>
+                          <button
+                            onClick={updateEmail}
+                            className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-all duration-300 text-sm"
+                          >
+                            Update Email
+                          </button>
                         </div>
                       </div>
                     </div>
                   </div>
-                )}
-              </motion.div>
-            </div>
+
+                  <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 rounded-xl border border-graphite shadow-lg">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-8 h-8 bg-gold/20 rounded-full flex items-center justify-center">
+                        <User className="w-4 h-4 text-gold" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gold">Account Information</h3>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
+                        <span className="text-text-secondary text-sm">Account Created:</span>
+                        <span className="text-text-primary text-sm text-right">{user?.created_at ? formatDate(user.created_at) : 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
+                        <span className="text-text-secondary text-sm">Last Sign In:</span>
+                        <span className="text-text-primary text-sm text-right">{user?.last_sign_in_at ? formatDate(user.last_sign_in_at) : 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
+                        <span className="text-text-secondary text-sm">Email Confirmed:</span>
+                        <span className="text-text-primary text-sm text-right">{user?.email_confirmed_at ? 'Yes' : 'No'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </motion.div>
           </div>
         </div>
       </section>
