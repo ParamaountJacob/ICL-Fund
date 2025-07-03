@@ -183,15 +183,30 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
 
                     {/* Modal */}
                     <motion.div
-                        initial={{ y: '100%' }}
-                        animate={{ y: 0 }}
-                        exit={{ y: '100%' }}
+                        initial={{
+                            y: window.innerWidth >= 768 ? 20 : '100%',
+                            opacity: window.innerWidth >= 768 ? 0 : 1,
+                            scale: window.innerWidth >= 768 ? 0.95 : 1
+                        }}
+                        animate={{
+                            y: 0,
+                            opacity: 1,
+                            scale: 1
+                        }}
+                        exit={{
+                            y: window.innerWidth >= 768 ? 20 : '100%',
+                            opacity: window.innerWidth >= 768 ? 0 : 1,
+                            scale: window.innerWidth >= 768 ? 0.95 : 1
+                        }}
                         transition={{
                             type: 'spring',
                             damping: 25,
                             stiffness: 300
                         }}
-                        className="fixed bottom-0 left-0 right-0 z-50 bg-surface rounded-t-3xl shadow-2xl max-h-[85vh] overflow-hidden md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-lg md:mb-4 md:rounded-3xl md:max-h-[80vh]"
+                        className="fixed z-50 bg-surface shadow-2xl overflow-hidden 
+                                 bottom-0 left-0 right-0 rounded-t-3xl max-h-[85vh]
+                                 md:top-1/2 md:left-1/2 md:bottom-auto md:right-auto md:transform md:-translate-x-1/2 md:-translate-y-1/2 
+                                 md:max-w-lg md:w-full md:mx-4 md:rounded-3xl md:max-h-[80vh]"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Drag Handle */}

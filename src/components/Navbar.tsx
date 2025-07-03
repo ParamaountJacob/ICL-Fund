@@ -188,61 +188,107 @@ const Navbar: React.FC = () => {
         {/* Mobile Menu */}
         <AnimatePresence>
           {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className={`fixed top-16 left-0 right-0 border-b border-graphite shadow-2xl md:hidden z-40 ${isHomePage ? 'bg-surface/95 backdrop-blur-md' : 'bg-background/95 backdrop-blur-sm'
-                }`}
-            >
-              <div className="py-6 px-6">
-                <div className="flex flex-col space-y-1 max-w-full">
-                  <Link to="/"
-                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Home
-                  </Link>
-                  <Link to="/investor-info"
-                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Investor Info
-                  </Link>
-                  <Link to="/about"
-                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    About
-                  </Link>
-                  <Link to="/faq"
-                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    FAQ
-                  </Link>
-                  <Link to="/contact"
-                    className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Contact
-                  </Link>
-                  {user && (
-                    <button
-                      onClick={() => {
-                        handleSignOut();
-                        setIsOpen(false);
-                      }}
-                      className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors w-full text-left"
+            <>
+              {/* Mobile backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30 md:hidden"
+                onClick={() => setIsOpen(false)}
+              />
+
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className={`fixed top-16 left-0 right-0 border-b border-graphite shadow-2xl md:hidden z-40 ${isHomePage ? 'bg-surface/95 backdrop-blur-md' : 'bg-background/95 backdrop-blur-sm'
+                  }`}
+              >
+                <div className="py-6 px-6">
+                  <div className="flex flex-col space-y-1 max-w-full">
+                    <Link to="/"
+                      className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                      onClick={() => setIsOpen(false)}
                     >
-                      <LogOut className="w-4 h-4" />
-                      Sign Out
-                    </button>
-                  )}
+                      Home
+                    </Link>
+                    <Link to="/investor-info"
+                      className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Investor Info
+                    </Link>
+                    <Link to="/about"
+                      className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      About
+                    </Link>
+                    <Link to="/faq"
+                      className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      FAQ
+                    </Link>
+                    <Link to="/contact"
+                      className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Contact
+                    </Link>
+
+                    {/* User-specific mobile menu items */}
+                    {user && (
+                      <>
+                        <hr className="my-2 border-graphite" />
+                        <Link to="/pitch-deck"
+                          className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <FileText className="w-4 h-4" />
+                          Pitch Deck
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            setShowNotificationModal(true);
+                          }}
+                          className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors w-full text-left"
+                        >
+                          <Bell className="w-4 h-4" />
+                          Notifications
+                          {unreadCount > 0 && (
+                            <div className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium min-w-[20px]">
+                              {unreadCount > 99 ? '99+' : unreadCount}
+                            </div>
+                          )}
+                        </button>
+                        <Link to="/profile"
+                          className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <User className="w-4 h-4" />
+                          Profile
+                        </Link>
+                        <hr className="my-2 border-graphite" />
+                        <button
+                          onClick={() => {
+                            handleSignOut();
+                            setIsOpen(false);
+                          }}
+                          className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors w-full text-left"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Sign Out
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </div>
