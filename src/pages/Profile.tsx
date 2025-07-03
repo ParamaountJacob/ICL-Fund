@@ -364,82 +364,83 @@ const Profile: React.FC = () => {
       </section>
 
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-4 gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
             {/* Professional Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 order-2 lg:order-1">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6 }}
-                className="bg-gradient-to-br from-surface to-accent p-8 rounded-2xl border border-graphite shadow-xl sticky top-8"
+                className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 lg:p-8 rounded-2xl border border-graphite shadow-xl lg:sticky lg:top-8"
               >
                 {/* Professional Avatar Section */}
-                <div className="text-center mb-8">
+                <div className="text-center mb-6 lg:mb-8">
                   <div className="relative inline-block">
-                    <div className="w-24 h-24 bg-gradient-to-br from-gold to-gold/80 rounded-full flex items-center justify-center shadow-lg ring-4 ring-gold/20">
-                      <User className="w-12 h-12 text-background" />
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-gold to-gold/80 rounded-full flex items-center justify-center shadow-lg ring-4 ring-gold/20">
+                      <User className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-background" />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-surface flex items-center justify-center">
-                      <div className="w-3 h-3 bg-green-300 rounded-full animate-pulse"></div>
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 bg-green-500 rounded-full border-4 border-surface flex items-center justify-center">
+                      <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3 bg-green-300 rounded-full animate-pulse"></div>
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <h3 className="text-xl font-semibold text-text-primary">
+                  <div className="mt-3 lg:mt-4">
+                    <h3 className="text-lg sm:text-xl font-semibold text-text-primary">
                       {profile.first_name && profile.last_name
                         ? `${profile.first_name} ${profile.last_name}`
                         : 'Investment Profile'
                       }
                     </h3>
-                    <p className="text-text-secondary text-sm break-all">{user?.email}</p>
-                    <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gold/10 text-gold border border-gold/20">
-                      <Shield className="w-3 h-3 mr-1" />
-                      Verified Investor
+                    <p className="text-text-secondary text-sm break-words max-w-full overflow-hidden">{user?.email}</p>
+                    <div className="mt-3">
+                      <button className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gold/10 text-gold border border-gold/20 hover:bg-gold/20 transition-colors duration-200">
+                        <Shield className="w-3 h-3 mr-1" />
+                        Verify Account
+                      </button>
                     </div>
                   </div>
                 </div>
 
                 {/* Navigation Tabs */}
-                <div className="space-y-2">
-                  {[
-                    { id: 'overview', label: 'Portfolio Overview', icon: TrendingUp },
-                    { id: 'personal', label: 'Personal Information', icon: User },
-                    { id: 'security', label: 'Security Settings', icon: Shield }
-                  ].map((tab) => {
-                    const Icon = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
-                        className={`w-full text-left p-4 rounded-xl transition-all duration-300 flex items-center gap-3 ${activeTab === tab.id
-                          ? 'bg-gold text-background shadow-lg scale-105'
-                          : 'text-text-secondary hover:bg-gold/10 hover:text-gold border border-transparent hover:border-gold/20'
-                          }`}
-                      >
-                        <Icon className="w-5 h-5" />
-                        <span className="font-medium">{tab.label}</span>
-                      </button>
-                    );
-                  })}
+                <div className="space-y-2">                {[
+                  { id: 'overview', label: 'Overview', icon: TrendingUp },
+                  { id: 'personal', label: 'Personal', icon: User },
+                  { id: 'security', label: 'Security', icon: Shield }
+                ].map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id as any)}
+                      className={`w-full text-left p-3 rounded-xl transition-all duration-300 flex items-center gap-2 text-sm ${activeTab === tab.id
+                        ? 'bg-gold text-background shadow-lg scale-105'
+                        : 'text-text-secondary hover:bg-gold/10 hover:text-gold border border-transparent hover:border-gold/20'
+                        }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span className="font-medium text-xs sm:text-sm">{tab.label}</span>
+                    </button>
+                  );
+                })}
                 </div>
 
                 {/* Quick Actions */}
-                <div className="mt-8 pt-6 border-t border-graphite">
-                  <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-4">Quick Actions</h4>
-                  <div className="space-y-3">
+                <div className="mt-6 lg:mt-8 pt-4 lg:pt-6 border-t border-graphite">
+                  <h4 className="text-xs sm:text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3 lg:mb-4">Quick Actions</h4>
+                  <div className="space-y-2 lg:space-y-3">
                     <button
                       onClick={handleStartInvesting}
-                      className="w-full bg-gradient-to-r from-gold to-gold/90 text-background px-4 py-3 rounded-xl font-semibold hover:from-gold/90 hover:to-gold transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+                      className="w-full bg-gradient-to-r from-gold to-gold/90 text-background px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-semibold hover:from-gold/90 hover:to-gold transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm"
                     >
                       <DollarSign className="w-4 h-4" />
                       Start Investing
                     </button>
                     <button
                       onClick={handleScheduleConsultation}
-                      className="w-full bg-surface border border-gold/30 text-gold px-4 py-3 rounded-xl font-medium hover:bg-gold/10 transition-all duration-300 flex items-center gap-2"
+                      className="w-full bg-surface border border-gold/30 text-gold px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl font-medium hover:bg-gold/10 transition-all duration-300 flex items-center gap-2 text-sm"
                     >
                       <Calendar className="w-4 h-4" />
-                      Schedule Consultation
+                      Schedule Call
                     </button>
                   </div>
                 </div>
@@ -447,7 +448,7 @@ const Profile: React.FC = () => {
             </div>
 
             {/* Main Content */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-3 order-1 lg:order-2">
               <motion.div
                 key={activeTab}
                 initial={{ opacity: 0, y: 20 }}
@@ -456,110 +457,112 @@ const Profile: React.FC = () => {
               >
                 {/* Overview Tab */}
                 {activeTab === 'overview' && (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4 sm:gap-6">
                     {/* Account Summary */}
-                    <div className="bg-gradient-to-br from-surface to-accent p-6 md:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-gold" />
+                    <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 lg:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300">
+                      <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gold/20 rounded-full flex items-center justify-center">
+                          <User className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
                         </div>
-                        <h3 className="text-xl font-semibold text-gold">Account Summary</h3>
+                        <h3 className="text-lg sm:text-xl font-semibold text-gold">Account Summary</h3>
                       </div>
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
-                          <span className="text-text-secondary font-medium">Email</span>
-                          <span className="text-text-primary text-right break-all max-w-[60%]">{user?.email || 'No email provided'}</span>
+                          <span className="text-text-secondary font-medium text-sm">Email</span>
+                          <span className="text-text-primary text-right text-sm break-words max-w-[60%] leading-tight">{user?.email || 'No email provided'}</span>
                         </div>
                         <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
-                          <span className="text-text-secondary font-medium">Name</span>
-                          <span className="text-text-primary text-right">{profile.first_name} {profile.last_name}</span>
+                          <span className="text-text-secondary font-medium text-sm">Name</span>
+                          <span className="text-text-primary text-right text-sm">{profile.first_name} {profile.last_name}</span>
                         </div>
                         <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
-                          <span className="text-text-secondary font-medium">Phone</span>
-                          <span className="text-text-primary text-right">{profile.phone || 'Not provided'}</span>
+                          <span className="text-text-secondary font-medium text-sm">Phone</span>
+                          <span className="text-text-primary text-right text-sm">{profile.phone || 'Not provided'}</span>
                         </div>
                         <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
-                          <span className="text-text-secondary font-medium">Member Since</span>
-                          <span className="text-text-primary text-right">{user?.created_at ? formatDate(user.created_at) : 'N/A'}</span>
+                          <span className="text-text-secondary font-medium text-sm">Member Since</span>
+                          <span className="text-text-primary text-right text-sm">{user?.created_at ? formatDate(user.created_at) : 'N/A'}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Investment Profile */}
-                    <div className="bg-gradient-to-br from-surface to-accent p-6 md:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
-                          <DollarSign className="w-5 h-5 text-gold" />
+                    <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 lg:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300">
+                      <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gold/20 rounded-full flex items-center justify-center">
+                          <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
                         </div>
-                        <h3 className="text-xl font-semibold text-gold">Investment Profile</h3>
+                        <h3 className="text-lg sm:text-xl font-semibold text-gold">Investment Profile</h3>
                       </div>
                       <div className="space-y-4">
-                        <div className="p-4 bg-accent rounded-lg border border-gold/20">
-                          <div className="flex items-center gap-2 mb-2">
-                            <DollarSign className="w-4 h-4 text-gold" />
-                            <span className="text-text-secondary font-medium">Net Worth</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="p-3 bg-accent rounded-lg border border-gold/20">
+                            <div className="flex items-center gap-2 mb-1">
+                              <DollarSign className="w-4 h-4 text-gold" />
+                              <span className="text-text-secondary font-medium text-sm">Net Worth</span>
+                            </div>
+                            <span className="text-text-primary text-sm font-semibold">
+                              {profile.net_worth || 'Not provided'}
+                            </span>
                           </div>
-                          <span className="text-text-primary text-lg font-semibold">
-                            {profile.net_worth || 'Not provided'}
-                          </span>
-                        </div>
-                        <div className="p-4 bg-accent rounded-lg border border-gold/20">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Target className="w-4 h-4 text-gold" />
-                            <span className="text-text-secondary font-medium">Annual Income</span>
+                          <div className="p-3 bg-accent rounded-lg border border-gold/20">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Target className="w-4 h-4 text-gold" />
+                              <span className="text-text-secondary font-medium text-sm">Annual Income</span>
+                            </div>
+                            <span className="text-text-primary text-sm font-semibold">
+                              {profile.annual_income || 'Not provided'}
+                            </span>
                           </div>
-                          <span className="text-text-primary text-lg font-semibold">
-                            {profile.annual_income || 'Not provided'}
-                          </span>
-                        </div>
-                        <div className="p-4 bg-accent rounded-lg border border-gold/20">
-                          <div className="flex items-center gap-2 mb-2">
-                            <TrendingUp className="w-4 h-4 text-gold" />
-                            <span className="text-text-secondary font-medium">Investment Goals</span>
+                          <div className="p-3 bg-accent rounded-lg border border-gold/20 md:col-span-2">
+                            <div className="flex items-center gap-2 mb-1">
+                              <TrendingUp className="w-4 h-4 text-gold" />
+                              <span className="text-text-secondary font-medium text-sm">Investment Goals</span>
+                            </div>
+                            <span className="text-text-primary text-sm leading-relaxed">
+                              {profile.investment_goals || 'Not provided'}
+                            </span>
                           </div>
-                          <span className="text-text-primary text-sm">
-                            {profile.investment_goals || 'Not provided'}
-                          </span>
                         </div>
                       </div>
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="bg-gradient-to-br from-surface to-accent p-6 md:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300 lg:col-span-2">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 bg-gold/20 rounded-full flex items-center justify-center">
-                          <Settings className="w-5 h-5 text-gold" />
+                    <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 lg:p-8 rounded-xl border border-graphite shadow-lg hover:shadow-xl transition-all duration-300">
+                      <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gold/20 rounded-full flex items-center justify-center">
+                          <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
                         </div>
-                        <h3 className="text-xl font-semibold text-gold">Quick Actions</h3>
+                        <h3 className="text-lg sm:text-xl font-semibold text-gold">Quick Actions</h3>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <button
                           onClick={handleStartInvesting}
-                          className="w-full text-left p-4 bg-gradient-to-r from-gold/20 to-gold/10 border-2 border-gold/30 rounded-lg hover:bg-gold/30 hover:border-gold/50 transition-all duration-300 flex items-center gap-3"
+                          className="w-full text-left p-3 bg-gradient-to-r from-gold/20 to-gold/10 border-2 border-gold/30 rounded-lg hover:bg-gold/30 hover:border-gold/50 transition-all duration-300 flex items-center gap-2"
                         >
-                          <TrendingUp className="w-5 h-5 text-gold" />
-                          <span className="font-medium text-gold">Start Investing</span>
+                          <TrendingUp className="w-4 h-4 text-gold flex-shrink-0" />
+                          <span className="font-medium text-gold text-sm">Start Investing</span>
                         </button>
                         <button
                           onClick={handleScheduleConsultation}
-                          className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
+                          className="w-full text-left p-3 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-2 border border-transparent"
                         >
-                          <MessageCircle className="w-5 h-5 text-gold" />
-                          <span className="font-medium">Schedule Consultation</span>
+                          <MessageCircle className="w-4 h-4 text-gold flex-shrink-0" />
+                          <span className="font-medium text-sm">Schedule Call</span>
                         </button>
                         <button
                           onClick={() => setActiveTab('personal')}
-                          className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
+                          className="w-full text-left p-3 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-2 border border-transparent"
                         >
-                          <Edit className="w-5 h-5 text-gold" />
-                          <span className="font-medium">Edit Profile</span>
+                          <Edit className="w-4 h-4 text-gold flex-shrink-0" />
+                          <span className="font-medium text-sm">Edit Profile</span>
                         </button>
                         <button
                           onClick={() => setActiveTab('security')}
-                          className="w-full text-left p-4 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-3 border border-transparent"
+                          className="w-full text-left p-3 bg-accent rounded-lg hover:bg-gold/20 hover:border-gold/30 transition-all duration-300 flex items-center gap-2 border border-transparent"
                         >
-                          <Lock className="w-5 h-5 text-gold" />
-                          <span className="font-medium">Security Settings</span>
+                          <Lock className="w-4 h-4 text-gold flex-shrink-0" />
+                          <span className="font-medium text-sm">Security</span>
                         </button>
                       </div>
                     </div>
