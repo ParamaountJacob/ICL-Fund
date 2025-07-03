@@ -28,26 +28,51 @@ const VerificationNotificationBell: React.FC<VerificationNotificationBellProps> 
     const [notifications, setNotifications] = useState<SimpleNotification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
+    const [isTableAvailable, setIsTableAvailable] = useState<boolean | null>(null); // null = checking, false = not available, true = available
 
     useEffect(() => {
         if (user) {
             loadNotifications();
 
             // Set up real-time subscription for notifications
-            const subscription = supabase
-                .channel('user_notifications')
-                .on('postgres_changes', {
-                    event: '*',
-                    schema: 'public',
-                    table: 'notifications',
-                    filter: `user_id=eq.${user.id}`
-                }, () => {
-                    loadNotifications();
-                })
-                .subscribe();
+            // Only set up subscription if notifications table exists
+            const setupSubscription = async () => {
+                try {
+                    // Test if notifications table exists first
+                    const { error: testError } = await supabase
+                        .from('notifications')
+                        .select('id')
+                        .limit(1);
 
+                    if (testError && testError.code === '42P01') {
+                        console.log('Notifications table not yet created, skipping subscription');
+                        return;
+                    }
+
+                    // Table exists, set up subscription
+                    const subscription = supabase
+                        .channel('user_notifications')
+                        .on('postgres_changes', {
+                            event: '*',
+                            schema: 'public',
+                            table: 'notifications',
+                            filter: `user_id=eq.${user.id}`
+                        }, () => {
+                            loadNotifications();
+                        })
+                        .subscribe();
+
+                    return () => {
+                        subscription.unsubscribe();
+                    };
+                } catch (error) {
+                    console.log('Failed to set up notification subscription:', error);
+                }
+            };
+
+            const cleanup = setupSubscription();
             return () => {
-                subscription.unsubscribe();
+                cleanup?.then(fn => fn?.());
             };
         }
     }, [user]);
@@ -66,15 +91,18 @@ const VerificationNotificationBell: React.FC<VerificationNotificationBellProps> 
                 // If notifications table doesn't exist yet, fail silently
                 if (error.code === '42P01') {
                     console.log('Notifications table not yet created');
+                    setIsTableAvailable(false);
                     return;
                 }
                 throw error;
             }
 
+            setIsTableAvailable(true);
             setNotifications(data || []);
             setUnreadCount(data?.filter(n => !n.is_read).length || 0);
         } catch (error: any) {
             console.error('Failed to load notifications:', error.message);
+            setIsTableAvailable(false);
         }
     };
 
@@ -147,8 +175,8 @@ const VerificationNotificationBell: React.FC<VerificationNotificationBellProps> 
         return `${Math.floor(diffInMinutes / 1440)}d ago`;
     };
 
-    // Don't render if user is not logged in
-    if (!user) return null;
+    // Don't render if user is not logged in or table is not available
+    if (!user || isTableAvailable === false) return null;
 
     return (
         <div className="relative">
@@ -207,8 +235,8 @@ const VerificationNotificationBell: React.FC<VerificationNotificationBellProps> 
                                             animate={{ opacity: 1 }}
                                             onClick={() => handleNotificationClick(notification)}
                                             className={`p-3 hover:bg-accent cursor-pointer transition-colors border-l-4 ${!notification.is_read
-                                                    ? 'bg-blue-50/30 border-l-blue-500'
-                                                    : 'border-l-transparent'
+                                                ? 'bg-blue-50/30 border-l-blue-500'
+                                                : 'border-l-transparent'
                                                 }`}
                                         >
                                             <div className="flex gap-3">
