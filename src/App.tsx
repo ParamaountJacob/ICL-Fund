@@ -77,7 +77,7 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/pitch-deck" element={<ProtectedRoute><PitchDeck /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><SimpleProfile /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/start-investing" element={<ProtectedRoute><StartInvesting /></ProtectedRoute>} />
         <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
         {/* Disabled investment routes - backend stripped */}

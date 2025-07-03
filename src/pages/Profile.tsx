@@ -37,10 +37,13 @@ const Profile: React.FC = () => {
     net_worth: '',
     annual_income: '',
     investment_goals: ''
-  });
-  const [loading, setLoading] = useState(false);
+  }); const [loading, setLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isEditingContact, setIsEditingContact] = useState(false);
+  const [isEditingInvestment, setIsEditingInvestment] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Load profile data when user is available
   useEffect(() => {
@@ -107,6 +110,49 @@ const Profile: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const saveProfile = async () => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user?.id,
+          ...profile,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      addNotification('Profile updated successfully!', 'success');
+      setIsEditingContact(false);
+      setIsEditingInvestment(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      addNotification('Failed to update profile', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setProfile(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleStartInvesting = () => {
+    // Navigate to investment flow
+    window.location.href = '/start-investing';
+  };
+
+  const handleScheduleConsultation = () => {
+    // Open contact form or scheduling
+    window.location.href = '/contact';
+  };
+
+  const updateEmail = () => {
+    addNotification('Email change feature coming soon', 'info');
   };
 
   const formatDate = (dateString: string) => {
@@ -214,8 +260,8 @@ const Profile: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('overview')}
                     className={`w-full text-left p-3 rounded-lg transition-all duration-300 flex items-center gap-3 ${activeTab === 'overview'
-                        ? 'bg-gold/20 border-gold/30 text-gold border'
-                        : 'hover:bg-gold/10 text-text-secondary hover:text-gold border border-transparent'
+                      ? 'bg-gold/20 border-gold/30 text-gold border'
+                      : 'hover:bg-gold/10 text-text-secondary hover:text-gold border border-transparent'
                       }`}
                   >
                     <User className="w-4 h-4" />
@@ -226,8 +272,8 @@ const Profile: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('edit')}
                     className={`w-full text-left p-3 rounded-lg transition-all duration-300 flex items-center gap-3 ${activeTab === 'edit'
-                        ? 'bg-gold/20 border-gold/30 text-gold border'
-                        : 'hover:bg-gold/10 text-text-secondary hover:text-gold border border-transparent'
+                      ? 'bg-gold/20 border-gold/30 text-gold border'
+                      : 'hover:bg-gold/10 text-text-secondary hover:text-gold border border-transparent'
                       }`}
                   >
                     <Edit className="w-4 h-4" />
@@ -238,8 +284,8 @@ const Profile: React.FC = () => {
                   <button
                     onClick={() => setActiveTab('security')}
                     className={`w-full text-left p-3 rounded-lg transition-all duration-300 flex items-center gap-3 ${activeTab === 'security'
-                        ? 'bg-gold/20 border-gold/30 text-gold border'
-                        : 'hover:bg-gold/10 text-text-secondary hover:text-gold border border-transparent'
+                      ? 'bg-gold/20 border-gold/30 text-gold border'
+                      : 'hover:bg-gold/10 text-text-secondary hover:text-gold border border-transparent'
                       }`}
                   >
                     <Lock className="w-4 h-4" />
@@ -959,8 +1005,8 @@ const Profile: React.FC = () => {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
                         className={`w-full text-left p-4 rounded-xl transition-all duration-300 flex items-center gap-3 ${activeTab === tab.id
-                            ? 'bg-gold text-background shadow-lg scale-105'
-                            : 'text-text-secondary hover:bg-gold/10 hover:text-gold border border-transparent hover:border-gold/20'
+                          ? 'bg-gold text-background shadow-lg scale-105'
+                          : 'text-text-secondary hover:bg-gold/10 hover:text-gold border border-transparent hover:border-gold/20'
                           }`}
                       >
                         <Icon className="w-5 h-5" />
@@ -1568,8 +1614,7 @@ const Profile: React.FC = () => {
   < AuthModal
 isOpen = { showAuthModal }
 onClose = {() => setShowAuthModal(false)}
-mode = "signup"
-onSuccess = { handleAuthSuccess }
+defaultTab = "register"
   />
     </div >
   );
