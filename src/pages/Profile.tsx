@@ -41,6 +41,22 @@ interface UserProfile {
   investment_goals: string;
   net_worth: string;
   annual_income: string;
+  verification_status?: 'pending' | 'verified' | 'denied';
+  verification_requested?: boolean;
+}
+
+interface AdminUser {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  net_worth: string;
+  annual_income: string;
+  investment_goals: string;
+  verification_status: 'pending' | 'verified' | 'denied';
+  verification_requested: boolean;
+  created_at: string;
 }
 
 type DocumentType = 'pitch_deck' | 'ppm' | 'wire_instructions';
@@ -50,6 +66,9 @@ const Profile: React.FC = () => {
   const { success, error: showError } = useNotifications();
   const navigate = useNavigate();
 
+  // Check if user is admin
+  const isAdmin = user?.email === 'innercirclelending@gmail.com';
+
   const [profile, setProfile] = useState<UserProfile>({
     first_name: authProfile?.first_name || '',
     last_name: authProfile?.last_name || '',
@@ -58,10 +77,15 @@ const Profile: React.FC = () => {
     ira_accounts: authProfile?.ira_accounts || '',
     investment_goals: authProfile?.investment_goals || '',
     net_worth: authProfile?.net_worth || '',
-    annual_income: authProfile?.annual_income || ''
+    annual_income: authProfile?.annual_income || '',
+    verification_status: authProfile?.verification_status || 'pending',
+    verification_requested: authProfile?.verification_requested || false
   });
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'personal' | 'security'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'personal' | 'security' | 'admin'>('overview');
+  const [allUsers, setAllUsers] = useState<AdminUser[]>([]);
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [isEditingContact, setIsEditingContact] = useState(false);
   const [isEditingInvestment, setIsEditingInvestment] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -99,11 +123,133 @@ const Profile: React.FC = () => {
         ira_accounts: authProfile.ira_accounts || '',
         investment_goals: authProfile.investment_goals || '',
         net_worth: authProfile.net_worth || '',
-        annual_income: authProfile.annual_income || ''
+        annual_income: authProfile.annual_income || '',
+        verification_status: authProfile.verification_status || 'pending',
+        verification_requested: authProfile.verification_requested || false
       });
     }
     fetchDocumentAccess();
-  }, [authProfile]);
+    if (isAdmin) {
+      fetchAllUsers();
+    }
+  }, [authProfile, isAdmin]);
+
+  const fetchAllUsers = async () => {
+    if (!isAdmin) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          email,
+          first_name,
+          last_name,
+          phone,
+          net_worth,
+          annual_income,
+          investment_goals,
+          verification_status,
+          verification_requested,
+          created_at
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        if (error.code === '42P01') {
+          showError('Database not yet configured. Please run the database migration first.');
+          return;
+        }
+        throw error;
+      }
+
+      setAllUsers(data || []);
+    } catch (error: any) {
+      logger.error('Error fetching users:', error);
+      showError('Failed to fetch users: ' + error.message);
+    }
+  };
+
+  const requestVerification = async () => {
+    if (!user) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          verification_requested: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      await refreshProfile();
+      success('Verification request sent successfully!');
+    } catch (error: any) {
+      showError('Failed to request verification: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateUserVerification = async (userId: string, status: 'verified' | 'denied') => {
+    if (!isAdmin) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          verification_status: status,
+          verification_requested: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      await fetchAllUsers();
+      success(`User ${status} successfully!`);
+      setSelectedUser(null);
+    } catch (error: any) {
+      showError('Failed to update verification: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateUserProfile = async (userId: string, updatedData: Partial<AdminUser>) => {
+    if (!isAdmin) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: updatedData.first_name,
+          last_name: updatedData.last_name,
+          phone: updatedData.phone,
+          net_worth: updatedData.net_worth,
+          annual_income: updatedData.annual_income,
+          investment_goals: updatedData.investment_goals,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      await fetchAllUsers();
+      success('User profile updated successfully!');
+      setEditingUser(null);
+      setSelectedUser(null);
+    } catch (error: any) {
+      showError('Failed to update user profile: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fetchDocumentAccess = async () => {
     try {
@@ -385,10 +531,23 @@ const Profile: React.FC = () => {
                     }
                   </h3>
                   <p className="text-text-secondary text-sm truncate">{user?.email}</p>
-                  <button className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gold/10 text-gold border border-gold/20 hover:bg-gold/20 transition-colors duration-200">
-                    <Shield className="w-3 h-3 mr-1" />
-                    Verify Account
-                  </button>
+                  {!isAdmin && (
+                    <button
+                      onClick={requestVerification}
+                      disabled={isLoading || profile.verification_requested}
+                      className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gold/10 text-gold border border-gold/20 hover:bg-gold/20 transition-colors duration-200 disabled:opacity-50"
+                    >
+                      <Shield className="w-3 h-3 mr-1" />
+                      {profile.verification_status === 'verified' ? 'Verified' :
+                        profile.verification_requested ? 'Verification Pending' : 'Request Verification'}
+                    </button>
+                  )}
+                  {isAdmin && (
+                    <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                      <Settings className="w-3 h-3 mr-1" />
+                      Admin Account
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -397,11 +556,12 @@ const Profile: React.FC = () => {
           {/* Mobile-First Navigation Tabs */}
           <div className="mb-6 sm:mb-8">
             <div className="bg-gradient-to-br from-surface to-accent p-2 rounded-2xl border border-graphite shadow-lg">
-              <div className="grid grid-cols-3 gap-1">
+              <div className={`grid gap-1 ${isAdmin ? 'grid-cols-4' : 'grid-cols-3'}`}>
                 {[
                   { id: 'overview', label: 'Overview', icon: TrendingUp },
                   { id: 'personal', label: 'Personal', icon: User },
-                  { id: 'security', label: 'Security', icon: Shield }
+                  { id: 'security', label: 'Security', icon: Shield },
+                  ...(isAdmin ? [{ id: 'admin', label: 'Admin', icon: Settings }] : [])
                 ].map((tab) => {
                   const Icon = tab.icon;
                   return (
@@ -409,8 +569,8 @@ const Profile: React.FC = () => {
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-300 ${activeTab === tab.id
-                        ? 'bg-gold text-background shadow-lg'
-                        : 'text-text-secondary hover:bg-gold/10 hover:text-gold'
+                          ? 'bg-gold text-background shadow-lg'
+                          : 'text-text-secondary hover:bg-gold/10 hover:text-gold'
                         }`}
                     >
                       <Icon className="w-5 h-5" />
@@ -736,6 +896,212 @@ const Profile: React.FC = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* Admin Tab */}
+              {activeTab === 'admin' && isAdmin && (
+                <div className="space-y-4 sm:space-y-6">
+                  {!selectedUser && !editingUser && (
+                    <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 rounded-xl border border-graphite shadow-lg">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center">
+                          <Settings className="w-4 h-4 text-red-500" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-red-500">User Management</h3>
+                      </div>
+
+                      <div className="space-y-3">
+                        {allUsers.map((user) => (
+                          <div key={user.id} className="flex justify-between items-center p-3 bg-accent rounded-lg">
+                            <div className="flex-1">
+                              <div className="font-medium text-text-primary">
+                                {user.first_name} {user.last_name}
+                                {!user.first_name && !user.last_name && 'Unnamed User'}
+                              </div>
+                              <div className="text-sm text-text-secondary">{user.email}</div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className={`px-2 py-1 text-xs rounded-full ${user.verification_status === 'verified' ? 'bg-green-100 text-green-800' :
+                                    user.verification_status === 'denied' ? 'bg-red-100 text-red-800' :
+                                      'bg-yellow-100 text-yellow-800'
+                                  }`}>
+                                  {user.verification_status === 'verified' ? 'Verified' :
+                                    user.verification_status === 'denied' ? 'Denied' :
+                                      user.verification_requested ? 'Verification Requested' : 'Not Verified'}
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => setSelectedUser(user)}
+                              className="ml-3 bg-gold text-background px-3 py-1 rounded-lg text-sm font-medium hover:bg-gold/90 transition-colors"
+                            >
+                              Manage
+                            </button>
+                          </div>
+                        ))}
+                        {allUsers.length === 0 && (
+                          <div className="text-center text-text-secondary py-8">
+                            No users found.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedUser && !editingUser && (
+                    <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 rounded-xl border border-graphite shadow-lg">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gold">Managing User: {selectedUser.first_name} {selectedUser.last_name}</h3>
+                        <button
+                          onClick={() => setSelectedUser(null)}
+                          className="text-text-secondary hover:text-text-primary"
+                        >
+                          ← Back to List
+                        </button>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="p-3 bg-accent rounded-lg">
+                            <div className="text-sm text-text-secondary">Email</div>
+                            <div className="font-medium">{selectedUser.email}</div>
+                          </div>
+                          <div className="p-3 bg-accent rounded-lg">
+                            <div className="text-sm text-text-secondary">Status</div>
+                            <div className={`font-medium ${selectedUser.verification_status === 'verified' ? 'text-green-600' :
+                                selectedUser.verification_status === 'denied' ? 'text-red-600' :
+                                  'text-yellow-600'
+                              }`}>
+                              {selectedUser.verification_status === 'verified' ? 'Verified' :
+                                selectedUser.verification_status === 'denied' ? 'Denied' :
+                                  selectedUser.verification_requested ? 'Verification Requested' : 'Not Verified'}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-3">
+                          <button
+                            onClick={() => setEditingUser(selectedUser)}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
+                          >
+                            Edit Profile
+                          </button>
+
+                          {selectedUser.verification_requested && selectedUser.verification_status !== 'verified' && (
+                            <>
+                              <button
+                                onClick={() => updateUserVerification(selectedUser.id, 'verified')}
+                                disabled={isLoading}
+                                className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors text-sm disabled:opacity-50"
+                              >
+                                {isLoading ? 'Processing...' : 'Approve Verification'}
+                              </button>
+                              <button
+                                onClick={() => updateUserVerification(selectedUser.id, 'denied')}
+                                disabled={isLoading}
+                                className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors text-sm disabled:opacity-50"
+                              >
+                                {isLoading ? 'Processing...' : 'Deny Verification'}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {editingUser && (
+                    <div className="bg-gradient-to-br from-surface to-accent p-4 sm:p-6 rounded-xl border border-graphite shadow-lg">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gold">Edit User Profile</h3>
+                        <button
+                          onClick={() => setEditingUser(null)}
+                          className="text-text-secondary hover:text-text-primary"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+
+                      <form onSubmit={(e) => {
+                        e.preventDefault();
+                        updateUserProfile(editingUser.id, editingUser);
+                      }} className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-text-secondary font-medium mb-2 text-sm">First Name</label>
+                            <input
+                              type="text"
+                              value={editingUser.first_name || ''}
+                              onChange={(e) => setEditingUser({ ...editingUser, first_name: e.target.value })}
+                              className="w-full p-3 bg-accent border border-graphite rounded-lg text-text-primary focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-200"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-text-secondary font-medium mb-2 text-sm">Last Name</label>
+                            <input
+                              type="text"
+                              value={editingUser.last_name || ''}
+                              onChange={(e) => setEditingUser({ ...editingUser, last_name: e.target.value })}
+                              className="w-full p-3 bg-accent border border-graphite rounded-lg text-text-primary focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-200"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-text-secondary font-medium mb-2 text-sm">Phone</label>
+                            <input
+                              type="tel"
+                              value={editingUser.phone || ''}
+                              onChange={(e) => setEditingUser({ ...editingUser, phone: e.target.value })}
+                              className="w-full p-3 bg-accent border border-graphite rounded-lg text-text-primary focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-200"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-text-secondary font-medium mb-2 text-sm">Net Worth</label>
+                            <input
+                              type="text"
+                              value={editingUser.net_worth || ''}
+                              onChange={(e) => setEditingUser({ ...editingUser, net_worth: e.target.value })}
+                              className="w-full p-3 bg-accent border border-graphite rounded-lg text-text-primary focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-200"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-text-secondary font-medium mb-2 text-sm">Annual Income</label>
+                            <input
+                              type="text"
+                              value={editingUser.annual_income || ''}
+                              onChange={(e) => setEditingUser({ ...editingUser, annual_income: e.target.value })}
+                              className="w-full p-3 bg-accent border border-graphite rounded-lg text-text-primary focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-200"
+                            />
+                          </div>
+                          <div className="sm:col-span-2">
+                            <label className="block text-text-secondary font-medium mb-2 text-sm">Investment Goals</label>
+                            <textarea
+                              value={editingUser.investment_goals || ''}
+                              onChange={(e) => setEditingUser({ ...editingUser, investment_goals: e.target.value })}
+                              className="w-full p-3 bg-accent border border-graphite rounded-lg text-text-primary focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-200 resize-none"
+                              rows={3}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex gap-3 pt-4">
+                          <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="bg-gold text-background px-6 py-2 rounded-lg font-medium hover:bg-gold/90 transition-colors disabled:opacity-50"
+                          >
+                            {isLoading ? 'Saving...' : 'Save Changes'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingUser(null)}
+                            className="bg-gray-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
                 </div>
               )}
             </motion.div>
