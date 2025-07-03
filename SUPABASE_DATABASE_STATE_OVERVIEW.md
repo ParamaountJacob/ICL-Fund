@@ -18,8 +18,8 @@ CREATE TABLE profiles (
     investment_goals text,
     net_worth text,
     annual_income text,
-    verification_status text DEFAULT 'pending', -- Added in 20250702000000
-    verification_requested boolean DEFAULT false, -- Added in 20250702000000
+    verification_status text DEFAULT 'pending', -- 'pending', 'verified', 'denied'
+    verification_requested boolean DEFAULT false,
     role text DEFAULT 'user', -- Added in comprehensive restoration
     created_at timestamptz DEFAULT now(),
     updated_at timestamptz DEFAULT now()
@@ -42,7 +42,23 @@ CREATE TABLE contact_submissions (
 );
 ```
 
-#### 3. **Investment Workflow Tables** (From comprehensive restoration - may exist):
+#### 3. **notifications** (Verification notification system)
+```sql
+CREATE TABLE notifications (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+    title text NOT NULL,
+    message text NOT NULL,
+    type text NOT NULL DEFAULT 'info', -- 'info', 'success', 'warning', 'error'
+    action_type text, -- 'verification_request', 'verification_approved', 'verification_denied'
+    action_data jsonb, -- Store related data like user_id for admin notifications
+    is_read boolean DEFAULT false,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);
+```
+
+#### 4. **Investment Workflow Tables** (From comprehensive restoration - may exist):
 - **simple_applications** - Investment applications
 - **simple_notifications** - User notifications  
 - **user_activity** - Activity tracking
@@ -87,6 +103,56 @@ FUNCTION handle_new_user() RETURNS trigger
 - **Purpose:** Auto-creates profile when new user signs up
 - **Trigger:** ON auth.users AFTER INSERT
 
+### **Notification Functions:**
+
+#### 4. **create_notification()** (Notification system)
+```sql
+FUNCTION create_notification(
+    p_user_id uuid,
+    p_title text,
+    p_message text,
+    p_type text DEFAULT 'info',
+    p_action_type text DEFAULT NULL,
+    p_action_data jsonb DEFAULT NULL
+) RETURNS uuid
+```
+- **Purpose:** Creates notifications for users
+- **Security:** SECURITY DEFINER
+
+#### 5. **create_admin_verification_notification()** (Admin notifications)
+```sql
+FUNCTION create_admin_verification_notification(
+    p_requesting_user_id uuid,
+    p_requesting_user_email text
+) RETURNS uuid
+```
+- **Purpose:** Creates admin notifications for verification requests
+- **Security:** SECURITY DEFINER
+
+#### 6. **notify_verification_status_change()** (Status notifications)
+```sql
+FUNCTION notify_verification_status_change(
+    p_user_id uuid,
+    p_status text
+) RETURNS uuid
+```
+- **Purpose:** Notifies users of verification status changes
+- **Security:** SECURITY DEFINER
+
+#### 7. **mark_notification_read()** (Mark as read)
+```sql
+FUNCTION mark_notification_read(p_notification_id uuid) RETURNS boolean
+```
+- **Purpose:** Marks notifications as read
+- **Security:** SECURITY DEFINER
+
+#### 8. **get_unread_notification_count()** (Count unread)
+```sql
+FUNCTION get_unread_notification_count() RETURNS integer
+```
+- **Purpose:** Gets unread notification count for current user
+- **Security:** SECURITY DEFINER
+
 ---
 
 ## 🔐 **ROW LEVEL SECURITY (RLS) POLICIES:**
@@ -100,11 +166,18 @@ FUNCTION handle_new_user() RETURNS trigger
 ### **contact_submissions table:**
 1. **"contact_submissions_user_access"** - Public read access
 
+### **notifications table:**
+1. **"notifications_user_access"** - Users can see their own notifications
+2. **"notifications_admin_access"** - Admins can see all notifications (for `innercirclelending@gmail.com`)
+
 ---
 
 ## 📊 **INDEXES:**
 - **idx_profiles_verification_status** - On verification_status column
 - **idx_profiles_verification_requested** - On verification_requested WHERE true
+- **idx_notifications_user_id** - On notifications.user_id for performance
+- **idx_notifications_is_read** - On notifications.is_read WHERE false
+- **idx_notifications_type** - On notifications.type
 
 ---
 
@@ -135,7 +208,18 @@ FUNCTION handle_new_user() RETURNS trigger
 - User sync from auth to profiles
 - Contact form submissions
 - Admin access for innercirclelending@gmail.com
-- Verification status tracking
+- Verification status tracking using `verification_status` column
+- Enhanced admin user management interface with clickable users
+- Verification request workflow with form validation
+- Real-time notification system for verification workflow
+- Admin notifications for verification requests
+- User notifications for verification status changes
+
+### **🔧 Fixed Issues:**
+- **Database Column Error:** Fixed `is_verified` column references to use `verification_status` instead
+- **Admin UI Enhancement:** Replaced "Manage" buttons with clickable user cards and hover effects
+- **Verification Workflow:** Added comprehensive verification form with required fields
+- **Notification System:** Created notification table and functions for verification workflow
 
 ### **❌ What's Potentially Broken:**
 - Investment workflow tables (if they exist from comprehensive restoration)

@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { supabase } from '../lib/supabase';
 import AuthModal from '../components/AuthModal';
+import VerificationNotificationBell from '../components/VerificationNotificationBell';
 import { useNavigate } from 'react-router-dom';
 import { logger } from '../utils/logger';
 import {
@@ -334,6 +335,26 @@ const Profile: React.FC = () => {
 
       if (error) throw error;
 
+      // Try to create notifications (will fail silently if table doesn't exist yet)
+      try {
+        // Create notification for user
+        await supabase.rpc('create_notification', {
+          p_user_id: user.id,
+          p_title: 'Verification Request Submitted',
+          p_message: 'Your verification request has been submitted and is being reviewed by our team.',
+          p_type: 'info',
+          p_action_type: 'verification_submitted'
+        });
+
+        // Create notification for admin
+        await supabase.rpc('create_admin_verification_notification', {
+          p_requesting_user_id: user.id,
+          p_requesting_user_email: user.email || 'Unknown'
+        });
+      } catch (notificationError) {
+        console.log('Notifications not yet configured:', notificationError);
+      }
+
       await refreshProfile();
       setShowVerificationForm(false);
       setVerificationFormData({
@@ -358,13 +379,23 @@ const Profile: React.FC = () => {
       const { error } = await supabase
         .from('profiles')
         .update({
-          is_verified: true,
+          verification_status: 'verified',
           verification_requested: false,
           updated_at: new Date().toISOString()
         })
         .eq('id', userId);
 
       if (error) throw error;
+
+      // Try to create notification for the user (will fail silently if table doesn't exist)
+      try {
+        await supabase.rpc('notify_verification_status_change', {
+          p_user_id: userId,
+          p_status: 'verified'
+        });
+      } catch (notificationError) {
+        console.log('Notifications not yet configured:', notificationError);
+      }
 
       await loadUsers();
       success('User verified successfully!');
@@ -381,6 +412,7 @@ const Profile: React.FC = () => {
       const { error } = await supabase
         .from('profiles')
         .update({
+          verification_status: 'denied',
           verification_requested: false,
           updated_at: new Date().toISOString()
         })
@@ -388,12 +420,34 @@ const Profile: React.FC = () => {
 
       if (error) throw error;
 
+      // Try to create notification for the user (will fail silently if table doesn't exist)
+      try {
+        await supabase.rpc('notify_verification_status_change', {
+          p_user_id: userId,
+          p_status: 'denied'
+        });
+      } catch (notificationError) {
+        console.log('Notifications not yet configured:', notificationError);
+      }
+
       await loadUsers();
       success('Verification request rejected.');
     } catch (error: any) {
       showError('Failed to reject verification: ' + error.message);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handler for when admin clicks on a verification notification
+  const handleAdminNotificationClick = (userId: string) => {
+    if (isAdmin) {
+      setActiveTab('admin');
+      // Find the user and set them as selected
+      const targetUser = allUsers.find(u => u.id === userId);
+      if (targetUser) {
+        setSelectedUser(targetUser);
+      }
     }
   };
 
@@ -759,6 +813,13 @@ const Profile: React.FC = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Notification Bell */}
+                <div className="flex-shrink-0">
+                  <VerificationNotificationBell
+                    onAdminNotificationClick={handleAdminNotificationClick}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -889,7 +950,7 @@ const Profile: React.FC = () => {
                           <div className="text-xs text-text-secondary">Begin your journey</div>
                         </div>
                       </button>
-                      {profile && !profile.is_verified && !profile.verification_requested && (
+                      {profile && profile.verification_status !== 'verified' && !profile.verification_requested && (
                         <button
                           onClick={() => setShowVerificationForm(true)}
                           className="w-full text-left p-4 bg-gradient-to-r from-blue-500/20 to-blue-500/10 border-2 border-blue-500/30 rounded-lg hover:bg-blue-500/30 hover:border-blue-500/50 transition-all duration-300 flex items-center gap-3"
@@ -901,7 +962,7 @@ const Profile: React.FC = () => {
                           </div>
                         </button>
                       )}
-                      {profile && profile.verification_requested && !profile.is_verified && (
+                      {profile && profile.verification_requested && profile.verification_status !== 'verified' && (
                         <div className="w-full text-left p-4 bg-gradient-to-r from-yellow-500/20 to-yellow-500/10 border-2 border-yellow-500/30 rounded-lg flex items-center gap-3">
                           <Clock className="w-5 h-5 text-yellow-500 flex-shrink-0" />
                           <div>
@@ -1319,14 +1380,14 @@ const Profile: React.FC = () => {
                                 </div>
                                 <div className="text-sm text-text-secondary">{user.email}</div>
                                 <div className="flex items-center gap-2 mt-1">
-                                  <span className={`px-2 py-1 text-xs rounded-full ${user.is_verified ? 'bg-green-100 text-green-800' :
+                                  <span className={`px-2 py-1 text-xs rounded-full ${user.verification_status === 'verified' ? 'bg-green-100 text-green-800' :
                                       user.verification_requested ? 'bg-yellow-100 text-yellow-800' :
                                         'bg-gray-100 text-gray-800'
                                     }`}>
-                                    {user.is_verified ? 'Verified' :
+                                    {user.verification_status === 'verified' ? 'Verified' :
                                       user.verification_requested ? 'Verification Requested' : 'Not Verified'}
                                   </span>
-                                  {user.verification_requested && !user.is_verified && (
+                                  {user.verification_requested && user.verification_status !== 'verified' && (
                                     <div className="flex gap-1">
                                       <button
                                         onClick={(e) => {
