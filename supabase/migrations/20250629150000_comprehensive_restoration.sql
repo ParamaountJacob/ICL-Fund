@@ -1392,9 +1392,9 @@ GRANT EXECUTE ON FUNCTION save_contact_submission(text, text, text, text, text, 
 
 DO $$
 BEGIN
-    RAISE NOTICE '';
+    RAISE NOTICE ' ';
     RAISE NOTICE '🎉 COMPREHENSIVE DATABASE RESTORATION COMPLETE! 🎉';
-    RAISE NOTICE '';
+    RAISE NOTICE ' ';
     RAISE NOTICE '✅ Tables: simple_applications, simple_notifications, user_activity, document_signatures';
     RAISE NOTICE '✅ Workflow Functions: create_simple_application, user workflow steps, admin workflow steps';
     RAISE NOTICE '✅ Notification Functions: get_user_notifications, get_admin_notifications, notification counts';
@@ -1403,11 +1403,11 @@ BEGIN
     RAISE NOTICE '✅ Contact Form: save_contact_submission function';
     RAISE NOTICE '✅ RLS Policies: All tables properly secured';
     RAISE NOTICE '✅ Activity Triggers: Automatic user activity logging';
-    RAISE NOTICE '';
+    RAISE NOTICE ' ';
     RAISE NOTICE '🚀 All 25+ missing functions restored!';
     RAISE NOTICE '🔒 Security: All functions check user permissions properly';
     RAISE NOTICE '📊 Ready for: Investment workflow, Admin dashboard, User profiles, Notifications';
-    RAISE NOTICE '';
+    RAISE NOTICE ' ';
     RAISE NOTICE '⚡ Your application should now work completely!';
 END $$;
 
@@ -1714,10 +1714,10 @@ END $$;
 
 DO $$
 BEGIN
-    RAISE NOTICE '';
+    RAISE NOTICE ' ';
     RAISE NOTICE '🏁 FINAL PRODUCTION TOUCHES COMPLETE! 🏁';
-    RAISE NOTICE '';
-    RAISE NOTICE '� RE-TRIGGER FRIENDLY MIGRATION STATUS:';
+    RAISE NOTICE ' ';
+    RAISE NOTICE '🔄 RE-TRIGGER FRIENDLY MIGRATION STATUS:';
     RAISE NOTICE '   ✅ All table creations check for existence first';
     RAISE NOTICE '   ✅ All RLS enabling checks current status';
     RAISE NOTICE '   ✅ All policy creations check for duplicates';
@@ -1725,26 +1725,26 @@ BEGIN
     RAISE NOTICE '   ✅ All constraint additions check for duplicates';
     RAISE NOTICE '   ✅ All trigger creations check for existence';
     RAISE NOTICE '   ✅ Functions use CREATE OR REPLACE (naturally idempotent)';
-    RAISE NOTICE '';
-    RAISE NOTICE '�🚀 PERFORMANCE OPTIMIZATIONS:';
+    RAISE NOTICE ' ';
+    RAISE NOTICE '🚀 PERFORMANCE OPTIMIZATIONS:';
     RAISE NOTICE '   ✅ Database indexes for fast queries';
     RAISE NOTICE '   ✅ Data validation constraints';
     RAISE NOTICE '   ✅ Automated cleanup functions';
-    RAISE NOTICE '';
+    RAISE NOTICE ' ';
     RAISE NOTICE '📊 DASHBOARD FUNCTIONS:';
     RAISE NOTICE '   ✅ Admin dashboard statistics';
     RAISE NOTICE '   ✅ User dashboard summary';
     RAISE NOTICE '   ✅ Contact form management';
-    RAISE NOTICE '';
+    RAISE NOTICE ' ';
     RAISE NOTICE '🔧 MAINTENANCE FEATURES:';
     RAISE NOTICE '   ✅ Notification cleanup automation';
     RAISE NOTICE '   ✅ Activity log management';
     RAISE NOTICE '   ✅ Data integrity constraints';
-    RAISE NOTICE '';
+    RAISE NOTICE ' ';
     RAISE NOTICE '🎉 DATABASE RESTORATION 100% COMPLETE!';
     RAISE NOTICE '🔄 THIS MIGRATION IS NOW FULLY RE-TRIGGER FRIENDLY!';
     RAISE NOTICE '🚀 Ready for production deployment and re-runs!';
-    RAISE NOTICE '';
+    RAISE NOTICE ' ';
 END $$;
 
 COMMIT;
