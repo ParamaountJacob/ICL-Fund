@@ -1,0 +1,8 @@
+This file has been renamed because it contains Unicode characters in RAISE statements that cause PostgreSQL compilation errors.
+
+The Unicode ✅ characters in RAISE NOTICE statements are not properly escaped and cause:
+ERROR: 42601: too few parameters specified for RAISE
+
+Use the fixed version: 20250702110000_comprehensive_restoration_fixed.sql instead.
+
+Or better yet, use the IMMEDIATE_FIX_SOLUTION.sql file to run the essential sync function directly in Supabase SQL Editor.
