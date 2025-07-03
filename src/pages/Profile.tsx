@@ -409,8 +409,8 @@ const Profile: React.FC = () => {
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-300 ${activeTab === tab.id
-                          ? 'bg-gold text-background shadow-lg'
-                          : 'text-text-secondary hover:bg-gold/10 hover:text-gold'
+                        ? 'bg-gold text-background shadow-lg'
+                        : 'text-text-secondary hover:bg-gold/10 hover:text-gold'
                         }`}
                     >
                       <Icon className="w-5 h-5" />
@@ -444,7 +444,7 @@ const Profile: React.FC = () => {
                     <div className="space-y-3">
                       <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
                         <span className="text-text-secondary font-medium text-sm">Email</span>
-                        <span className="text-text-primary text-right text-sm break-words max-w-[60%] leading-tight">{user?.email || 'No email provided'}</span>
+                        <span className="text-text-primary text-right text-sm break-words max-w-[70%] leading-tight">{user?.email || 'No email provided'}</span>
                       </div>
                       <div className="flex justify-between items-start p-3 bg-accent rounded-lg">
                         <span className="text-text-secondary font-medium text-sm">Name</span>
@@ -467,33 +467,33 @@ const Profile: React.FC = () => {
                       <div className="w-8 h-8 bg-gold/20 rounded-full flex items-center justify-center">
                         <DollarSign className="w-4 h-4 text-gold" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gold">Investment Profile</h3>
+                      <h3 className="text-base sm:text-lg font-semibold text-gold">Investment Profile</h3>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="p-3 bg-accent rounded-lg border border-gold/20">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-1">
                           <DollarSign className="w-4 h-4 text-gold" />
-                          <span className="text-text-secondary font-medium text-sm">Net Worth</span>
+                          <span className="text-text-secondary font-medium text-xs sm:text-sm">Net Worth</span>
                         </div>
-                        <span className="text-text-primary text-sm font-semibold">
+                        <span className="text-text-primary text-xs sm:text-sm font-semibold">
                           {profile.net_worth || 'Not provided'}
                         </span>
                       </div>
                       <div className="p-3 bg-accent rounded-lg border border-gold/20">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-1">
                           <Target className="w-4 h-4 text-gold" />
-                          <span className="text-text-secondary font-medium text-sm">Annual Income</span>
+                          <span className="text-text-secondary font-medium text-xs sm:text-sm">Annual Income</span>
                         </div>
-                        <span className="text-text-primary text-sm font-semibold">
+                        <span className="text-text-primary text-xs sm:text-sm font-semibold">
                           {profile.annual_income || 'Not provided'}
                         </span>
                       </div>
                       <div className="p-3 bg-accent rounded-lg border border-gold/20 sm:col-span-2">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-1">
                           <TrendingUp className="w-4 h-4 text-gold" />
-                          <span className="text-text-secondary font-medium text-sm">Investment Goals</span>
+                          <span className="text-text-secondary font-medium text-xs sm:text-sm">Investment Goals</span>
                         </div>
-                        <span className="text-text-primary text-sm leading-relaxed">
+                        <span className="text-text-primary text-xs sm:text-sm leading-relaxed">
                           {profile.investment_goals || 'Not provided'}
                         </span>
                       </div>
