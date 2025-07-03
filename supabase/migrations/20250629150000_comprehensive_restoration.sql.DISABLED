@@ -1,8 +1,0 @@
--- PLACEHOLDER MIGRATION - ORIGINAL DISABLED DUE TO UNICODE ERRORS
--- This file originally contained Unicode characters (✅) in RAISE statements
--- which caused PostgreSQL parsing errors: "too few parameters specified for RAISE"
--- 
--- Use instead: 20250703000000_clean_emergency_fix.sql
--- Or run IMMEDIATE_FIX_SOLUTION.sql directly in Supabase SQL Editor
-
-SELECT 'This migration was disabled due to Unicode character issues. Use the emergency fix instead.' as status;
