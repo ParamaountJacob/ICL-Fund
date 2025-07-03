@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useAuth } from '../hooks/useAuth';
-import { useNotifications } from '../hooks/useNotifications';
+import { useAuth } from '../contexts/AuthContext';
+import { useNotifications } from '../contexts/NotificationContext';
 import { supabase } from '../lib/supabase';
 import { AuthModal } from '../components/auth/AuthModal';
 import { useNavigate } from 'react-router-dom';
-import { logger } from '../lib/logger';
+import { logger } from '../utils/logger';
 import {
   User,
   Edit,
