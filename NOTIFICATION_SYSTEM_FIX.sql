@@ -34,6 +34,7 @@ CREATE POLICY "notifications_admin_access" ON notifications
     FOR ALL USING (auth.email() = 'innercirclelending@gmail.com');
 
 -- Function to create notification for user
+DROP FUNCTION IF EXISTS create_notification(uuid, text, text, text, text, jsonb);
 CREATE OR REPLACE FUNCTION create_notification(
     p_user_id uuid,
     p_title text,
@@ -57,6 +58,7 @@ END;
 $$;
 
 -- Function to create admin notification for verification requests
+DROP FUNCTION IF EXISTS create_admin_verification_notification(uuid, text);
 CREATE OR REPLACE FUNCTION create_admin_verification_notification(
     p_requesting_user_id uuid,
     p_requesting_user_email text
@@ -99,6 +101,7 @@ END;
 $$;
 
 -- Function to notify user of verification status change
+DROP FUNCTION IF EXISTS notify_verification_status_change(uuid, text);
 CREATE OR REPLACE FUNCTION notify_verification_status_change(
     p_user_id uuid,
     p_status text
@@ -133,6 +136,7 @@ END;
 $$;
 
 -- Function to mark notification as read
+DROP FUNCTION IF EXISTS mark_notification_read(uuid);
 CREATE OR REPLACE FUNCTION mark_notification_read(p_notification_id uuid)
 RETURNS boolean
 LANGUAGE plpgsql
@@ -148,6 +152,7 @@ END;
 $$;
 
 -- Function to get unread notification count
+DROP FUNCTION IF EXISTS get_unread_notification_count();
 CREATE OR REPLACE FUNCTION get_unread_notification_count()
 RETURNS integer
 LANGUAGE plpgsql
