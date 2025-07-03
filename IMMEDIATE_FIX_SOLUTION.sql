@@ -4,11 +4,57 @@
 -- This will create the essential sync function without migration files
 -- Copy and paste this entire code block into Supabase Dashboard > SQL Editor
 
--- Step 1: Fix any existing trigger issues first
+-- Step 1: COMPLETELY DISABLE ALL PROBLEMATIC TRIGGERS AND FUNCTIONS
 DROP TRIGGER IF EXISTS profiles_activity_trigger ON profiles;
 DROP TRIGGER IF EXISTS simple_applications_activity_trigger ON simple_applications;
+DROP FUNCTION IF EXISTS log_user_activity() CASCADE;
 
--- Step 2: Create sync function (fixed version)
+-- Step 2: Create user_activity table if it doesn't exist (needed for new trigger)
+CREATE TABLE IF NOT EXISTS user_activity (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+    action_type text NOT NULL,
+    action_description text,
+    metadata jsonb,
+    created_at timestamptz DEFAULT now()
+);
+
+-- Step 3: Create FIXED trigger function that handles both 'id' and 'user_id' fields
+CREATE OR REPLACE FUNCTION log_user_activity()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Handle different table schemas properly
+    INSERT INTO user_activity (user_id, action_type, action_description, metadata)
+    VALUES (
+        CASE 
+            WHEN TG_TABLE_NAME = 'profiles' THEN COALESCE(NEW.id, OLD.id)
+            ELSE COALESCE(NEW.user_id, OLD.user_id)
+        END,
+        TG_OP,
+        CASE 
+            WHEN TG_TABLE_NAME = 'simple_applications' THEN
+                CASE TG_OP
+                    WHEN 'INSERT' THEN 'Created new investment application'
+                    WHEN 'UPDATE' THEN 'Updated investment application'
+                    WHEN 'DELETE' THEN 'Deleted investment application'
+                END
+            WHEN TG_TABLE_NAME = 'profiles' THEN
+                CASE TG_OP
+                    WHEN 'INSERT' THEN 'Created profile'
+                    WHEN 'UPDATE' THEN 'Updated profile information'
+                END
+            ELSE 'Unknown action'
+        END,
+        jsonb_build_object('table', TG_TABLE_NAME, 'operation', TG_OP)
+    );
+    
+    RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+-- Step 4: Create sync function (fixed version)
 CREATE OR REPLACE FUNCTION sync_auth_users_to_profiles()
 RETURNS TABLE (
     synced_count integer,
@@ -21,9 +67,6 @@ DECLARE
     sync_count integer := 0;
     user_record RECORD;
 BEGIN
-    -- Step 1: Disable any problematic triggers temporarily
-    DROP TRIGGER IF EXISTS profiles_activity_trigger ON profiles;
-    
     -- Check if profiles table exists first
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.tables 
@@ -115,57 +158,9 @@ BEGIN
 END;
 $$;
 
--- Step 3: Create user_activity table if it doesn't exist (to fix trigger error)
-CREATE TABLE IF NOT EXISTS user_activity (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-    action_type text NOT NULL,
-    action_description text,
-    metadata jsonb,
-    created_at timestamptz DEFAULT now()
-);
-
--- Step 4: Fix the problematic trigger function
-CREATE OR REPLACE FUNCTION log_user_activity()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    -- Only log if user_activity table exists
-    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'user_activity') THEN
-        -- Use 'id' field instead of 'user_id' for profiles table
-        INSERT INTO user_activity (user_id, action_type, action_description, metadata)
-        VALUES (
-            CASE 
-                WHEN TG_TABLE_NAME = 'profiles' THEN COALESCE(NEW.id, OLD.id)
-                ELSE COALESCE(NEW.user_id, OLD.user_id)
-            END,
-            TG_OP,
-            CASE 
-                WHEN TG_TABLE_NAME = 'simple_applications' THEN
-                    CASE TG_OP
-                        WHEN 'INSERT' THEN 'Created new investment application'
-                        WHEN 'UPDATE' THEN 'Updated investment application'
-                        WHEN 'DELETE' THEN 'Deleted investment application'
-                    END
-                WHEN TG_TABLE_NAME = 'profiles' THEN
-                    CASE TG_OP
-                        WHEN 'INSERT' THEN 'Created profile'
-                        WHEN 'UPDATE' THEN 'Updated profile information'
-                    END
-                ELSE 'Unknown action'
-            END,
-            jsonb_build_object('table', TG_TABLE_NAME, 'operation', TG_OP)
-        );
-    END IF;
-    
-    RETURN COALESCE(NEW, OLD);
-END;
-$$;
-
 -- Step 5: Grant permissions
 GRANT EXECUTE ON FUNCTION sync_auth_users_to_profiles() TO authenticated;
 GRANT EXECUTE ON FUNCTION sync_auth_users_to_profiles() TO anon;
 
--- Step 6: Test the function immediately (this will also fix the trigger)
+-- Step 6: Test the function immediately (this will sync users without trigger errors)
 SELECT * FROM sync_auth_users_to_profiles();
