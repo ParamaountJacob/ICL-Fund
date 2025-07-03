@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { supabase } from '../lib/supabase';
-import { AuthModal } from '../components/auth/AuthModal';
+import AuthModal from '../components/AuthModal';
 import { useNavigate } from 'react-router-dom';
 import { logger } from '../utils/logger';
 import {
@@ -329,7 +329,7 @@ const Profile: React.FC = () => {
               <p className="text-text-secondary mb-6">Please log in to access your profile.</p>
               <button
                 onClick={() => window.location.href = '/'}
-                className="btn-primary"
+                className="button"
               >
                 Go to Home
               </button>
@@ -763,7 +763,7 @@ const Profile: React.FC = () => {
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        defaultTab="register"
+        onSuccess={handleAuthSuccess}
       />
     </div>
   );
