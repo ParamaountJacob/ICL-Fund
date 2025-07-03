@@ -25,6 +25,7 @@ import PromissoryNoteFlow from './pages/PromissoryNoteFlow';
 import Onboarding from './pages/Onboarding';
 import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
+import NotificationsPage from './pages/NotificationsPage';
 import SubscriptionAgreement from './pages/onboarding-flow/SubscriptionAgreement';
 import PromissoryNote from './pages/onboarding-flow/PromissoryNote';
 import WireDetails from './pages/onboarding-flow/WireDetails';
@@ -78,6 +79,7 @@ function AppContent() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/pitch-deck" element={<ProtectedRoute><PitchDeck /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
         <Route path="/start-investing" element={<ProtectedRoute><StartInvesting /></ProtectedRoute>} />
         <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
         {/* Disabled investment routes - backend stripped */}

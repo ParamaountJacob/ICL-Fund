@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, FileText } from 'lucide-react';
+import { Menu, X, User, LogOut, FileText, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
+import { useUnreadNotifications } from '../hooks/useUnreadNotifications';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,6 +11,7 @@ const Navbar: React.FC = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const { pathname } = useLocation();
   const { user, signOut } = useAuth();
+  const { unreadCount } = useUnreadNotifications();
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   // Close profile dropdown when clicking outside
@@ -97,9 +99,14 @@ const Navbar: React.FC = () => {
             <button
               onMouseEnter={() => setShowProfileDropdown(true)}
               onMouseLeave={() => setShowProfileDropdown(false)}
-              className="p-2 rounded-full bg-accent hover:bg-gold/20 transition-all duration-200 flex items-center gap-2"
+              className="p-2 rounded-full bg-accent hover:bg-gold/20 transition-all duration-200 flex items-center gap-2 relative"
             >
               <User className="w-5 h-5 text-gold" />
+              {unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium min-w-[20px]">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </div>
+              )}
             </button>
 
             <AnimatePresence>
@@ -120,6 +127,19 @@ const Navbar: React.FC = () => {
                   >
                     <FileText className="w-4 h-4" />
                     Pitch Deck
+                  </Link>
+                  <Link
+                    to="/notifications"
+                    className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors relative"
+                    onClick={() => setShowProfileDropdown(false)}
+                  >
+                    <Bell className="w-4 h-4" />
+                    Notifications
+                    {unreadCount > 0 && (
+                      <div className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium min-w-[20px]">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </div>
+                    )}
                   </Link>
                   <Link
                     to="/profile"
