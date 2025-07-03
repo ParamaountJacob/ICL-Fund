@@ -51,9 +51,9 @@ BEGIN
             created_at timestamptz DEFAULT now(),
             updated_at timestamptz DEFAULT now()
         );
-        RAISE NOTICE '✅ Created simple_applications table';
+        RAISE NOTICE 'Created simple_applications table';
     ELSE
-        RAISE NOTICE '⚡ Table simple_applications already exists, skipping creation';
+        RAISE NOTICE 'Table simple_applications already exists, skipping creation';
     END IF;
 
     -- Simplified notifications table
@@ -69,9 +69,9 @@ BEGIN
             application_id uuid REFERENCES simple_applications(id) ON DELETE CASCADE,
             created_at timestamptz DEFAULT now()
         );
-        RAISE NOTICE '✅ Created simple_notifications table';
+        RAISE NOTICE 'Created simple_notifications table';
     ELSE
-        RAISE NOTICE '⚡ Table simple_notifications already exists, skipping creation';
+        RAISE NOTICE 'Table simple_notifications already exists, skipping creation';
     END IF;
 
     -- User activity tracking (for profile modal)
@@ -84,9 +84,9 @@ BEGIN
             metadata jsonb DEFAULT '{}',
             created_at timestamptz DEFAULT now()
         );
-        RAISE NOTICE '✅ Created user_activity table';
+        RAISE NOTICE 'Created user_activity table';
     ELSE
-        RAISE NOTICE '⚡ Table user_activity already exists, skipping creation';
+        RAISE NOTICE 'Table user_activity already exists, skipping creation';
     END IF;
 
     -- Document signatures table
@@ -100,9 +100,9 @@ BEGIN
             signed_at timestamptz,
             created_at timestamptz DEFAULT now()
         );
-        RAISE NOTICE '✅ Created document_signatures table';
+        RAISE NOTICE 'Created document_signatures table';
     ELSE
-        RAISE NOTICE '⚡ Table document_signatures already exists, skipping creation';
+        RAISE NOTICE 'Table document_signatures already exists, skipping creation';
     END IF;
 END $$;
 
@@ -116,36 +116,36 @@ BEGIN
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'simple_applications') THEN
         IF NOT (SELECT relrowsecurity FROM pg_class WHERE relname = 'simple_applications') THEN
             ALTER TABLE simple_applications ENABLE ROW LEVEL SECURITY;
-            RAISE NOTICE '✅ Enabled RLS on simple_applications';
+            RAISE NOTICE 'Enabled RLS on simple_applications';
         ELSE
-            RAISE NOTICE '⚡ RLS already enabled on simple_applications';
+            RAISE NOTICE 'RLS already enabled on simple_applications';
         END IF;
     END IF;
 
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'simple_notifications') THEN
         IF NOT (SELECT relrowsecurity FROM pg_class WHERE relname = 'simple_notifications') THEN
             ALTER TABLE simple_notifications ENABLE ROW LEVEL SECURITY;
-            RAISE NOTICE '✅ Enabled RLS on simple_notifications';
+            RAISE NOTICE 'Enabled RLS on simple_notifications';
         ELSE
-            RAISE NOTICE '⚡ RLS already enabled on simple_notifications';
+            RAISE NOTICE 'RLS already enabled on simple_notifications';
         END IF;
     END IF;
 
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'user_activity') THEN
         IF NOT (SELECT relrowsecurity FROM pg_class WHERE relname = 'user_activity') THEN
             ALTER TABLE user_activity ENABLE ROW LEVEL SECURITY;
-            RAISE NOTICE '✅ Enabled RLS on user_activity';
+            RAISE NOTICE 'Enabled RLS on user_activity';
         ELSE
-            RAISE NOTICE '⚡ RLS already enabled on user_activity';
+            RAISE NOTICE 'RLS already enabled on user_activity';
         END IF;
     END IF;
 
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'document_signatures') THEN
         IF NOT (SELECT relrowsecurity FROM pg_class WHERE relname = 'document_signatures') THEN
             ALTER TABLE document_signatures ENABLE ROW LEVEL SECURITY;
-            RAISE NOTICE '✅ Enabled RLS on document_signatures';
+            RAISE NOTICE 'Enabled RLS on document_signatures';
         ELSE
-            RAISE NOTICE '⚡ RLS already enabled on document_signatures';
+            RAISE NOTICE 'RLS already enabled on document_signatures';
         END IF;
     END IF;
 END $$;
@@ -163,9 +163,9 @@ BEGIN
                 user_id = auth.uid() OR 
                 EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND (role = 'admin' OR role = 'super_admin'))
             );
-        RAISE NOTICE '✅ Created simple_applications_user_access policy';
+        RAISE NOTICE 'Created simple_applications_user_access policy';
     ELSE
-        RAISE NOTICE '⚡ Policy simple_applications_user_access already exists';
+        RAISE NOTICE 'Policy simple_applications_user_access already exists';
     END IF;
 END $$;
 
@@ -178,9 +178,9 @@ BEGIN
                 user_id = auth.uid() OR 
                 EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND (role = 'admin' OR role = 'super_admin'))
             );
-        RAISE NOTICE '✅ Created simple_notifications_user_access policy';
+        RAISE NOTICE 'Created simple_notifications_user_access policy';
     ELSE
-        RAISE NOTICE '⚡ Policy simple_notifications_user_access already exists';
+        RAISE NOTICE 'Policy simple_notifications_user_access already exists';
     END IF;
 END $$;
 
@@ -193,9 +193,9 @@ BEGIN
                 user_id = auth.uid() OR 
                 EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND (role = 'admin' OR role = 'super_admin'))
             );
-        RAISE NOTICE '✅ Created user_activity_access policy';
+        RAISE NOTICE 'Created user_activity_access policy';
     ELSE
-        RAISE NOTICE '⚡ Policy user_activity_access already exists';
+        RAISE NOTICE 'Policy user_activity_access already exists';
     END IF;
 END $$;
 
@@ -208,9 +208,9 @@ BEGIN
                 user_id = auth.uid() OR 
                 EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND (role = 'admin' OR role = 'super_admin'))
             );
-        RAISE NOTICE '✅ Created document_signatures_access policy';
+        RAISE NOTICE 'Created document_signatures_access policy';
     ELSE
-        RAISE NOTICE '⚡ Policy document_signatures_access already exists';
+        RAISE NOTICE 'Policy document_signatures_access already exists';
     END IF;
 END $$;
 

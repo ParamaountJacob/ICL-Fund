@@ -41,7 +41,7 @@ try {
 
 # Migration files in order
 $migrations = @(
-    "20250629150000_comprehensive_restoration.sql",
+    "20250702110000_comprehensive_restoration_fixed.sql",
     "20250702000000_add_verification_columns.sql", 
     "20250702100000_add_user_sync_function.sql"
 )
