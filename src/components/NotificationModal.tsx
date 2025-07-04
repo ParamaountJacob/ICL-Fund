@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useDragControls, PanInfo } from 'framer-motion';
 import { Bell, Shield, User, Clock, Check, X, ExternalLink, CheckCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -30,6 +30,9 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [filter, setFilter] = useState<'all' | 'unread'>('all');
+    const [isExpanded, setIsExpanded] = useState(false);
+    const dragControls = useDragControls();
+    const modalRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (isOpen && user) {
@@ -168,6 +171,19 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
 
     const unreadCount = notifications.filter(n => !n.is_read).length;
 
+    const handleDragEnd = (event: any, info: PanInfo) => {
+        const { offset, velocity } = info;
+
+        // If dragging down significantly or with high velocity, close
+        if (offset.y > 150 || velocity.y > 300) {
+            onClose();
+        }
+        // If dragging up significantly, expand
+        else if (offset.y < -100 || velocity.y < -300) {
+            setIsExpanded(true);
+        }
+    };
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -183,10 +199,16 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
 
                     {/* Modal */}
                     <motion.div
+                        ref={modalRef}
+                        drag="y"
+                        dragControls={dragControls}
+                        dragConstraints={{ top: 0, bottom: 0 }}
+                        dragElastic={{ top: 0, bottom: 0.2 }}
+                        onDragEnd={handleDragEnd}
                         initial={{
-                            y: window.innerWidth >= 768 ? 20 : '100%',
-                            opacity: window.innerWidth >= 768 ? 0 : 1,
-                            scale: window.innerWidth >= 768 ? 0.95 : 1
+                            y: typeof window !== 'undefined' && window.innerWidth >= 768 ? 0 : '100%',
+                            opacity: typeof window !== 'undefined' && window.innerWidth >= 768 ? 0 : 1,
+                            scale: typeof window !== 'undefined' && window.innerWidth >= 768 ? 0.9 : 1
                         }}
                         animate={{
                             y: 0,
@@ -194,24 +216,31 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
                             scale: 1
                         }}
                         exit={{
-                            y: window.innerWidth >= 768 ? 20 : '100%',
-                            opacity: window.innerWidth >= 768 ? 0 : 1,
-                            scale: window.innerWidth >= 768 ? 0.95 : 1
+                            y: typeof window !== 'undefined' && window.innerWidth >= 768 ? 0 : '100%',
+                            opacity: typeof window !== 'undefined' && window.innerWidth >= 768 ? 0 : 1,
+                            scale: typeof window !== 'undefined' && window.innerWidth >= 768 ? 0.9 : 1
                         }}
                         transition={{
                             type: 'spring',
-                            damping: 25,
+                            damping: 30,
                             stiffness: 300
                         }}
-                        className="fixed z-50 bg-surface shadow-2xl overflow-hidden 
-                                 bottom-0 left-0 right-0 rounded-t-3xl max-h-[85vh]
-                                 md:top-1/2 md:left-1/2 md:bottom-auto md:right-auto md:transform md:-translate-x-1/2 md:-translate-y-1/2 
-                                 md:max-w-lg md:w-full md:mx-4 md:rounded-3xl md:max-h-[80vh]"
+                        className={`fixed z-50 bg-surface shadow-2xl overflow-hidden
+                                 ${isExpanded
+                                ? 'bottom-0 left-0 right-0 top-0 rounded-none max-h-screen'
+                                : 'bottom-0 left-0 right-0 rounded-t-3xl max-h-[90vh]'
+                            }
+                                 md:top-1/2 md:left-1/2 md:bottom-auto md:right-auto 
+                                 md:transform md:-translate-x-1/2 md:-translate-y-1/2 
+                                 md:max-w-lg md:w-full md:max-h-[85vh] md:rounded-3xl`}
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Drag Handle */}
-                        <div className="flex justify-center py-3 md:hidden">
-                            <div className="w-12 h-1 bg-graphite rounded-full opacity-30" />
+                        <div
+                            className="flex justify-center py-3 md:hidden cursor-grab active:cursor-grabbing"
+                            onPointerDown={(e) => dragControls.start(e)}
+                        >
+                            <div className="w-12 h-1 bg-graphite rounded-full opacity-40" />
                         </div>
 
                         {/* Header */}
@@ -265,7 +294,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
                         </div>
 
                         {/* Content */}
-                        <div className="overflow-y-auto max-h-[60vh] md:max-h-[50vh]">
+                        <div className={`overflow-y-auto ${isExpanded ? 'max-h-[calc(100vh-200px)]' : 'max-h-[55vh]'} md:max-h-[50vh]`}>
                             {isLoading ? (
                                 <div className="flex items-center justify-center py-12">
                                     <div className="text-center">

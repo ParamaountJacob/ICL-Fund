@@ -183,9 +183,7 @@ const Navbar: React.FC = () => {
           >
             {isOpen ? <X className="h-6 w-6 text-text-primary" /> : <Menu className="h-6 w-6 text-text-primary" />}
           </button>
-        </div>
-
-        {/* Mobile Menu */}
+        </div>        {/* Mobile Menu */}
         <AnimatePresence>
           {isOpen && (
             <>
@@ -194,46 +192,62 @@ const Navbar: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30 md:hidden"
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 md:hidden"
                 onClick={() => setIsOpen(false)}
               />
 
+              {/* Full header overlay menu */}
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className={`fixed top-16 left-0 right-0 border-b border-graphite shadow-2xl md:hidden z-40 ${isHomePage ? 'bg-surface/95 backdrop-blur-md' : 'bg-background/95 backdrop-blur-sm'
-                  }`}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className={`fixed top-0 left-0 right-0 md:hidden z-40 ${isHomePage ? 'bg-surface/98 backdrop-blur-lg' : 'bg-background/98 backdrop-blur-lg'
+                  } border-b border-graphite shadow-2xl`}
               >
-                <div className="py-6 px-6">
-                  <div className="flex flex-col space-y-1 max-w-full">
+                {/* Header with toggle */}
+                <div className="flex items-center justify-between px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <button
+                      className="flex items-center"
+                      onClick={() => setIsOpen(!isOpen)}
+                      aria-label="Close Menu"
+                    >
+                      <X className="h-6 w-6 text-text-primary" />
+                    </button>
+                    <span className="text-lg font-semibold text-text-primary">Menu</span>
+                  </div>
+                </div>
+
+                {/* Menu Content */}
+                <div className="px-6 pb-8">
+                  <div className="flex flex-col space-y-1">
                     <Link to="/"
-                      className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                      className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
                       onClick={() => setIsOpen(false)}
                     >
                       Home
                     </Link>
                     <Link to="/investor-info"
-                      className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                      className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
                       onClick={() => setIsOpen(false)}
                     >
                       Investor Info
                     </Link>
                     <Link to="/about"
-                      className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                      className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
                       onClick={() => setIsOpen(false)}
                     >
                       About
                     </Link>
                     <Link to="/faq"
-                      className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                      className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
                       onClick={() => setIsOpen(false)}
                     >
                       FAQ
                     </Link>
                     <Link to="/contact"
-                      className="block py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                      className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
                       onClick={() => setIsOpen(false)}
                     >
                       Contact
@@ -242,12 +256,14 @@ const Navbar: React.FC = () => {
                     {/* User-specific mobile menu items */}
                     {user && (
                       <>
-                        <hr className="my-2 border-graphite" />
+                        <div className="py-2">
+                          <div className="w-full h-px bg-gold/30"></div>
+                        </div>
                         <Link to="/pitch-deck"
-                          className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                          className="flex items-center gap-4 py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
                           onClick={() => setIsOpen(false)}
                         >
-                          <FileText className="w-4 h-4" />
+                          <FileText className="w-5 h-5" />
                           Pitch Deck
                         </Link>
                         <button
@@ -255,32 +271,36 @@ const Navbar: React.FC = () => {
                             setIsOpen(false);
                             setShowNotificationModal(true);
                           }}
-                          className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors w-full text-left"
+                          className="flex items-center justify-between py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors w-full text-left border-b border-graphite/20"
                         >
-                          <Bell className="w-4 h-4" />
-                          Notifications
+                          <div className="flex items-center gap-4">
+                            <Bell className="w-5 h-5" />
+                            Notifications
+                          </div>
                           {unreadCount > 0 && (
-                            <div className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium min-w-[20px]">
-                              {unreadCount > 99 ? '99+' : unreadCount}
+                            <div className="bg-red-500 text-white text-sm rounded-full w-6 h-6 flex items-center justify-center font-medium">
+                              {unreadCount > 9 ? '9+' : unreadCount}
                             </div>
                           )}
                         </button>
                         <Link to="/profile"
-                          className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors"
+                          className="flex items-center gap-4 py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
                           onClick={() => setIsOpen(false)}
                         >
-                          <User className="w-4 h-4" />
+                          <User className="w-5 h-5" />
                           Profile
                         </Link>
-                        <hr className="my-2 border-graphite" />
+                        <div className="py-2">
+                          <div className="w-full h-px bg-gold/30"></div>
+                        </div>
                         <button
                           onClick={() => {
                             handleSignOut();
                             setIsOpen(false);
                           }}
-                          className="flex items-center gap-3 py-3 text-base font-medium text-text-primary hover:text-gold transition-colors w-full text-left"
+                          className="flex items-center gap-4 py-4 text-lg font-medium text-red-500 hover:text-red-400 transition-colors w-full text-left"
                         >
-                          <LogOut className="w-4 h-4" />
+                          <LogOut className="w-5 h-5" />
                           Sign Out
                         </button>
                       </>
