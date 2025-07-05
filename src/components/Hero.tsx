@@ -29,7 +29,7 @@ const Hero: React.FC = () => {
             className="mb-16 text-center"
           >
             <h1 className="heading-xl mb-8">
-              Invest Money You Didn't Know You Had
+              Invest Money You Didn't Know You Could
             </h1>
             <p className="text-2xl md:text-3xl text-text-secondary leading-relaxed max-w-4xl mx-auto">
               Turn your hidden assets into a steady income stream. We help you unlock funds from dormant 401(k)s, 
