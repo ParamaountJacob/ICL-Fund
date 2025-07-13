@@ -550,7 +550,7 @@ const Profile: React.FC = () => {
       setShowAuthModal(true);
       return;
     }
-    navigate('/onboarding');
+    navigate('/contact');
   };
 
   const handleAuthSuccess = () => {
@@ -1381,8 +1381,8 @@ const Profile: React.FC = () => {
                                 <div className="text-sm text-text-secondary">{user.email}</div>
                                 <div className="flex items-center gap-2 mt-1">
                                   <span className={`px-2 py-1 text-xs rounded-full ${user.verification_status === 'verified' ? 'bg-green-100 text-green-800' :
-                                      user.verification_requested ? 'bg-yellow-100 text-yellow-800' :
-                                        'bg-gray-100 text-gray-800'
+                                    user.verification_requested ? 'bg-yellow-100 text-yellow-800' :
+                                      'bg-gray-100 text-gray-800'
                                     }`}>
                                     {user.verification_status === 'verified' ? 'Verified' :
                                       user.verification_requested ? 'Verification Requested' : 'Not Verified'}

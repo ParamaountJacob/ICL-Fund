@@ -40,22 +40,21 @@ const NewsletterSignup: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Mobile: Stack vertically */}
-        <div className="flex flex-col md:flex-row gap-3 md:gap-3">
+        {/* Desktop: Side by side, Mobile: Stack vertically */}
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email address"
             required
-            className="flex-1 bg-background border border-graphite rounded-lg md:border-0 md:border-b md:rounded-none px-4 py-3 md:px-0 focus:ring-2 focus:ring-gold/20 md:focus:ring-0 focus:border-gold text-text-primary placeholder-text-secondary transition-all duration-200"
+            className="flex-1 bg-background border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary placeholder-text-secondary transition-all duration-200 min-w-0"
           />
           <button
             type="submit"
             disabled={loading || !email}
-            className={`button px-6 py-3 flex items-center justify-center gap-2 whitespace-nowrap ${
-              loading || !email ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`button px-6 py-3 flex items-center justify-center gap-2 whitespace-nowrap shrink-0 ${loading || !email ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
           >
             <Send className="w-4 h-4" />
             {loading ? 'Subscribing...' : 'Subscribe'}

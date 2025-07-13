@@ -442,7 +442,7 @@ const SimpleProfile: React.FC = () => {
                             <h3 className="text-lg font-semibold text-text-primary mb-4">Quick Actions</h3>
                             <div className="flex flex-wrap gap-3">
                                 <button
-                                    onClick={() => window.location.href = '/start-investing'}
+                                    onClick={() => window.location.href = '/contact'}
                                     className="button px-4 py-2"
                                 >
                                     Update Investment Info

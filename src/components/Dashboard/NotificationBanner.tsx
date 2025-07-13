@@ -112,7 +112,7 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
                         </div>
                     </div>
                     <Link
-                        to="/onboarding"
+                        to="/contact"
                         className="bg-gold text-white px-6 py-3 rounded-lg hover:bg-gold/90 transition-colors font-medium"
                     >
                         Start Investing

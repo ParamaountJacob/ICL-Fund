@@ -18,18 +18,18 @@ const Home: React.FC = () => {
       <Leadership />
       <Investors />
       <Philosophy />
-      
+
       {/* Newsletter Section */}
       <section className="py-12 md:py-32 bg-premium-gradient from-surface to-background bg-premium-pattern">
         <div className="section">
           <div className="max-w-4xl mx-auto text-center mb-16">
             <h2 className="heading-lg mb-6">Stay Ahead of the Market</h2>
-            <p className="text-xl text-text-secondary leading-relaxed">
-              Join our exclusive newsletter for insights on private lending opportunities, 
+            <p className="text-lg sm:text-xl text-text-secondary leading-relaxed">
+              Join our exclusive newsletter for insights on private lending opportunities,
               market trends, and investment strategies from our expert team.
             </p>
           </div>
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6">
             <NewsletterSignup />
           </div>
         </div>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { supabase } from '../lib/supabase';
+import { sendApplicationEmail } from '../lib/emailService';
 import { ArrowLeft, ArrowRight, DollarSign, User, Phone, Mail, Target, Home, FileText } from 'lucide-react';
 
 interface InvestmentFormData {
@@ -97,10 +98,18 @@ const StartInvesting: React.FC = () => {
 
             if (updateError) throw updateError;
 
-            success('Investment information saved successfully!');
+            // Send application email
+            const emailResult = await sendApplicationEmail(formData);
+
+            if (emailResult.success) {
+                success('Investment application submitted successfully! Our team will review and contact you soon.');
+            } else {
+                success('Investment information saved successfully!');
+            }
+
             setCurrentStep(4); // Go to final step
         } catch (err: any) {
-            error(`Error saving information: ${err.message}`);
+            error(`Error submitting application: ${err.message}`);
         } finally {
             setLoading(false);
         }
@@ -354,16 +363,16 @@ const StartInvesting: React.FC = () => {
             className="text-center space-y-6"
         >
             <div className="w-16 h-16 bg-gold rounded-full flex items-center justify-center mx-auto">
-                <FileText className="w-8 h-8 text-background" />
+                <Mail className="w-8 h-8 text-background" />
             </div>
-            <h2 className="text-2xl font-bold text-text-primary">Ready to Sign Documents</h2>
+            <h2 className="text-2xl font-bold text-text-primary">Application Submitted</h2>
             <p className="text-text-secondary max-w-md mx-auto">
-                Your investment information has been saved. The next step would be document signing.
+                Your investment application has been submitted successfully. Our team will review your information and contact you within 2-3 business days to proceed with the next steps.
             </p>
             <div className="bg-surface rounded-lg p-6 border border-graphite">
-                <p className="text-text-primary font-medium">Document Signing</p>
+                <p className="text-text-primary font-medium">What's Next?</p>
                 <p className="text-text-secondary text-sm mt-2">
-                    This feature is currently in development. Your information has been saved to your profile.
+                    Our team will reach out to discuss your investment goals and provide detailed information about our current opportunities.
                 </p>
             </div>
             <button
@@ -383,10 +392,10 @@ const StartInvesting: React.FC = () => {
 
     return (
         <div className="pt-16 min-h-screen bg-background">
-            <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+            <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">Start Investing</h1>
-                    <p className="text-text-secondary">Join our exclusive investment opportunities</p>
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary mb-4">Start Investing</h1>
+                    <p className="text-text-secondary text-sm sm:text-base">Join our exclusive investment opportunities</p>
                 </div>
 
                 {currentStep <= 3 && (
@@ -401,7 +410,7 @@ const StartInvesting: React.FC = () => {
                                 return (
                                     <div key={index} className="flex items-center">
                                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isActive ? 'bg-gold text-background' :
-                                                isCompleted ? 'bg-gold/20 text-gold' : 'bg-surface text-text-secondary'
+                                            isCompleted ? 'bg-gold/20 text-gold' : 'bg-surface text-text-secondary'
                                             }`}>
                                             <StepIcon className="w-5 h-5" />
                                         </div>
@@ -426,13 +435,13 @@ const StartInvesting: React.FC = () => {
                     {currentStep === 4 && renderStep4()}
 
                     {currentStep <= 3 && (
-                        <div className="flex justify-between items-center mt-8">
+                        <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mt-8 pb-8">
                             <button
                                 onClick={handleBack}
                                 disabled={currentStep === 1}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${currentStep === 1
-                                        ? 'text-text-secondary cursor-not-allowed'
-                                        : 'text-text-primary hover:bg-graphite'
+                                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${currentStep === 1
+                                    ? 'text-text-secondary cursor-not-allowed'
+                                    : 'text-text-primary hover:bg-graphite'
                                     }`}
                             >
                                 <ArrowLeft className="w-4 h-4" />
@@ -442,7 +451,7 @@ const StartInvesting: React.FC = () => {
                             {currentStep < 3 ? (
                                 <button
                                     onClick={handleNext}
-                                    className="flex items-center gap-2 button px-6 py-2"
+                                    className="flex items-center justify-center gap-2 button px-6 py-2 w-full sm:w-auto"
                                 >
                                     Next
                                     <ArrowRight className="w-4 h-4" />
@@ -451,7 +460,7 @@ const StartInvesting: React.FC = () => {
                                 <button
                                     onClick={handleSubmit}
                                     disabled={loading}
-                                    className="flex items-center gap-2 button px-6 py-2 disabled:opacity-50"
+                                    className="flex items-center justify-center gap-2 button px-6 py-2 disabled:opacity-50 w-full sm:w-auto"
                                 >
                                     {loading ? 'Saving...' : 'Submit'}
                                     <ArrowRight className="w-4 h-4" />

@@ -55,8 +55,8 @@ const Investors: React.FC = () => {
             <div className="space-y-4 mt-8">
               <button
                 onClick={() => {
-                  console.log('Start Investing clicked - navigating to /start-investing');
-                  window.location.href = '/start-investing';
+                  console.log('Start Investing clicked - navigating to /contact');
+                  window.location.href = '/contact';
                 }}
                 style={{
                   width: '100%',

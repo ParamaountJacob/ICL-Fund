@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase, createInvestmentApplicationWithDetails, getUserProfile, get_investment_application_by_id } from '../lib/supabase';
-import { 
+import { sendOnboardingEmail } from '../lib/emailService';
+import {
   ArrowRight, ArrowLeft, CheckCircle, DollarSign, FileText, CreditCard,
-  User, Building, Info, Calculator, Percent, Calendar, Shield, Clock, 
+  User, Building, Info, Calculator, Percent, Calendar, Shield, Clock,
   TrendingUp, X
 } from 'lucide-react';
 import { SuccessModal } from '../components/SuccessModal';
@@ -41,18 +42,18 @@ const Onboarding: React.FC = () => {
     // Check for application ID and step in URL
     const appId = searchParams.get('applicationId');
     const step = searchParams.get('step');
-    
+
     if (appId) {
       setApplicationId(appId);
     }
-    
+
     // Check if we need to restore state from help page navigation
     if (location.state?.restoreState) {
       const { currentStep: restoredStep, formData: restoredFormData, selectedTier: restoredTier } = location.state.restoreState;
       setCurrentStep(restoredStep);
       setFormData(restoredFormData);
       setSelectedTier(restoredTier);
-      
+
       // Clear the state to prevent issues on refresh
       navigate('/onboarding', { replace: true });
     } else {
@@ -65,9 +66,9 @@ const Onboarding: React.FC = () => {
         navigate('/profile');
         return;
       }
-      
+
       setUser(user);
-      
+
       // If we have an application ID, fetch the application details
       if (appId) {
         // If step is specified, set the current step
@@ -75,7 +76,7 @@ const Onboarding: React.FC = () => {
           navigate(`/promissory-note-flow?applicationId=${appId}`);
           return;
         }
-        
+
         fetchApplicationDetails(appId);
       }
     });
@@ -84,7 +85,7 @@ const Onboarding: React.FC = () => {
   const fetchApplicationDetails = async (appId: string) => {
     try {
       const application = await get_investment_application_by_id(appId);
-      
+
       if (application) {
         // Set form data based on application
         setFormData({
@@ -95,7 +96,7 @@ const Onboarding: React.FC = () => {
           isRetirementSelfDirected: null,
           custodianName: ''
         });
-        
+
         // Set selected tier based on investment amount
         const amount = Number(application.investment_amount);
         if (amount >= 1000000) {
@@ -123,7 +124,7 @@ const Onboarding: React.FC = () => {
     else if (amount >= 500000) baseRate = 13;
     else if (amount >= 350000) baseRate = 12;
     else baseRate = 11;
-    
+
     return years === 2 ? baseRate + 1 : baseRate;
   };
 
@@ -173,14 +174,22 @@ const Onboarding: React.FC = () => {
     try {
       const investmentAmount = Number(formData.investmentAmount);
       const annualPercentage = getReturnRate(investmentAmount, formData.termYears);
-      
+
       const newApplicationId = await createInvestmentApplicationWithDetails(
         investmentAmount,
         annualPercentage,
         formData.payoutFrequency,
         formData.termYears * 12
       );
-      
+
+      // Send notification email
+      await sendOnboardingEmail({
+        ...formData,
+        userId: user.id,
+        applicationId: newApplicationId,
+        investmentAmount
+      });
+
       setApplicationId(newApplicationId);
       setShowSuccessModal(true);
     } catch (error) {
@@ -219,13 +228,13 @@ const Onboarding: React.FC = () => {
   }
 
   const returns = formData.investmentAmount ? calculateReturns(Number(formData.investmentAmount), formData.termYears) : null;
-  
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-text-primary">Investment Onboarding</h1>
-          <p className="text-text-secondary mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-text-primary">Investment Onboarding</h1>
+          <p className="text-text-secondary mt-2 text-sm sm:text-base">
             Configure your investment amount, terms, and projected returns
           </p>
         </div>
@@ -235,59 +244,59 @@ const Onboarding: React.FC = () => {
           <div className="relative flex items-center justify-between w-full max-w-3xl">
             {/* Progress Bar */}
             <div className="absolute top-1/2 transform -translate-y-1/2 h-1 bg-graphite w-full"></div>
-            <div 
+            <div
               className="absolute top-1/2 transform -translate-y-1/2 h-1 bg-gold transition-all duration-500"
               style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
             ></div>
-            
+
             {/* Step Circles */}
-            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center ${
-              currentStep >= 1 ? 'bg-gold text-background' : 'bg-graphite text-text-secondary'
-            }`}>
+            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center ${currentStep >= 1 ? 'bg-gold text-background' : 'bg-graphite text-text-secondary'
+              }`}>
               {currentStep > 1 ? <CheckCircle className="w-5 h-5" /> : 1}
             </div>
-            
-            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center ${
-              currentStep >= 2 ? 'bg-gold text-background' : 'bg-graphite text-text-secondary'
-            }`}>
+
+            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center ${currentStep >= 2 ? 'bg-gold text-background' : 'bg-graphite text-text-secondary'
+              }`}>
               {currentStep > 2 ? <CheckCircle className="w-5 h-5" /> : 2}
             </div>
-            
-            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center ${
-              currentStep >= 3 ? 'bg-gold text-background' : 'bg-graphite text-text-secondary'
-            }`}>
+
+            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center ${currentStep >= 3 ? 'bg-gold text-background' : 'bg-graphite text-text-secondary'
+              }`}>
               {currentStep > 3 ? <CheckCircle className="w-5 h-5" /> : 3}
             </div>
-            
-            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center ${
-              currentStep >= 4 ? 'bg-gold text-background' : 'bg-graphite text-text-secondary'
-            }`}>
+
+            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center ${currentStep >= 4 ? 'bg-gold text-background' : 'bg-graphite text-text-secondary'
+              }`}>
               4
             </div>
           </div>
         </div>
-        
+
         {/* Step Labels */}
         <div className="flex justify-center mb-12">
-          <div className="grid grid-cols-4 w-full max-w-3xl">
+          <div className="grid grid-cols-4 gap-2 w-full max-w-3xl">
             <div className="text-center">
-              <span className={`text-sm ${currentStep === 1 ? 'text-gold font-medium' : 'text-text-secondary'}`}>
-                Investment Details
+              <span className={`text-xs sm:text-sm ${currentStep === 1 ? 'text-gold font-medium' : 'text-text-secondary'}`}>
+                <span className="hidden sm:inline">Investment Details</span>
+                <span className="sm:hidden">Details</span>
               </span>
             </div>
             <div className="text-center">
-              <span className={`text-sm ${currentStep === 2 ? 'text-gold font-medium' : 'text-text-secondary'}`}>
-                Payout Preferences
+              <span className={`text-xs sm:text-sm ${currentStep === 2 ? 'text-gold font-medium' : 'text-text-secondary'}`}>
+                <span className="hidden sm:inline">Payout Preferences</span>
+                <span className="sm:hidden">Payout</span>
               </span>
             </div>
             <div className="text-center">
-              <span className={`text-sm ${currentStep === 3 ? 'text-gold font-medium' : 'text-text-secondary'}`}>
-                Funding Source
+              <span className={`text-xs sm:text-sm ${currentStep === 3 ? 'text-gold font-medium' : 'text-text-secondary'}`}>
+                <span className="hidden sm:inline">Funding Source</span>
+                <span className="sm:hidden">Funding</span>
               </span>
             </div>
             <div className="text-center">
-              <span className={`text-sm ${currentStep === 4 ? 'text-gold font-medium' : 'text-text-secondary'}`}>
-                Review & Submit
+              <span className={`text-xs sm:text-sm ${currentStep === 4 ? 'text-gold font-medium' : 'text-text-secondary'}`}>
+                <span className="hidden sm:inline">Review & Submit</span>
+                <span className="sm:hidden">Review</span>
               </span>
             </div>
           </div>
@@ -315,14 +324,13 @@ const Onboarding: React.FC = () => {
                         <label className="block text-sm font-medium text-text-secondary mb-3">Investment Term</label>
                         <div className="grid grid-cols-2 gap-3">
                           {[1, 2].map((years) => (
-                            <button 
-                              key={years} 
-                              onClick={() => handleInputChange('termYears', years)} 
-                              className={`p-4 rounded-lg border-2 transition-all duration-200 font-medium ${
-                                formData.termYears === years 
-                                  ? 'border-gold bg-gold/10 text-gold' 
+                            <button
+                              key={years}
+                              onClick={() => handleInputChange('termYears', years)}
+                              className={`p-4 rounded-lg border-2 transition-all duration-200 font-medium ${formData.termYears === years
+                                  ? 'border-gold bg-gold/10 text-gold'
                                   : 'border-graphite bg-accent text-text-secondary hover:border-gold/50'
-                              }`}
+                                }`}
                             >
                               <div className="text-center">
                                 <div className="font-semibold">{years} Year{years > 1 ? 's' : ''}</div>
@@ -340,14 +348,13 @@ const Onboarding: React.FC = () => {
                           {['200000', '350000', '500000', '1000000'].map((amount) => {
                             const rate = getReturnRate(Number(amount), formData.termYears);
                             return (
-                              <button 
-                                key={amount} 
-                                onClick={() => handleTierSelect(amount)} 
-                                className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left ${
-                                  selectedTier === amount 
-                                    ? 'border-gold bg-gold/10' 
+                              <button
+                                key={amount}
+                                onClick={() => handleTierSelect(amount)}
+                                className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left ${selectedTier === amount
+                                    ? 'border-gold bg-gold/10'
                                     : 'border-graphite bg-accent hover:border-gold/50'
-                                }`}
+                                  }`}
                               >
                                 <div className="flex justify-between items-center">
                                   <div>
@@ -367,9 +374,9 @@ const Onboarding: React.FC = () => {
                         <label className="block text-sm font-medium text-text-secondary mb-3">Exact Investment Amount</label>
                         <div className="relative">
                           <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-secondary text-lg">$</span>
-                          <input 
-                            type="number" 
-                            value={formData.investmentAmount} 
+                          <input
+                            type="number"
+                            value={formData.investmentAmount}
                             onChange={(e) => {
                               const value = e.target.value;
                               handleInputChange('investmentAmount', value);
@@ -383,10 +390,10 @@ const Onboarding: React.FC = () => {
                               } else if (amount >= 200000) {
                                 setSelectedTier('200000');
                               }
-                            }} 
-                            min="200000" 
-                            step="1000" 
-                            className="w-full bg-accent border border-graphite rounded-lg pl-10 pr-4 py-3 text-lg font-semibold focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary" 
+                            }}
+                            min="200000"
+                            step="1000"
+                            className="w-full bg-accent border border-graphite rounded-lg pl-10 pr-4 py-3 text-lg font-semibold focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary"
                             placeholder="Minimum: $200,000"
                           />
                         </div>
@@ -456,14 +463,13 @@ const Onboarding: React.FC = () => {
                     { key: 'quarterly', label: 'Quarterly', amount: returns?.quarterlyReturn || 0, desc: 'Receive payments every 3 months' },
                     { key: 'annually', label: 'Annually', amount: returns?.annualReturn || 0, desc: 'Receive payments once per year' }
                   ].map((option) => (
-                    <button 
-                      key={option.key} 
-                      onClick={() => handleInputChange('payoutFrequency', option.key as any)} 
-                      className={`p-6 rounded-lg border-2 transition-all duration-200 text-center ${
-                        formData.payoutFrequency === option.key 
-                          ? 'border-gold bg-gold/10' 
+                    <button
+                      key={option.key}
+                      onClick={() => handleInputChange('payoutFrequency', option.key as any)}
+                      className={`p-6 rounded-lg border-2 transition-all duration-200 text-center ${formData.payoutFrequency === option.key
+                          ? 'border-gold bg-gold/10'
                           : 'border-graphite bg-accent hover:border-gold/50'
-                      }`}
+                        }`}
                     >
                       <div className="mb-3">
                         <div className="font-semibold text-text-primary text-lg">{option.label}</div>
@@ -483,10 +489,10 @@ const Onboarding: React.FC = () => {
                     <div>
                       <div className="text-sm text-text-secondary mb-1">Payment Amount</div>
                       <div className="font-bold text-gold text-lg">${Math.round(
-                        formData.payoutFrequency === 'monthly' 
-                          ? returns?.monthlyReturn || 0 
-                          : formData.payoutFrequency === 'quarterly' 
-                            ? returns?.quarterlyReturn || 0 
+                        formData.payoutFrequency === 'monthly'
+                          ? returns?.monthlyReturn || 0
+                          : formData.payoutFrequency === 'quarterly'
+                            ? returns?.quarterlyReturn || 0
                             : returns?.annualReturn || 0
                       ).toLocaleString()}</div>
                     </div>
@@ -509,13 +515,12 @@ const Onboarding: React.FC = () => {
                   Funding Source
                 </h3>
                 <div className="space-y-4 mb-8">
-                  <button 
-                    onClick={() => handleInputChange('fundingSource', 'personal')} 
-                    className={`w-full p-6 rounded-lg border-2 transition-all duration-200 text-left ${
-                      formData.fundingSource === 'personal' 
-                        ? 'border-gold bg-gold/10' 
+                  <button
+                    onClick={() => handleInputChange('fundingSource', 'personal')}
+                    className={`w-full p-6 rounded-lg border-2 transition-all duration-200 text-left ${formData.fundingSource === 'personal'
+                        ? 'border-gold bg-gold/10'
                         : 'border-graphite bg-accent hover:border-gold/50'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-4">
                       <User className="w-6 h-6 text-gold" />
@@ -525,13 +530,12 @@ const Onboarding: React.FC = () => {
                       </div>
                     </div>
                   </button>
-                  <button 
-                    onClick={() => handleInputChange('fundingSource', 'entity')} 
-                    className={`w-full p-6 rounded-lg border-2 transition-all duration-200 text-left ${
-                      formData.fundingSource === 'entity' 
-                        ? 'border-gold bg-gold/10' 
+                  <button
+                    onClick={() => handleInputChange('fundingSource', 'entity')}
+                    className={`w-full p-6 rounded-lg border-2 transition-all duration-200 text-left ${formData.fundingSource === 'entity'
+                        ? 'border-gold bg-gold/10'
                         : 'border-graphite bg-accent hover:border-gold/50'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-4">
                       <Building className="w-6 h-6 text-gold" />
@@ -542,13 +546,12 @@ const Onboarding: React.FC = () => {
                     </div>
                   </button>
                   <div className="space-y-4">
-                    <button 
-                      onClick={() => handleInputChange('fundingSource', 'retirement')} 
-                      className={`w-full p-6 rounded-lg border-2 transition-all duration-200 text-left ${
-                        formData.fundingSource === 'retirement' 
-                          ? 'border-gold bg-gold/10' 
+                    <button
+                      onClick={() => handleInputChange('fundingSource', 'retirement')}
+                      className={`w-full p-6 rounded-lg border-2 transition-all duration-200 text-left ${formData.fundingSource === 'retirement'
+                          ? 'border-gold bg-gold/10'
                           : 'border-graphite bg-accent hover:border-gold/50'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-4">
                         <FileText className="w-6 h-6 text-gold" />
@@ -559,30 +562,29 @@ const Onboarding: React.FC = () => {
                       </div>
                     </button>
                     {formData.fundingSource === 'retirement' && (
-                      <motion.div 
-                        initial={{ opacity: 0, height: 0 }} 
-                        animate={{ opacity: 1, height: 'auto' }} 
-                        exit={{ opacity: 0, height: 0 }} 
-                        transition={{ duration: 0.3 }} 
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
                         className="bg-accent rounded-xl p-4 md:p-6 ml-0 md:ml-4 border-l-4 border-gold"
                       >
                         <h4 className="text-lg font-semibold text-text-primary mb-4">Is your retirement account self-directed?</h4>
                         <div className="space-y-3 mb-6">
-                          <button 
-                            onClick={() => handleInputChange('isRetirementSelfDirected', true)} 
-                            className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left ${
-                              formData.isRetirementSelfDirected === true 
-                                ? 'border-green-500 bg-green-500/10' 
+                          <button
+                            onClick={() => handleInputChange('isRetirementSelfDirected', true)}
+                            className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left ${formData.isRetirementSelfDirected === true
+                                ? 'border-green-500 bg-green-500/10'
                                 : 'border-graphite bg-surface hover:border-green-500/50'
-                            }`}
+                              }`}
                           >
                             <div className="flex items-center gap-3">
                               <CheckCircle className="w-5 h-5 text-green-500" />
                               <span className="font-medium text-text-primary">Yes, it is self-directed</span>
                             </div>
                           </button>
-                          <button 
-                            onClick={() => navigate('/help/self-directed-ira', { state: { onboardingState: { currentStep, formData, selectedTier } } })} 
+                          <button
+                            onClick={() => navigate('/help/self-directed-ira', { state: { onboardingState: { currentStep, formData, selectedTier } } })}
                             className="w-full p-4 rounded-lg border-2 border-red-500/50 bg-red-500/10 hover:border-red-500 transition-all duration-200 text-left"
                           >
                             <div className="flex items-center gap-3">
@@ -590,8 +592,8 @@ const Onboarding: React.FC = () => {
                               <span className="font-medium text-text-primary">No, it is not self-directed</span>
                             </div>
                           </button>
-                          <button 
-                            onClick={() => navigate('/help/self-directed-ira', { state: { onboardingState: { currentStep, formData, selectedTier } } })} 
+                          <button
+                            onClick={() => navigate('/help/self-directed-ira', { state: { onboardingState: { currentStep, formData, selectedTier } } })}
                             className="w-full p-4 rounded-lg border-2 border-yellow-500/50 bg-yellow-500/10 hover:border-yellow-500 transition-all duration-200 text-left"
                           >
                             <div className="flex items-center gap-3">
@@ -603,11 +605,11 @@ const Onboarding: React.FC = () => {
                         {formData.isRetirementSelfDirected === true && (
                           <div>
                             <label className="block text-sm font-medium text-text-secondary mb-3">Who is your custodian? (optional)</label>
-                            <input 
-                              type="text" 
-                              value={formData.custodianName} 
-                              onChange={(e) => handleInputChange('custodianName', e.target.value)} 
-                              className="w-full bg-surface border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary" 
+                            <input
+                              type="text"
+                              value={formData.custodianName}
+                              onChange={(e) => handleInputChange('custodianName', e.target.value)}
+                              className="w-full bg-surface border border-graphite rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary"
                               placeholder="e.g. Equity Trust, Entrust Group, etc."
                             />
                           </div>
@@ -619,8 +621,8 @@ const Onboarding: React.FC = () => {
                               <div>
                                 <h5 className="font-semibold text-red-500 mb-2">Account Not Eligible</h5>
                                 <p className="text-text-secondary text-sm mb-3">We can only accept self-directed accounts. Please consult your custodian or visit our help page to learn how to convert your account.</p>
-                                <button 
-                                  onClick={() => navigate('/help/self-directed-ira', { state: { onboardingState: { currentStep, formData, selectedTier } } })} 
+                                <button
+                                  onClick={() => navigate('/help/self-directed-ira', { state: { onboardingState: { currentStep, formData, selectedTier } } })}
                                   className="text-red-500 hover:text-red-400 font-medium text-sm underline"
                                 >
                                   Learn more about self-directed accounts →
@@ -649,7 +651,7 @@ const Onboarding: React.FC = () => {
                   <FileText className="w-5 h-5 text-gold" />
                   Review & Submit
                 </h3>
-                
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="bg-accent rounded-lg p-6 border border-graphite">
                     <h4 className="font-semibold text-text-primary mb-4">Investment Details</h4>
@@ -672,7 +674,7 @@ const Onboarding: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="bg-accent rounded-lg p-6 border border-graphite">
                     <h4 className="font-semibold text-text-primary mb-4">Return Summary</h4>
                     <div className="space-y-3">
@@ -695,7 +697,7 @@ const Onboarding: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-accent rounded-lg p-6 border border-graphite">
                   <h4 className="font-semibold text-text-primary mb-4">Funding Source</h4>
                   <div className="flex items-center gap-4">
@@ -717,14 +719,14 @@ const Onboarding: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-gold/10 border border-gold/20 rounded-lg p-6">
                   <div className="flex items-start gap-3">
                     <Info className="w-5 h-5 text-gold mt-1" />
                     <div>
                       <h4 className="font-semibold text-gold mb-2">Next Steps</h4>
                       <p className="text-text-secondary text-sm">
-                        After submitting your application, our team will review your information and contact you within 2-3 business days. 
+                        After submitting your application, our team will review your information and contact you within 2-3 business days.
                         Once approved, you'll receive a notification to sign your promissory note and complete the investment process.
                       </p>
                     </div>
@@ -734,26 +736,25 @@ const Onboarding: React.FC = () => {
             )}
           </AnimatePresence>
 
-          <div className="flex justify-between mt-8">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mt-8 pb-8">
             {currentStep > 1 && (
               <button
                 onClick={handlePrevious}
-                className="flex items-center gap-2 px-6 py-3 border border-graphite text-text-primary rounded-lg hover:bg-accent transition-colors"
+                className="flex items-center justify-center gap-2 px-6 py-3 border border-graphite text-text-primary rounded-lg hover:bg-accent transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </button>
             )}
-            
+
             {currentStep < 4 ? (
               <button
                 onClick={handleNext}
                 disabled={!isStepValid()}
-                className={`ml-auto flex items-center gap-2 px-6 py-3 rounded-lg font-medium ${
-                  isStepValid()
+                className={`${currentStep === 1 ? 'w-full sm:w-auto sm:ml-auto' : 'w-full sm:w-auto'} flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium ${isStepValid()
                     ? 'bg-gold text-background hover:bg-gold/90'
                     : 'bg-graphite text-text-secondary cursor-not-allowed'
-                }`}
+                  }`}
               >
                 Continue
                 <ArrowRight className="w-4 h-4" />
@@ -762,11 +763,10 @@ const Onboarding: React.FC = () => {
               <button
                 onClick={handleSubmit}
                 disabled={loading || !isStepValid()}
-                className={`ml-auto flex items-center gap-2 px-6 py-3 rounded-lg font-medium ${
-                  isStepValid() && !loading
+                className={`w-full sm:w-auto ${currentStep === 1 ? 'sm:ml-auto' : ''} flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium ${isStepValid() && !loading
                     ? 'bg-gold text-background hover:bg-gold/90'
                     : 'bg-graphite text-text-secondary cursor-not-allowed'
-                }`}
+                  }`}
               >
                 {loading ? (
                   <>
