@@ -12,11 +12,11 @@ const FAQ: React.FC = () => {
     },
     {
       question: "What is the investment process?",
-      answer: "The process is straightforward: 1) Request and sign the subscription agreement, 2) Sign the promissory note, 3) Transfer funds. Once completed, you'll receive your chosen payment schedule (monthly, quarterly, or annual) and have access to our investor portal."
+      answer: "The process is straightforward: 1) Request and sign the subscription agreement, 2) Sign the promissory note, 3) Transfer funds. Your investment term is 12-24 months, providing you predictable returns and transparency. During this time, we deploy your capital in carefully selected short-term loans (typically 6 months or less), allowing us to adapt quickly to market conditions while delivering your consistent returns."
     },
     {
       question: "What types of loans do you provide?",
-      answer: "Inner Circle Lending provides loans to businesses that value privacy and discretion. While specific details are confidential, we focus on borrowers who prioritize confidentiality and are willing to pay a premium for discreet lending solutions."
+      answer: "We focus exclusively on short-term loans (typically 6 months or less) across select niches where privacy is not just valued—it's essential. Our borrowers avoid public institutions by design and are willing to pay a premium for discretion. This short-term approach allows us to quickly adapt to market shifts and reallocate capital in real time, rather than being locked into long-term commitments."
     },
     {
       question: "What are the minimum investment requirements?",
@@ -33,6 +33,10 @@ const FAQ: React.FC = () => {
     {
       question: "How do you maintain borrower privacy while protecting investors?",
       answer: "While we maintain strict borrower confidentiality, we implement robust security measures, including comprehensive guarantees and surety bonding, to protect our investors' interests."
+    },
+    {
+      question: "How does the tax liability redirection strategy work?",
+      answer: "We collaborate with highly skilled tax strategists to help eligible investors redirect part of their tax liability directly into the fund itself. This IRS-approved strategy can turn what would have been a tax payment into a productive asset, providing both tax benefits and investment returns. This isn't suitable for everyone, but when it applies, it can be a meaningful multiplier for your overall wealth strategy."
     },
     {
       question: "What is your due diligence process?",

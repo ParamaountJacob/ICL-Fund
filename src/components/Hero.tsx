@@ -32,8 +32,9 @@ const Hero: React.FC = () => {
               Invest Money You Didn't Know You Could
             </h1>
             <p className="text-2xl md:text-3xl text-text-secondary leading-relaxed max-w-4xl mx-auto">
-              Turn your hidden assets into a steady income stream. We help you unlock funds from dormant 401(k)s, 
-              tax payments, or crypto holdings and put them to work earning 11-15% fixed returns.
+              Turn your hidden assets into a steady income stream. We help you unlock funds from dormant 401(k)s,
+              tax payments, or crypto holdings and deploy them strategically across short-term, high-yield opportunities
+              that deliver 11-15% fixed returns.
             </p>
           </motion.div>
 
@@ -50,7 +51,7 @@ const Hero: React.FC = () => {
                 Self-direct your 401(k) or IRA into high-yield investments while keeping tax benefits.
               </p>
             </div>
-            
+
             <div className="bg-surface/50 backdrop-blur-sm p-6 rounded-lg border border-graphite">
               <CircleDollarSign className="w-8 h-8 text-gold mb-4" />
               <h3 className="text-lg font-semibold mb-2">Tax Payments</h3>
@@ -58,7 +59,7 @@ const Hero: React.FC = () => {
                 Transform your tax burden into an investment opportunity with IRS-approved strategies.
               </p>
             </div>
-            
+
             <div className="bg-surface/50 backdrop-blur-sm p-6 rounded-lg border border-graphite">
               <Wallet className="w-8 h-8 text-gold mb-4" />
               <h3 className="text-lg font-semibold mb-2">Crypto Holdings</h3>
@@ -74,8 +75,8 @@ const Hero: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <button 
-              onClick={() => navigate('/contact', { state: { consultation: true } })} 
+            <button
+              onClick={() => navigate('/contact', { state: { consultation: true } })}
               className="button"
             >
               Find My Hidden Funds

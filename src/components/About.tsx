@@ -26,9 +26,17 @@ const About: React.FC = () => {
           >
             <h2 className="heading-lg mb-4">Your Wealth, Unlocked</h2>
             <p className="text-text-secondary text-lg mt-6 leading-relaxed">
-              You could be wealthier than you think. Many people have thousands – even hundreds of thousands – 
+              You could be wealthier than you think. Many people have thousands – even hundreds of thousands –
               of dollars "trapped" in places they can't easily access or don't realize they can invest.
             </p>
+            <div className="mt-8 p-6 bg-accent rounded-lg border border-gold/20">
+              <h3 className="text-lg font-semibold text-gold mb-3">How Our Investment Structure Works</h3>
+              <p className="text-text-secondary leading-relaxed">
+                <strong>Your commitment:</strong> 12-24 month investment terms that give you predictable returns and full transparency.<br />
+                <strong>Our deployment:</strong> We put your capital to work in carefully selected short-term loans (typically 6 months or less),
+                allowing us to adapt quickly to market conditions and maintain consistent performance.
+              </p>
+            </div>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -41,7 +49,7 @@ const About: React.FC = () => {
               <FileText className="w-12 h-12 text-gold mb-6" />
               <h3 className="text-xl font-semibold mb-4">Retirement Freedom</h3>
               <p className="text-text-secondary mb-6">
-                Most people don't know they can invest their 401(k) or IRA beyond stocks and mutual funds. 
+                Most people don't know they can invest their 401(k) or IRA beyond stocks and mutual funds.
                 We help you unlock these funds for better returns while maintaining tax benefits.
               </p>
               <div className="pt-4 border-t border-graphite">
@@ -61,7 +69,7 @@ const About: React.FC = () => {
               <CircleDollarSign className="w-12 h-12 text-gold mb-6" />
               <h3 className="text-xl font-semibold mb-4">Tax Optimization</h3>
               <p className="text-text-secondary mb-6">
-                High earners can lose 30-50% of income to taxes. We help you redirect tax payments into 
+                High earners can lose 30-50% of income to taxes. We help you redirect tax payments into
                 investments using IRS-approved strategies the wealthy already use.
               </p>
               <div className="pt-4 border-t border-graphite">
@@ -81,7 +89,7 @@ const About: React.FC = () => {
               <Wallet className="w-12 h-12 text-gold mb-6" />
               <h3 className="text-xl font-semibold mb-4">Crypto Income</h3>
               <p className="text-text-secondary mb-6">
-                Convert volatile crypto holdings into steady monthly income through our secured lending platform. 
+                Convert volatile crypto holdings into steady monthly income through our secured lending platform.
                 Keep your crypto exposure while earning consistent returns.
               </p>
               <div className="pt-4 border-t border-graphite">
