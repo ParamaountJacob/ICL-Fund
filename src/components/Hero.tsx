@@ -29,12 +29,14 @@ const Hero: React.FC = () => {
             className="mb-16 text-center"
           >
             <h1 className="heading-xl mb-8">
-              Invest Money You Didn't Know You Could
+              11-15% Fixed-Income Returns, Engineered for Privacy
             </h1>
-            <p className="text-2xl md:text-3xl text-text-secondary leading-relaxed max-w-4xl mx-auto">
-              Turn your hidden assets into a steady income stream. We help you unlock funds from dormant 401(k)s,
-              tax payments, or crypto holdings and deploy them strategically across short-term, high-yield opportunities
-              that deliver 11-15% fixed returns.
+            <p className="text-xl md:text-2xl text-text-secondary leading-relaxed max-w-4xl mx-auto mb-6">
+              For accredited investors seeking consistent, predictable returns independent of market volatility.
+            </p>
+            <p className="text-lg md:text-xl text-text-secondary/80 leading-relaxed max-w-3xl mx-auto">
+              Turn your tax liability into a yield-generating asset. We help you unlock funds from dormant 401(k)s,
+              tax payments, or crypto holdings and deploy them strategically across short-term, secured business loans.
             </p>
           </motion.div>
 
@@ -46,7 +48,7 @@ const Hero: React.FC = () => {
           >
             <div className="bg-surface/50 backdrop-blur-sm p-6 rounded-lg border border-graphite">
               <FileText className="w-8 h-8 text-gold mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Retirement Accounts</h3>
+              <h3 className="text-lg font-semibold mb-2">Self-Directed Retirement</h3>
               <p className="text-text-secondary">
                 Self-direct your 401(k) or IRA into high-yield investments while keeping tax benefits.
               </p>
@@ -54,7 +56,7 @@ const Hero: React.FC = () => {
 
             <div className="bg-surface/50 backdrop-blur-sm p-6 rounded-lg border border-graphite">
               <CircleDollarSign className="w-8 h-8 text-gold mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Tax Payments</h3>
+              <h3 className="text-lg font-semibold mb-2">Tax Repositioning</h3>
               <p className="text-text-secondary">
                 Transform your tax burden into an investment opportunity with IRS-approved strategies.
               </p>
@@ -62,9 +64,9 @@ const Hero: React.FC = () => {
 
             <div className="bg-surface/50 backdrop-blur-sm p-6 rounded-lg border border-graphite">
               <Wallet className="w-8 h-8 text-gold mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Crypto Holdings</h3>
+              <h3 className="text-lg font-semibold mb-2">Crypto Income Stream</h3>
               <p className="text-text-secondary">
-                Put your idle crypto to work generating consistent monthly income.
+                Convert volatile crypto holdings into steady monthly income through secured lending.
               </p>
             </div>
           </motion.div>
@@ -79,7 +81,7 @@ const Hero: React.FC = () => {
               onClick={() => navigate('/contact', { state: { consultation: true } })}
               className="button"
             >
-              Find My Hidden Funds
+              Schedule Free Consultation
             </button>
             <a href="#process" className="button-gold">
               How It Works
