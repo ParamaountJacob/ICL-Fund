@@ -66,131 +66,133 @@ const Navbar: React.FC = () => {
   } : {};
 
   return (
-    <motion.header
-      className={headerClasses}
-      style={headerStyle}
-      transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
-    >
-      <div className="container px-4 md:px-6 mx-auto flex items-center justify-between max-w-full">
-        <Link to="/" className="flex items-center space-x-2 text-text-primary">
-          <img
-            src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
-            alt="Inner Circle Lending"
-            className="h-5 md:h-8 w-auto"
-          />
-          <span className="font-display font-semibold text-sm md:text-lg uppercase tracking-wide">InnerCircle</span>
-        </Link>
+    <>
+      <motion.header
+        className={headerClasses}
+        style={headerStyle}
+        transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
+      >
+        <div className="container px-4 md:px-6 mx-auto flex items-center justify-between max-w-full">
+          <Link to="/" className="flex items-center space-x-2 text-text-primary">
+            <img
+              src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
+              alt="Inner Circle Lending"
+              className="h-5 md:h-8 w-auto"
+            />
+            <span className="font-display font-semibold text-sm md:text-lg uppercase tracking-wide">InnerCircle</span>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex md:items-center md:gap-8">
-          <Link to="/" className="nav-link">
-            HOME
-          </Link>
-          <Link to="/about" className="nav-link">
-            ABOUT
-          </Link>
-          <Link to="/faq" className="nav-link">
-            FAQ
-          </Link>
-          <Link to="/investor-info" className="nav-link">
-            INVESTOR INFO
-          </Link>
-          <Link to="/contact" className="nav-link">
-            CONTACT
-          </Link>
-          {user && (<div className="relative" ref={profileDropdownRef}>
-            <button
-              onMouseEnter={() => setShowProfileDropdown(true)}
-              onMouseLeave={() => setShowProfileDropdown(false)}
-              className="p-2 rounded-full bg-accent hover:bg-gold/20 transition-all duration-200 flex items-center gap-2 relative"
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex md:items-center md:gap-8">
+            <Link to="/" className="nav-link">
+              HOME
+            </Link>
+            <Link to="/about" className="nav-link">
+              ABOUT
+            </Link>
+            <Link to="/faq" className="nav-link">
+              FAQ
+            </Link>
+            <Link to="/investor-info" className="nav-link">
+              INVESTOR INFO
+            </Link>
+            <Link to="/contact" className="nav-link">
+              CONTACT
+            </Link>
+            {user && (<div className="relative" ref={profileDropdownRef}>
+              <button
+                onMouseEnter={() => setShowProfileDropdown(true)}
+                onMouseLeave={() => setShowProfileDropdown(false)}
+                className="p-2 rounded-full bg-accent hover:bg-gold/20 transition-all duration-200 flex items-center gap-2 relative"
+              >
+                <User className="w-5 h-5 text-gold" />
+                {unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium min-w-[20px]">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </button>
+
+              <AnimatePresence>
+                {showProfileDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-48 bg-surface border border-graphite rounded-lg shadow-lg py-2 z-50"
+                    onMouseEnter={() => setShowProfileDropdown(true)}
+                    onMouseLeave={() => setShowProfileDropdown(false)}
+                  >
+                    <Link
+                      to="/pitch-deck"
+                      className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors"
+                      onClick={() => setShowProfileDropdown(false)}
+                    >
+                      <FileText className="w-4 h-4" />
+                      Pitch Deck
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setShowProfileDropdown(false);
+                        setShowNotificationModal(true);
+                      }}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors text-left"
+                    >
+                      <Bell className="w-4 h-4" />
+                      Notifications
+                      {unreadCount > 0 && (
+                        <div className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium min-w-[20px]">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </div>
+                      )}
+                    </button>
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors"
+                      onClick={() => setShowProfileDropdown(false)}
+                    >
+                      <User className="w-4 h-4" />
+                      Profile
+                    </Link>
+                    <hr className="my-1 border-graphite" />
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors text-left"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            )}
+          </nav>
+
+          {/* Mobile: Just Contact + Hamburger */}
+          <div className="md:hidden flex items-center gap-4">
+            <Link
+              to="/contact"
+              className="text-text-primary hover:text-gold transition-colors font-medium text-sm"
             >
-              <User className="w-5 h-5 text-gold" />
-              {unreadCount > 0 && (
-                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium min-w-[20px]">
-                  {unreadCount > 99 ? '99+' : unreadCount}
-                </div>
-              )}
+              Contact
+            </Link>
+            <button
+              className="flex items-center p-2 hover:bg-gold/10 rounded-lg transition-colors"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? "Close Menu" : "Open Menu"}
+            >
+              {isOpen ? <X className="h-6 w-6 text-text-primary" /> : <Menu className="h-6 w-6 text-text-primary" />}
             </button>
+          </div>        </div>
+      </motion.header>
 
-            <AnimatePresence>
-              {showProfileDropdown && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute right-0 mt-2 w-48 bg-surface border border-graphite rounded-lg shadow-lg py-2 z-50"
-                  onMouseEnter={() => setShowProfileDropdown(true)}
-                  onMouseLeave={() => setShowProfileDropdown(false)}
-                >
-                  <Link
-                    to="/pitch-deck"
-                    className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors"
-                    onClick={() => setShowProfileDropdown(false)}
-                  >
-                    <FileText className="w-4 h-4" />
-                    Pitch Deck
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setShowProfileDropdown(false);
-                      setShowNotificationModal(true);
-                    }}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors text-left"
-                  >
-                    <Bell className="w-4 h-4" />
-                    Notifications
-                    {unreadCount > 0 && (
-                      <div className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium min-w-[20px]">
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                      </div>
-                    )}
-                  </button>
-                  <Link
-                    to="/profile"
-                    className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors"
-                    onClick={() => setShowProfileDropdown(false)}
-                  >
-                    <User className="w-4 h-4" />
-                    Profile
-                  </Link>
-                  <hr className="my-1 border-graphite" />
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors text-left"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Sign Out
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          )}
-        </nav>
-
-        {/* Mobile: Just Contact + Hamburger */}
-        <div className="md:hidden flex items-center gap-4">
-          <Link
-            to="/contact"
-            className="text-text-primary hover:text-gold transition-colors font-medium text-sm"
-          >
-            Contact
-          </Link>
-          <button
-            className="flex items-center p-2 hover:bg-gold/10 rounded-lg transition-colors"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label={isOpen ? "Close Menu" : "Open Menu"}
-          >
-            {isOpen ? <X className="h-6 w-6 text-text-primary" /> : <Menu className="h-6 w-6 text-text-primary" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu - Moved outside header container */}
+      {/* Mobile Menu - Completely outside header */}
       <AnimatePresence>
         {isOpen && (
-          <>              {/* Mobile backdrop */}
+          <>
+            {/* Mobile backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -205,7 +207,7 @@ const Navbar: React.FC = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className={`fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] md:hidden z-[9999] ${isHomePage ? 'bg-surface border-l border-graphite/30' : 'bg-background border-l border-graphite/30'
+              className={`fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] md:hidden z-[9999] ${isHomePage ? 'bg-surface/95 backdrop-blur-lg border-l border-graphite/30' : 'bg-background/95 backdrop-blur-lg border-l border-graphite/30'
                 } shadow-2xl overflow-hidden`}
             >
               {/* Header with close button on right */}
@@ -317,7 +319,7 @@ const Navbar: React.FC = () => {
         isOpen={showNotificationModal}
         onClose={() => setShowNotificationModal(false)}
       />
-    </motion.header>
+    </>
   );
 };
 
