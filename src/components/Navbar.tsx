@@ -51,8 +51,8 @@ const Navbar: React.FC = () => {
 
   // Get scroll-based transform for smooth sliding
   const { scrollY } = useScroll();
-  const headerY = useTransform(scrollY, [600, 900], [-80, 0]);
-  const headerOpacity = useTransform(scrollY, [600, 900], [0, 1]);
+  const headerY = useTransform(scrollY, [650, 950], [-80, 0]);
+  const headerOpacity = useTransform(scrollY, [650, 950], [0, 1]);
 
   // Header should slide smoothly based on scroll position
   const headerClasses = isHomePage
