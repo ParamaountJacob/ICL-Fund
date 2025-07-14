@@ -14,6 +14,7 @@ import InvestorInfo from './pages/InvestorInfo';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
 import Privacy from './pages/Privacy';
+import Overview from './pages/Overview';
 import PitchDeck from './pages/PitchDeck';
 import PPM from './pages/PPM';
 import PPMView from './pages/PPMView';
@@ -77,6 +78,7 @@ function AppContent() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/overview" element={<Overview />} />
         <Route path="/pitch-deck" element={<ProtectedRoute><PitchDeck /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
