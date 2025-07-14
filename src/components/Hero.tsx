@@ -31,12 +31,11 @@ const Hero: React.FC = () => {
             <h1 className="heading-xl mb-8">
               11-15% Fixed-Income Returns, Engineered for Privacy
             </h1>
-            <p className="text-xl md:text-2xl text-text-secondary leading-relaxed max-w-4xl mx-auto mb-6">
-              For accredited investors seeking consistent, predictable returns independent of market volatility.
+            <p className="text-xl md:text-2xl text-text-secondary leading-relaxed max-w-3xl mx-auto mb-6">
+              For accredited investors seeking predictable returns independent of market volatility.
             </p>
-            <p className="text-lg md:text-xl text-text-secondary/80 leading-relaxed max-w-3xl mx-auto">
-              Turn your tax liability into a yield-generating asset. We help you unlock funds from dormant 401(k)s,
-              tax payments, or crypto holdings and deploy them strategically across short-term, secured business loans.
+            <p className="text-lg text-text-secondary/80 leading-relaxed max-w-2xl mx-auto">
+              Turn tax liability into yield-generating assets through secured business loans.
             </p>
           </motion.div>
 
@@ -49,24 +48,24 @@ const Hero: React.FC = () => {
             <div className="bg-surface/50 backdrop-blur-sm p-6 rounded-lg border border-graphite">
               <FileText className="w-8 h-8 text-gold mb-4" />
               <h3 className="text-lg font-semibold mb-2">Self-Directed Retirement</h3>
-              <p className="text-text-secondary">
-                Self-direct your 401(k) or IRA into high-yield investments while keeping tax benefits.
+              <p className="text-text-secondary text-sm">
+                Direct 401(k)/IRA funds into high-yield investments while keeping tax benefits.
               </p>
             </div>
 
             <div className="bg-surface/50 backdrop-blur-sm p-6 rounded-lg border border-graphite">
               <CircleDollarSign className="w-8 h-8 text-gold mb-4" />
               <h3 className="text-lg font-semibold mb-2">Tax Repositioning</h3>
-              <p className="text-text-secondary">
-                Transform your tax burden into an investment opportunity with IRS-approved strategies.
+              <p className="text-text-secondary text-sm">
+                Transform tax payments into investment opportunities with IRS-approved strategies.
               </p>
             </div>
 
             <div className="bg-surface/50 backdrop-blur-sm p-6 rounded-lg border border-graphite">
               <Wallet className="w-8 h-8 text-gold mb-4" />
               <h3 className="text-lg font-semibold mb-2">Crypto Income Stream</h3>
-              <p className="text-text-secondary">
-                Convert volatile crypto holdings into steady monthly income through secured lending.
+              <p className="text-text-secondary text-sm">
+                Convert volatile crypto holdings into steady monthly income.
               </p>
             </div>
           </motion.div>
