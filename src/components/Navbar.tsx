@@ -49,10 +49,10 @@ const Navbar: React.FC = () => {
   // Determine if this is the home page
   const isHomePage = pathname === '/';
 
-  // Get scroll-based transform for smooth sliding
+  // Get scroll-based transform for smooth sliding with easing
   const { scrollY } = useScroll();
-  const headerY = useTransform(scrollY, [350, 550], [-80, 0]);
-  const headerOpacity = useTransform(scrollY, [350, 550], [0, 1]);
+  const headerY = useTransform(scrollY, [300, 600], [-80, 0], { ease: "easeOut" });
+  const headerOpacity = useTransform(scrollY, [300, 600], [0, 1], { ease: "easeOut" });
 
   // Header should slide smoothly based on scroll position
   const headerClasses = isHomePage
@@ -68,6 +68,7 @@ const Navbar: React.FC = () => {
     <motion.header
       className={headerClasses}
       style={headerStyle}
+      transition={{ type: "spring", stiffness: 400, damping: 40 }}
     >
       <div className="container px-4 md:px-6 mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2 text-text-primary">
