@@ -196,31 +196,28 @@ const Navbar: React.FC = () => {
                 onClick={() => setIsOpen(false)}
               />
 
-              {/* Full header overlay menu */}
+              {/* Right-sliding menu overlay */}
               <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, x: 300 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 300 }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}
-                className={`fixed top-0 left-0 right-0 md:hidden z-40 ${isHomePage ? 'bg-surface/98 backdrop-blur-lg' : 'bg-background/98 backdrop-blur-lg'
-                  } border-b border-graphite shadow-2xl`}
+                className={`fixed top-0 right-0 bottom-0 w-80 md:hidden z-40 ${isHomePage ? 'bg-surface/98 backdrop-blur-lg' : 'bg-background/98 backdrop-blur-lg'
+                  } border-l border-graphite shadow-2xl`}
               >
-                {/* Header with toggle */}
-                <div className="flex items-center justify-between px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <button
-                      className="flex items-center"
-                      onClick={() => setIsOpen(!isOpen)}
-                      aria-label="Close Menu"
-                    >
-                      <X className="h-6 w-6 text-text-primary" />
-                    </button>
-                    <span className="text-lg font-semibold text-text-primary">Menu</span>
-                  </div>
+                {/* Header with close button on right */}
+                <div className="flex items-center justify-end px-6 py-4 border-b border-graphite/20">
+                  <button
+                    className="flex items-center p-2"
+                    onClick={() => setIsOpen(false)}
+                    aria-label="Close Menu"
+                  >
+                    <X className="h-6 w-6 text-text-primary" />
+                  </button>
                 </div>
 
                 {/* Menu Content */}
-                <div className="px-6 pb-8">
+                <div className="px-6 py-4 h-full overflow-y-auto">
                   <div className="flex flex-col space-y-1">
                     <Link to="/"
                       className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
