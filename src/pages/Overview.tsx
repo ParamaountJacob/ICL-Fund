@@ -16,7 +16,11 @@ const Overview: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.9, rotateY: -15 }}
                 animate={{ opacity: 1, scale: 1, rotateY: 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
+<<<<<<< HEAD
+                className="w-full max-w-5xl mx-auto"
+=======
                 className="w-full max-w-5xl mx-auto my-8"
+>>>>>>> 713dd8d1aacaf92690d87fa16cb5306882b46748
             >
                 {/* Main Business Card */}
                 <div className="relative bg-gradient-to-br from-gray-900 to-black rounded-xl overflow-hidden business-card-shadow border border-gold/30">
