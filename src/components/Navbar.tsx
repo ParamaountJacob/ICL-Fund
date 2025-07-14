@@ -49,10 +49,10 @@ const Navbar: React.FC = () => {
   // Determine if this is the home page
   const isHomePage = pathname === '/';
 
-  // Get scroll-based transform for smooth sliding - longer range for smoother fast scrolling
+  // Get scroll-based transform for smooth sliding - clamped to prevent overshoot
   const { scrollY } = useScroll();
-  const headerY = useTransform(scrollY, [650, 1150], [-80, 0]);
-  const headerOpacity = useTransform(scrollY, [650, 1150], [0, 1]);
+  const headerY = useTransform(scrollY, [650, 1150], [-80, 0], { clamp: true });
+  const headerOpacity = useTransform(scrollY, [650, 1150], [0, 1], { clamp: true });
 
   // Header should slide smoothly based on scroll position
   const headerClasses = isHomePage
@@ -198,9 +198,9 @@ const Navbar: React.FC = () => {
 
               {/* Right-sliding menu overlay */}
               <motion.div
-                initial={{ opacity: 0, x: "100%" }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: "100%" }}
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}
                 className={`fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] md:hidden z-40 ${isHomePage ? 'bg-surface/98 backdrop-blur-lg' : 'bg-background/98 backdrop-blur-lg'
                   } border-l border-graphite shadow-2xl`}
