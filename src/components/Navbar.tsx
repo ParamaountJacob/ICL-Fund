@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     // Scroll listener for homepage header transparency
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 200); // Appear later in scroll
     };
 
     if (pathname === '/') {

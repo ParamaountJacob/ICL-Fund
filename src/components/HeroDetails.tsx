@@ -9,7 +9,7 @@ const HeroDetails: React.FC = () => {
     const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
 
     return (
-        <section className="py-16 md:py-24 bg-background relative overflow-hidden" ref={sectionRef} style={{ marginTop: '100vh', zIndex: 10, position: 'relative' }}>
+        <section className="min-h-screen py-20 md:py-32 bg-background relative overflow-hidden" ref={sectionRef} style={{ marginTop: '100vh', zIndex: 10, position: 'relative' }}>
             {/* Golden accent elements */}
             <div className="absolute top-20 right-10 w-32 h-32 bg-gold/5 rounded-full blur-xl"></div>
             <div className="absolute bottom-32 left-10 w-24 h-24 bg-gold/10 rounded-full blur-2xl"></div>

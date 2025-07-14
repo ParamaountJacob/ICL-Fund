@@ -6,10 +6,11 @@ const Hero: React.FC = () => {
   const navigate = useNavigate();
   const { scrollY } = useScroll();
 
-  // Transform values for parallax effect
-  const y = useTransform(scrollY, [0, 800], [0, -200]);
-  const opacity = useTransform(scrollY, [0, 400], [1, 0]);
-  const scale = useTransform(scrollY, [0, 800], [1, 1.1]);
+  // Transform values for parallax effect - slower transitions
+  const y = useTransform(scrollY, [0, 1000], [0, -300]);
+  const opacity = useTransform(scrollY, [0, 600], [1, 0]);
+  const scale = useTransform(scrollY, [0, 1000], [1, 1.2]);
+  const blurOverlay = useTransform(scrollY, [0, 400], [0, 1]);
 
   return (
     <motion.section
@@ -30,12 +31,16 @@ const Hero: React.FC = () => {
         >
           <source src="https://cdn.shopify.com/videos/c/o/v/0a657f7363044727af7cfa2d4bdfeeb0.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="absolute inset-0 bg-black/40"></div>
+        <motion.div
+          className="absolute inset-0 backdrop-blur-sm bg-black/20"
+          style={{ opacity: blurOverlay }}
+        ></motion.div>
       </motion.div>
 
       {/* Centered Logo */}
       <motion.div
-        className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30"
+        className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30 w-full"
         style={{ y, opacity }}
       >
         <div className="flex items-center justify-center gap-3">
@@ -44,7 +49,7 @@ const Hero: React.FC = () => {
             alt="Inner Circle Lending"
             className="h-8 w-auto"
           />
-          <span className="text-white font-light text-xl tracking-wide">INNERCIRCLE</span>
+          <span className="text-white font-thin text-xl tracking-widest">INNERCIRCLE</span>
         </div>
       </motion.div>
 
@@ -58,11 +63,11 @@ const Hero: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.5 }}
         >
-          <h1 className="text-4xl md:text-6xl lg:text-8xl font-light text-white leading-tight tracking-wide drop-shadow-2xl">
-            Engineered
+          <h1 className="text-5xl md:text-7xl lg:text-9xl font-thin text-white leading-tight tracking-wider drop-shadow-2xl">
+            The Power
           </h1>
-          <h1 className="text-4xl md:text-6xl lg:text-8xl font-light text-gold leading-tight tracking-wide mt-2 drop-shadow-2xl">
-            for Privacy
+          <h1 className="text-5xl md:text-7xl lg:text-9xl font-thin text-gold leading-tight tracking-wider mt-4 drop-shadow-2xl">
+            of Certainty
           </h1>
         </motion.div>
 
