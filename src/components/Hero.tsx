@@ -50,9 +50,9 @@ const Hero: React.FC = () => {
       >
         <motion.div
           className="flex items-center justify-center gap-4 md:gap-5"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 1.0, ease: "easeOut" }}
+          initial={{ opacity: 0, y: 30, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 2.0, delay: 1.0, ease: "easeOut" }}
         >
           <img
             src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
