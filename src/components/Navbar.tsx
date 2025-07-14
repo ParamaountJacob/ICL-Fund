@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, User, LogOut, FileText, Bell } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useUnreadNotifications } from '../hooks/useUnreadNotifications';
 import NotificationModal from './NotificationModal';
@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     // Scroll listener for homepage header transparency
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 500); // Much later appearance - after logo finishes sliding
+      setIsScrolled(window.scrollY > 400); // Trigger point for smooth sliding
     };
 
     if (pathname === '/') {
@@ -60,15 +60,25 @@ const Navbar: React.FC = () => {
   // Determine if this is the home page
   const isHomePage = pathname === '/';
 
-  // Header should slide in smoothly on home page
+  // Get scroll-based transform for smooth sliding
+  const { scrollY } = useScroll();
+  const headerY = useTransform(scrollY, [300, 500], [-100, 0]);
+  const headerOpacity = useTransform(scrollY, [300, 500], [0, 1]);
+
+  // Header should slide smoothly based on scroll position
   const headerClasses = isHomePage
-    ? `fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-1500 ease-out ${isScrolled ? 'bg-background/95 shadow-md backdrop-blur-sm translate-y-0 opacity-100' : 'bg-transparent -translate-y-full opacity-0'
-    }`
+    ? 'fixed top-0 left-0 right-0 z-50 py-4 bg-background/95 shadow-md backdrop-blur-sm'
     : 'fixed top-0 left-0 right-0 z-50 py-4 bg-background/95 backdrop-blur-sm shadow-md';
 
+  const headerStyle = isHomePage ? {
+    y: headerY,
+    opacity: headerOpacity
+  } : {};
+
   return (
-    <header
+    <motion.header
       className={headerClasses}
+      style={headerStyle}
     >
       <div className="container px-4 md:px-6 mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2 text-text-primary">
@@ -318,7 +328,7 @@ const Navbar: React.FC = () => {
         isOpen={showNotificationModal}
         onClose={() => setShowNotificationModal(false)}
       />
-    </header>
+    </motion.header>
   );
 };
 

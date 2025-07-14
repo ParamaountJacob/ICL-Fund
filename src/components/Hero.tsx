@@ -8,7 +8,7 @@ const Hero: React.FC = () => {
 
   // Transform values for parallax effect - optimized for desktop and mobile
   const y = useTransform(scrollY, [0, 800], [0, -200]);
-  const opacity = useTransform(scrollY, [0, 400], [1, 0]);
+  const opacity = useTransform(scrollY, [0, 600], [1, 0]); // Fade out later
   const scale = useTransform(scrollY, [0, 800], [1, 1.1]);
   const blurOverlay = useTransform(scrollY, [0, 300], [0, 1]);
 
@@ -32,7 +32,7 @@ const Hero: React.FC = () => {
         >
           <source src="https://cdn.shopify.com/videos/c/o/v/0a657f7363044727af7cfa2d4bdfeeb0.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="absolute inset-0 bg-black/45"></div>
         <motion.div
           className="absolute inset-0 backdrop-blur-sm bg-black/20"
           style={{ opacity: blurOverlay }}
@@ -52,7 +52,7 @@ const Hero: React.FC = () => {
           className="flex items-center justify-center gap-4 md:gap-5"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 1.5, ease: "easeOut" }}
+          transition={{ duration: 1.2, delay: 1.0, ease: "easeOut" }}
         >
           <img
             src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
