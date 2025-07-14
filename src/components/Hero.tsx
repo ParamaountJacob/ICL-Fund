@@ -26,11 +26,11 @@ const Hero: React.FC = () => {
           muted
           loop
           playsInline
-          className="w-full h-full object-cover opacity-60 grayscale"
+          className="w-full h-full object-cover"
         >
           <source src="https://cdn.shopify.com/videos/c/o/v/0a657f7363044727af7cfa2d4bdfeeb0.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-black/50"></div>
       </motion.div>
 
       {/* Centered Logo */}
@@ -38,13 +38,13 @@ const Hero: React.FC = () => {
         className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30"
         style={{ y, opacity }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center gap-3">
           <img
             src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
             alt="Inner Circle Lending"
-            className="h-6 w-auto"
+            className="h-8 w-auto"
           />
-          <span className="text-white font-light text-lg tracking-wide">INNERCIRCLE</span>
+          <span className="text-white font-light text-xl tracking-wide">INNERCIRCLE</span>
         </div>
       </motion.div>
 
@@ -58,26 +58,26 @@ const Hero: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.5 }}
         >
-          <h1 className="text-4xl md:text-6xl lg:text-8xl font-light text-white leading-tight tracking-wide">
+          <h1 className="text-4xl md:text-6xl lg:text-8xl font-light text-white leading-tight tracking-wide drop-shadow-2xl">
             Engineered
           </h1>
-          <h1 className="text-4xl md:text-6xl lg:text-8xl font-light text-gold leading-tight tracking-wide mt-2">
+          <h1 className="text-4xl md:text-6xl lg:text-8xl font-light text-gold leading-tight tracking-wide mt-2 drop-shadow-2xl">
             for Privacy
           </h1>
         </motion.div>
 
-        {/* Scroll indicator - positioned to be visible */}
+        {/* Scroll indicator - positioned right below the words */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 2 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          className="mt-16 flex justify-center"
         >
-          <div className="w-6 h-10 border-2 border-white/40 rounded-full flex justify-center">
+          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
             <motion.div
               animate={{ y: [0, 12, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="w-1 h-3 bg-white/60 rounded-full mt-2"
+              className="w-1 h-3 bg-white/70 rounded-full mt-2"
             />
           </div>
         </motion.div>
