@@ -191,6 +191,125 @@ const Overview: React.FC = () => {
                         }}></div>
                     </div>
                 </div>
+
+                {/* Clear Separator */}
+                <motion.div
+                    initial={{ opacity: 0, scaleX: 0 }}
+                    animate={{ opacity: 1, scaleX: 1 }}
+                    transition={{ duration: 1.0, delay: 2.0 }}
+                    className="w-full max-w-md mx-auto mt-12 mb-16"
+                >
+                    <div className="h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent"></div>
+                    <div className="text-center mt-4">
+                        <p className="text-gold/60 text-sm tracking-wider">FOR THOSE WHO WANT TO KNOW MORE</p>
+                    </div>
+                </motion.div>
+
+                {/* Detailed Information Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 2.2 }}
+                    className="max-w-4xl mx-auto space-y-8"
+                >
+                    {/* Our Approach */}
+                    <div className="luxury-glass rounded-lg p-8">
+                        <h3 className="text-2xl font-display font-light text-gold mb-6 text-center tracking-wide">
+                            Our Approach
+                        </h3>
+                        <div className="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 className="text-white font-semibold mb-3">Selective Partnership</h4>
+                                <p className="text-white/80 text-sm leading-relaxed">
+                                    We work exclusively with high-income professionals who value discretion and predictability.
+                                    Our clients typically include successful physicians, business owners, and executives seeking
+                                    alternatives to traditional investment volatility.
+                                </p>
+                            </div>
+                            <div>
+                                <h4 className="text-white font-semibold mb-3">Strategic Tax Integration</h4>
+                                <p className="text-white/80 text-sm leading-relaxed">
+                                    Through partnerships with tax strategists, we help clients redirect tax liabilities
+                                    into yield-generating assets. This approach transforms mandatory expenses into
+                                    productive capital, often improving after-tax returns significantly.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* The Advantage */}
+                    <div className="luxury-glass rounded-lg p-8">
+                        <h3 className="text-2xl font-display font-light text-gold mb-6 text-center tracking-wide">
+                            Why Inner Circle
+                        </h3>
+                        <div className="space-y-6">
+                            <div className="flex items-start space-x-4">
+                                <div className="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <div className="w-2 h-2 bg-gold rounded-full"></div>
+                                </div>
+                                <div>
+                                    <h4 className="text-white font-semibold mb-2">Intentionally Private</h4>
+                                    <p className="text-white/80 text-sm leading-relaxed">
+                                        Our lending model remains proprietary by design. We believe sophisticated investors
+                                        prefer discretion over public institutions, maintaining privacy for both borrowers and lenders.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start space-x-4">
+                                <div className="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <div className="w-2 h-2 bg-gold rounded-full"></div>
+                                </div>
+                                <div>
+                                    <h4 className="text-white font-semibold mb-2">Agile Capital Deployment</h4>
+                                    <p className="text-white/80 text-sm leading-relaxed">
+                                        With 1-2 year terms instead of decade-long commitments, we can adapt quickly to market
+                                        shifts and reallocate capital in real time. This flexibility benefits both our strategy
+                                        and our investors' liquidity needs.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start space-x-4">
+                                <div className="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <div className="w-2 h-2 bg-gold rounded-full"></div>
+                                </div>
+                                <div>
+                                    <h4 className="text-white font-semibold mb-2">Bespoke Solutions</h4>
+                                    <p className="text-white/80 text-sm leading-relaxed">
+                                        Rather than one-size-fits-all products, we build specific solutions for specific people.
+                                        Each engagement is crafted around the individual's financial situation, timeline, and objectives.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Next Steps */}
+                    <div className="text-center luxury-glass rounded-lg p-8">
+                        <h3 className="text-2xl font-display font-light text-gold mb-4 tracking-wide">
+                            Ready to Explore?
+                        </h3>
+                        <p className="text-white/80 mb-6 max-w-xl mx-auto">
+                            Initial consultations are confidential and available to qualified investors.
+                            We'll discuss your specific situation and determine if Inner Circle Lending aligns with your objectives.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Link
+                                to="/contact"
+                                className="px-8 py-3 bg-gradient-to-r from-gold to-yellow-600 text-black font-semibold rounded-lg hover:from-yellow-600 hover:to-gold transition-all duration-300 shadow-lg"
+                            >
+                                Schedule Consultation
+                            </Link>
+                            <Link
+                                to="/"
+                                className="px-8 py-3 border border-gold/50 text-gold font-semibold rounded-lg hover:bg-gold/10 transition-all duration-300"
+                            >
+                                Learn More
+                            </Link>
+                        </div>
+                    </div>
+                </motion.div>
             </motion.div>
         </div>
     );
