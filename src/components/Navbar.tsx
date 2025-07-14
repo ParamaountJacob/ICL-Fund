@@ -40,21 +40,10 @@ const Navbar: React.FC = () => {
   };
 
   useEffect(() => {
-    // Scroll listener for homepage header transparency
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 400); // Trigger point for smooth sliding
-    };
-
-    if (pathname === '/') {
-      window.addEventListener('scroll', handleScroll);
-    } else {
-      // For other pages, we want the scrolled effect immediately
+    // Only set scrolled state for non-home pages
+    if (pathname !== '/') {
       setIsScrolled(true);
     }
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
   }, [pathname]);
 
   // Determine if this is the home page
@@ -62,8 +51,8 @@ const Navbar: React.FC = () => {
 
   // Get scroll-based transform for smooth sliding
   const { scrollY } = useScroll();
-  const headerY = useTransform(scrollY, [300, 500], [-100, 0]);
-  const headerOpacity = useTransform(scrollY, [300, 500], [0, 1]);
+  const headerY = useTransform(scrollY, [350, 550], [-80, 0]);
+  const headerOpacity = useTransform(scrollY, [350, 550], [0, 1]);
 
   // Header should slide smoothly based on scroll position
   const headerClasses = isHomePage
