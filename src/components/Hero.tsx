@@ -39,41 +39,57 @@ const Hero: React.FC = () => {
         ></motion.div>
       </motion.div>
 
-      {/* Centered Logo - will transform to navbar slowly */}
+      {/* Bigger Centered Logo - positioned lower and more prominent */}
       <motion.div
-        className="absolute top-8 w-full z-30 flex justify-center"
+        className="absolute top-16 md:top-20 w-full z-30 flex justify-center"
         style={{
-          y: useTransform(scrollY, [0, 600], [0, -60]),
+          y: useTransform(scrollY, [0, 600], [0, -80]),
           opacity: useTransform(scrollY, [0, 500], [1, 0]),
-          scale: useTransform(scrollY, [0, 600], [1, 0.7])
+          scale: useTransform(scrollY, [0, 600], [1, 0.6])
         }}
       >
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-4 md:gap-5">
           <img
             src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
             alt="Inner Circle Lending"
-            className="h-8 w-auto"
+            className="h-10 md:h-12 lg:h-14 w-auto"
           />
-          <span className="text-white font-thin text-xl tracking-widest">INNERCIRCLE</span>
+          <span className="text-white font-thin text-2xl md:text-3xl lg:text-4xl tracking-widest">INNERCIRCLE</span>
         </div>
       </motion.div>
 
-      {/* Hero Text */}
+      {/* Hero Text - More compelling and dynamic */}
       <motion.div
-        className="relative z-20 text-center px-4 md:px-6"
-        style={{ y, opacity }}
+        className="relative z-20 text-center px-4 md:px-6 mt-8 md:mt-12"
+        style={{
+          y,
+          opacity,
+          scale: useTransform(scrollY, [0, 400], [1, 1.05])
+        }}
       >
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 0.5 }}
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 1.5, delay: 0.8, ease: "easeOut" }}
         >
-          <h1 className="text-4xl md:text-6xl lg:text-8xl xl:text-9xl font-thin text-white leading-tight tracking-wider drop-shadow-2xl">
+          <motion.h1
+            className="text-5xl md:text-7xl lg:text-9xl xl:text-[12rem] font-thin text-white leading-[0.9] tracking-wider drop-shadow-2xl mb-2 md:mb-4"
+            animate={{
+              textShadow: ["0 0 20px rgba(255,255,255,0.3)", "0 0 40px rgba(255,255,255,0.5)", "0 0 20px rgba(255,255,255,0.3)"]
+            }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
             The Power
-          </h1>
-          <h1 className="text-4xl md:text-6xl lg:text-8xl xl:text-9xl font-thin text-gold leading-tight tracking-wider mt-2 md:mt-4 drop-shadow-2xl">
+          </motion.h1>
+          <motion.h1
+            className="text-5xl md:text-7xl lg:text-9xl xl:text-[12rem] font-thin text-gold leading-[0.9] tracking-wider drop-shadow-2xl"
+            animate={{
+              textShadow: ["0 0 20px rgba(218,165,32,0.4)", "0 0 40px rgba(218,165,32,0.6)", "0 0 20px rgba(218,165,32,0.4)"]
+            }}
+            transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}
+          >
             of Certainty
-          </h1>
+          </motion.h1>
         </motion.div>
       </motion.div>
     </motion.section>
