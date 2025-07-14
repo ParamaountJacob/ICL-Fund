@@ -45,8 +45,6 @@ const HeroDetails: React.FC = () => {
                         className="grid md:grid-cols-3 gap-8 mb-16"
                     >
                         <div className="bg-surface p-8 rounded-lg border border-graphite relative group hover:border-gold/30 transition-all duration-300">
-                            {/* Golden corner accent */}
-                            <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-gold/20 to-transparent rounded-tr-lg"></div>
                             <FileText className="w-10 h-10 text-gold mb-6" />
                             <h3 className="text-xl font-semibold mb-4">Self-Directed Retirement</h3>
                             <p className="text-text-secondary leading-relaxed">
@@ -69,8 +67,6 @@ const HeroDetails: React.FC = () => {
                         </div>
 
                         <div className="bg-surface p-8 rounded-lg border border-graphite relative group hover:border-gold/30 transition-all duration-300">
-                            {/* Golden corner accent */}
-                            <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-tr from-gold/20 to-transparent rounded-bl-lg"></div>
                             <Wallet className="w-10 h-10 text-gold mb-6" />
                             <h3 className="text-xl font-semibold mb-4">Crypto Income Stream</h3>
                             <p className="text-text-secondary leading-relaxed">

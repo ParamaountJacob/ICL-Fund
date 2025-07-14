@@ -30,7 +30,7 @@ const Hero: React.FC = () => {
           className="w-full h-full object-cover"
           style={{ minHeight: '100vh', minWidth: '100vw' }}
         >
-          <source src="https://cdn.shopify.com/videos/c/o/v/0a657f7363044727af7cfa2d4bdfeeb0.mp4" type="video/mp4" />
+          <source src="https://res.cloudinary.com/digjsdron/video/upload/v1752517183/TempVid-1_vzn8mn.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-black/45"></div>
         <motion.div
