@@ -60,9 +60,9 @@ const Navbar: React.FC = () => {
   // Determine if this is the home page
   const isHomePage = pathname === '/';
 
-  // Header should be transparent on home page when not scrolled
+  // Header should slide in smoothly on home page
   const headerClasses = isHomePage
-    ? `fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-1000 ease-out ${isScrolled ? 'bg-background/95 shadow-md backdrop-blur-sm translate-y-0 opacity-100' : 'bg-transparent translate-y-0 opacity-0'
+    ? `fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-1500 ease-out ${isScrolled ? 'bg-background/95 shadow-md backdrop-blur-sm translate-y-0 opacity-100' : 'bg-transparent -translate-y-full opacity-0'
     }`
     : 'fixed top-0 left-0 right-0 z-50 py-4 bg-background/95 backdrop-blur-sm shadow-md';
 
