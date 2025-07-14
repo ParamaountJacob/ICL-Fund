@@ -1,38 +1,58 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { CircleDollarSign, FileText, Wallet } from 'lucide-react';
 
 const Hero: React.FC = () => {
   const navigate = useNavigate();
+  const { scrollY } = useScroll();
+
+  // Transform values for parallax effect
+  const y = useTransform(scrollY, [0, 800], [0, -200]);
+  const opacity = useTransform(scrollY, [0, 400], [1, 0]);
+  const scale = useTransform(scrollY, [0, 800], [1, 1.1]);
 
   return (
-    <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      <div className="absolute inset-0 z-0">
+    <motion.section
+      id="home"
+      className="min-h-screen flex items-center justify-center relative overflow-hidden"
+      style={{ position: 'fixed', width: '100%', top: 0, zIndex: 1 }}
+    >
+      <motion.div
+        className="absolute inset-0 z-0"
+        style={{ scale }}
+      >
         <video
           autoPlay
           muted
           loop
           playsInline
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover opacity-60 grayscale"
         >
           <source src="https://cdn.shopify.com/videos/c/o/v/0a657f7363044727af7cfa2d4bdfeeb0.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-black/40"></div>
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 backdrop-blur-sm"></div>
+      </motion.div>
 
       {/* Centered Logo */}
-      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30">
+      <motion.div
+        className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30"
+        style={{ y, opacity }}
+      >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gold rounded-full flex items-center justify-center">
-            <div className="w-4 h-4 border-2 border-background rounded-full"></div>
-          </div>
+          <img
+            src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
+            alt="Inner Circle Lending"
+            className="h-6 w-auto"
+          />
           <span className="text-white font-light text-lg tracking-wide">INNERCIRCLE</span>
         </div>
-      </div>
+      </motion.div>
 
       {/* Hero Text */}
-      <div className="relative z-20 text-center px-6">
+      <motion.div
+        className="relative z-20 text-center px-6"
+        style={{ y, opacity }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -46,23 +66,23 @@ const Hero: React.FC = () => {
           </h1>
         </motion.div>
 
-        {/* Subtle scroll indicator */}
+        {/* Scroll indicator - positioned to be visible */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 2 }}
-          className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
         >
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
+          <div className="w-6 h-10 border-2 border-white/40 rounded-full flex justify-center">
             <motion.div
               animate={{ y: [0, 12, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="w-1 h-3 bg-white/50 rounded-full mt-2"
+              className="w-1 h-3 bg-white/60 rounded-full mt-2"
             />
           </div>
         </motion.div>
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 };
 

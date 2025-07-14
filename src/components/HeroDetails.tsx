@@ -6,18 +6,26 @@ import { useNavigate } from 'react-router-dom';
 const HeroDetails: React.FC = () => {
     const navigate = useNavigate();
     const sectionRef = useRef<HTMLDivElement>(null);
-    const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
+    const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
 
     return (
-        <section className="py-16 md:py-24 bg-background" ref={sectionRef}>
-            <div className="section">
+        <section className="py-16 md:py-24 bg-background relative overflow-hidden" ref={sectionRef} style={{ marginTop: '100vh', zIndex: 10, position: 'relative' }}>
+            {/* Golden accent elements */}
+            <div className="absolute top-20 right-10 w-32 h-32 bg-gold/5 rounded-full blur-xl"></div>
+            <div className="absolute bottom-32 left-10 w-24 h-24 bg-gold/10 rounded-full blur-2xl"></div>
+            <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-gold/8 rounded-full blur-lg"></div>
+
+            <div className="section relative z-10">
                 <div className="max-w-5xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                         transition={{ duration: 0.8 }}
-                        className="mb-16 text-center"
+                        className="mb-16 text-center relative"
                     >
+                        {/* Golden accent behind heading */}
+                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-64 h-1 bg-gradient-to-r from-transparent via-gold to-transparent opacity-30"></div>
+
                         <h2 className="text-3xl md:text-5xl font-light mb-6 text-white">
                             11-15% Fixed Returns
                         </h2>
@@ -36,7 +44,9 @@ const HeroDetails: React.FC = () => {
                         transition={{ duration: 0.8, delay: 0.2 }}
                         className="grid md:grid-cols-3 gap-8 mb-16"
                     >
-                        <div className="bg-surface p-8 rounded-lg border border-graphite">
+                        <div className="bg-surface p-8 rounded-lg border border-graphite relative group hover:border-gold/30 transition-all duration-300">
+                            {/* Golden corner accent */}
+                            <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-gold/20 to-transparent rounded-tr-lg"></div>
                             <FileText className="w-10 h-10 text-gold mb-6" />
                             <h3 className="text-xl font-semibold mb-4">Self-Directed Retirement</h3>
                             <p className="text-text-secondary leading-relaxed">
@@ -44,15 +54,23 @@ const HeroDetails: React.FC = () => {
                             </p>
                         </div>
 
-                        <div className="bg-surface p-8 rounded-lg border border-graphite">
-                            <CircleDollarSign className="w-10 h-10 text-gold mb-6" />
-                            <h3 className="text-xl font-semibold mb-4">Tax Repositioning</h3>
-                            <p className="text-text-secondary leading-relaxed">
-                                Transform tax payments into investment opportunities with IRS-approved strategies that create wealth instead of expense.
-                            </p>
+                        <div className="bg-surface p-8 rounded-lg border border-gold/20 relative group hover:border-gold/40 transition-all duration-300">
+                            {/* Golden frame effect for center card */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-transparent to-gold/5 rounded-lg"></div>
+                            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-gold/40 rounded-tl-lg"></div>
+                            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-gold/40 rounded-br-lg"></div>
+                            <div className="relative z-10">
+                                <CircleDollarSign className="w-10 h-10 text-gold mb-6" />
+                                <h3 className="text-xl font-semibold mb-4">Tax Repositioning</h3>
+                                <p className="text-text-secondary leading-relaxed">
+                                    Transform tax payments into investment opportunities with IRS-approved strategies that create wealth instead of expense.
+                                </p>
+                            </div>
                         </div>
 
-                        <div className="bg-surface p-8 rounded-lg border border-graphite">
+                        <div className="bg-surface p-8 rounded-lg border border-graphite relative group hover:border-gold/30 transition-all duration-300">
+                            {/* Golden corner accent */}
+                            <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-tr from-gold/20 to-transparent rounded-bl-lg"></div>
                             <Wallet className="w-10 h-10 text-gold mb-6" />
                             <h3 className="text-xl font-semibold mb-4">Crypto Income Stream</h3>
                             <p className="text-text-secondary leading-relaxed">
@@ -65,15 +83,18 @@ const HeroDetails: React.FC = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="flex flex-col sm:flex-row gap-6 justify-center"
+                        className="flex flex-col sm:flex-row gap-6 justify-center relative"
                     >
+                        {/* Golden glow behind buttons */}
+                        <div className="absolute inset-0 bg-gold/5 rounded-lg blur-2xl transform scale-150"></div>
+
                         <button
                             onClick={() => navigate('/contact', { state: { consultation: true } })}
-                            className="button text-lg px-8 py-4"
+                            className="button text-lg px-8 py-4 relative z-10"
                         >
                             Schedule Free Consultation
                         </button>
-                        <a href="#unlock" className="button-gold text-lg px-8 py-4">
+                        <a href="#unlock" className="button-gold text-lg px-8 py-4 relative z-10">
                             Learn More
                         </a>
                     </motion.div>
