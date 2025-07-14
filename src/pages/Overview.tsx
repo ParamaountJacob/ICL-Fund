@@ -1,11 +1,61 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
 import { Shield, TrendingUp, Clock, Eye, ArrowRight, Phone, Mail, Globe } from 'lucide-react';
 
 const Overview: React.FC = () => {
+    const [showDetailedSection, setShowDetailedSection] = useState(false);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const detailedSectionRef = useRef<HTMLDivElement>(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (detailedSectionRef.current) {
+                const rect = detailedSectionRef.current.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight * 0.7; // Show when 70% into view
+                setShowDetailedSection(isVisible);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll(); // Check initial position
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const handleNavigation = async (path: string) => {
+        setIsTransitioning(true);
+
+        // Wait for transition animation
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        navigate(path);
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-6 py-8 pt-24 md:pt-32">
+            {/* Page Transition Overlay */}
+            <AnimatePresence>
+                {isTransitioning && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="fixed inset-0 bg-black z-50 flex items-center justify-center"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.5, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.3, delay: 0.1 }}
+                            className="text-gold text-xl font-display tracking-wider"
+                        >
+                            Transitioning...
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             {/* Business Card Container - Desktop: Card Proportions, Mobile: Full Screen */}
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, rotateY: -15 }}
@@ -159,12 +209,12 @@ const Overview: React.FC = () => {
                                     >
                                         Get In Touch
                                     </Link>
-                                    <Link
-                                        to="/"
+                                    <button
+                                        onClick={() => handleNavigation('/')}
                                         className="px-6 py-2 border border-gold/50 text-gold font-semibold text-sm rounded-lg hover:bg-gold/10 transition-all duration-300"
                                     >
                                         Learn More
-                                    </Link>
+                                    </button>
                                 </div>
                             </div>
                         </motion.div>
@@ -194,9 +244,13 @@ const Overview: React.FC = () => {
 
                 {/* Clear Separator */}
                 <motion.div
+                    ref={detailedSectionRef}
                     initial={{ opacity: 0, scaleX: 0 }}
-                    animate={{ opacity: 1, scaleX: 1 }}
-                    transition={{ duration: 1.0, delay: 2.0 }}
+                    animate={{
+                        opacity: showDetailedSection ? 1 : 0,
+                        scaleX: showDetailedSection ? 1 : 0
+                    }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
                     className="w-full max-w-md mx-auto mt-12 mb-16"
                 >
                     <div className="h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent"></div>
@@ -207,9 +261,12 @@ const Overview: React.FC = () => {
 
                 {/* Detailed Information Section */}
                 <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 2.2 }}
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{
+                        opacity: showDetailedSection ? 1 : 0,
+                        y: showDetailedSection ? 0 : 50
+                    }}
+                    transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                     className="max-w-4xl mx-auto space-y-8"
                 >
                     {/* Our Approach */}
@@ -301,12 +358,12 @@ const Overview: React.FC = () => {
                             >
                                 Schedule Consultation
                             </Link>
-                            <Link
-                                to="/"
+                            <button
+                                onClick={() => handleNavigation('/')}
                                 className="px-8 py-3 border border-gold/50 text-gold font-semibold rounded-lg hover:bg-gold/10 transition-all duration-300"
                             >
                                 Learn More
-                            </Link>
+                            </button>
                         </div>
                     </div>
                 </motion.div>
