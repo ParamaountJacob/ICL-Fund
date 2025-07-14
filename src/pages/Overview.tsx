@@ -6,7 +6,9 @@ import { Shield, TrendingUp, Clock, Eye, ArrowRight, Phone, Mail, Globe } from '
 const Overview: React.FC = () => {
     const [showDetailedSection, setShowDetailedSection] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [videoPreloaded, setVideoPreloaded] = useState(false);
     const detailedSectionRef = useRef<HTMLDivElement>(null);
+    const videoPreloadRef = useRef<HTMLVideoElement>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -24,6 +26,33 @@ const Overview: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Preload homepage video
+    useEffect(() => {
+        const video = videoPreloadRef.current;
+        if (video) {
+            const handleCanPlayThrough = () => {
+                setVideoPreloaded(true);
+                console.log('Homepage video preloaded successfully');
+            };
+
+            const handleError = () => {
+                console.log('Video preload failed, but will continue anyway');
+                setVideoPreloaded(true); // Set to true anyway to allow navigation
+            };
+
+            video.addEventListener('canplaythrough', handleCanPlayThrough);
+            video.addEventListener('error', handleError);
+
+            // Start preloading
+            video.load();
+
+            return () => {
+                video.removeEventListener('canplaythrough', handleCanPlayThrough);
+                video.removeEventListener('error', handleError);
+            };
+        }
+    }, []);
+
     const handleNavigation = async (path: string) => {
         setIsTransitioning(true);
 
@@ -35,6 +64,18 @@ const Overview: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-6 py-8 pt-24 md:pt-32">
+            {/* Hidden video for preloading homepage video */}
+            <video
+                ref={videoPreloadRef}
+                muted
+                playsInline
+                preload="auto"
+                className="hidden"
+                aria-hidden="true"
+            >
+                <source src="https://res.cloudinary.com/digjsdron/video/upload/v1752517183/TempVid-1_vzn8mn.mp4" type="video/mp4" />
+            </video>
+
             {/* Page Transition Overlay */}
             <AnimatePresence>
                 {isTransitioning && (
@@ -49,8 +90,15 @@ const Overview: React.FC = () => {
                             initial={{ scale: 0.5, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ duration: 0.3, delay: 0.1 }}
-                            className="text-gold text-xl font-display tracking-wider"
+                            className="text-gold text-xl font-display tracking-wider flex flex-col items-center"
                         >
+                            <div className="mb-4">
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                    className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full"
+                                ></motion.div>
+                            </div>
                             Transitioning...
                         </motion.div>
                     </motion.div>
