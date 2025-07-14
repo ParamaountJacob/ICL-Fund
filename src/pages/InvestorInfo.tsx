@@ -124,21 +124,21 @@ const InvestorInfo: React.FC = () => {
 
   return (
     <div className="pt-0">
-      <section className="py-32 md:py-40">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-20 sm:py-32 md:py-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Hero Section */}
-          <div className="text-center mb-32">
-            <h1 className="text-4xl md:text-6xl font-display font-bold text-gold mb-8">
+          <div className="text-center mb-20 sm:mb-32">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-display font-bold text-gold mb-6 sm:mb-8 px-4 sm:px-0">
               Investor Information
             </h1>
-            <p className="text-xl md:text-2xl text-text-secondary max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl md:text-2xl text-text-secondary max-w-4xl mx-auto leading-relaxed px-4 sm:px-0">
               Discover exclusive investment opportunities designed for qualified investors
               seeking consistent returns and portfolio diversification.
             </p>
           </div>
 
           {/* Investment Overview */}
-          <div className="grid lg:grid-cols-2 gap-20 items-center mb-32">
+          <div className="grid lg:grid-cols-2 gap-12 sm:gap-16 lg:gap-20 items-center mb-20 sm:mb-32 px-2 sm:px-0">
             <div>
               <h2 className="text-3xl md:text-4xl font-display font-semibold mb-8">
                 Premium Investment Opportunities
@@ -182,36 +182,36 @@ const InvestorInfo: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-surface p-10 rounded-lg border border-graphite">
-              <h3 className="text-2xl font-semibold text-gold mb-8">Investment Tiers</h3>
+            <div className="bg-surface p-6 sm:p-8 md:p-10 rounded-lg border border-graphite">
+              <h3 className="text-xl sm:text-2xl font-semibold text-gold mb-6 sm:mb-8">Investment Tiers</h3>
 
-              <div className="space-y-6 md:space-y-8">
-                <div className="bg-accent p-4 md:p-6 rounded-lg border border-graphite">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-1 sm:gap-0">
+              <div className="space-y-4 sm:space-y-6 md:space-y-8">
+                <div className="bg-accent p-4 sm:p-5 md:p-6 rounded-lg border border-graphite">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-2 sm:gap-1">
                     <h4 className="font-semibold text-lg md:text-xl">Tier 1</h4>
                     <span className="text-gold font-semibold text-base md:text-lg">11% (12% for 2-year)</span>
                   </div>
                   <p className="text-text-secondary text-sm md:text-base">$200,000 - $349,999</p>
                 </div>
 
-                <div className="bg-accent p-4 md:p-6 rounded-lg border border-graphite">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-1 sm:gap-0">
+                <div className="bg-accent p-4 sm:p-5 md:p-6 rounded-lg border border-graphite">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-2 sm:gap-1">
                     <h4 className="font-semibold text-lg md:text-xl">Tier 2</h4>
                     <span className="text-gold font-semibold text-base md:text-lg">12% (13% for 2-year)</span>
                   </div>
                   <p className="text-text-secondary text-sm md:text-base">$350,000 - $499,999</p>
                 </div>
 
-                <div className="bg-accent p-4 md:p-6 rounded-lg border border-graphite">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-1 sm:gap-0">
+                <div className="bg-accent p-4 sm:p-5 md:p-6 rounded-lg border border-graphite">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-2 sm:gap-1">
                     <h4 className="font-semibold text-lg md:text-xl">Tier 3</h4>
                     <span className="text-gold font-semibold text-base md:text-lg">13% (14% for 2-year)</span>
                   </div>
                   <p className="text-text-secondary text-sm md:text-base">$500,000 - $999,999</p>
                 </div>
 
-                <div className="bg-accent p-4 md:p-6 rounded-lg border border-graphite">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-1 sm:gap-0">
+                <div className="bg-accent p-4 sm:p-5 md:p-6 rounded-lg border border-graphite">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 md:mb-3 gap-2 sm:gap-1">
                     <h4 className="font-semibold text-lg md:text-xl">Tier 4</h4>
                     <span className="text-gold font-semibold text-base md:text-lg">14% (15% for 2-year)</span>
                   </div>
@@ -222,19 +222,19 @@ const InvestorInfo: React.FC = () => {
           </div>
 
           {/* Enhanced Investment Calculator */}
-          <div className="mb-32">
+          <div className="mb-20 sm:mb-32 px-2 sm:px-0">
             <div className="text-center mb-8 md:mb-12">
-              <h2 className="text-3xl md:text-4xl font-display font-semibold mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-semibold mb-4 sm:mb-6 px-4 sm:px-0">
                 Investment Calculator
               </h2>
-              <p className="text-base md:text-lg text-text-secondary max-w-2xl mx-auto px-4">
+              <p className="text-base md:text-lg text-text-secondary max-w-2xl mx-auto px-4 sm:px-0">
                 See your potential returns with our investment calculator
               </p>
             </div>
 
-            <div className="max-w-6xl mx-auto">
-              <div className="bg-gradient-to-br from-surface via-surface to-accent p-6 md:p-12 rounded-2xl border border-graphite shadow-2xl">
-                <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+            <div className="max-w-6xl mx-auto px-2 sm:px-0">
+              <div className="bg-gradient-to-br from-surface via-surface to-accent p-4 sm:p-6 md:p-12 rounded-2xl border border-graphite shadow-2xl">
+                <div className="grid lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
                   {/* Input Section */}
                   <div className="lg:col-span-1">
                     <div className="flex items-center gap-3 mb-6 md:mb-8">
@@ -249,12 +249,12 @@ const InvestorInfo: React.FC = () => {
                         <label className="block text-xs md:text-sm uppercase tracking-wide text-text-secondary mb-3 md:mb-4">
                           Investment Term
                         </label>
-                        <div className="grid grid-cols-2 gap-3 md:gap-3">
+                        <div className="grid grid-cols-2 gap-3">
                           {[1, 2].map((years) => (
                             <button
                               key={years}
                               onClick={() => setTermYears(years)}
-                              className={`p-4 md:p-4 rounded-lg md:rounded-xl border-2 transition-all duration-300 font-semibold text-base md:text-base ${termYears === years
+                              className={`p-3 sm:p-4 rounded-lg md:rounded-xl border-2 transition-all duration-300 font-semibold text-sm sm:text-base ${termYears === years
                                 ? 'border-gold bg-gold/10 text-gold shadow-lg'
                                 : 'border-graphite bg-accent text-text-secondary hover:border-gold/50 hover:bg-gold/5'
                                 }`}
@@ -269,14 +269,14 @@ const InvestorInfo: React.FC = () => {
                         <label className="block text-xs md:text-sm uppercase tracking-wide text-text-secondary mb-3 md:mb-4">
                           Investment Amount
                         </label>
-                        <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                           {['200000', '350000', '500000', '1000000'].map((amount) => {
                             const rate = getReturnRate(Number(amount), termYears);
                             return (
                               <button
                                 key={amount}
                                 onClick={() => handleTierSelect(amount)}
-                                className={`p-3 md:p-4 rounded-lg md:rounded-xl border-2 transition-all duration-300 text-center ${selectedTier === amount
+                                className={`p-3 sm:p-4 rounded-lg md:rounded-xl border-2 transition-all duration-300 text-center ${selectedTier === amount
                                   ? 'border-gold bg-gold/10 text-gold shadow-lg'
                                   : 'border-graphite bg-accent text-text-secondary hover:border-gold/50 hover:bg-gold/5'
                                   }`}
@@ -502,36 +502,36 @@ const InvestorInfo: React.FC = () => {
           </div>
 
           {/* Prominent Call to Action */}
-          <div className="bg-gradient-to-r from-gold/20 to-gold/10 border border-gold/30 rounded-2xl p-12 text-center mb-20 md:mb-0">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-4xl md:text-5xl font-display font-bold text-gold mb-6">
+          <div className="bg-gradient-to-r from-gold/20 to-gold/10 border border-gold/30 rounded-2xl p-6 sm:p-8 md:p-12 text-center mb-20 md:mb-0 mx-2 sm:mx-0">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gold mb-4 sm:mb-6 leading-tight">
                 Ready to Start Earning?
               </h2>
-              <p className="text-xl text-text-secondary mb-10 leading-relaxed">
+              <p className="text-lg sm:text-xl text-text-secondary mb-8 sm:mb-10 leading-relaxed px-2 sm:px-0">
                 Join our exclusive group of investors and start earning consistent returns.
                 Our streamlined onboarding process makes it easy to begin your investment journey today.
               </p>
 
-              <div className="space-y-6">
+              <div className="space-y-6 sm:space-y-8">
                 <button
                   onClick={handleGetStarted}
-                  className="bg-gold text-background px-12 py-6 text-xl font-semibold rounded-xl hover:bg-gold/90 transition-all duration-300 inline-flex items-center gap-4 shadow-lg hover:shadow-xl transform hover:scale-105 w-full md:w-auto justify-center"
+                  className="bg-gold text-background px-8 sm:px-12 py-5 sm:py-6 text-lg sm:text-xl font-semibold rounded-xl hover:bg-gold/90 transition-all duration-300 inline-flex items-center gap-3 sm:gap-4 shadow-lg hover:shadow-xl transform hover:scale-105 w-full sm:w-auto justify-center"
                 >
                   Start Earning
-                  <ArrowRight className="w-6 h-6" />
+                  <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
 
-                <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-sm text-text-secondary">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 md:gap-8 text-sm text-text-secondary px-2 sm:px-0">
                   <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-gold" />
+                    <Shield className="w-4 h-4 text-gold flex-shrink-0" />
                     <span>Secure & Confidential</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gold" />
+                    <Clock className="w-4 h-4 text-gold flex-shrink-0" />
                     <span>2-3 Day Review Process</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Target className="w-4 h-4 text-gold" />
+                    <Target className="w-4 h-4 text-gold flex-shrink-0" />
                     <span>No Hidden Fees</span>
                   </div>
                 </div>

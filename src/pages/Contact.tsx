@@ -4,6 +4,7 @@ import { Mail, Video, Phone, ArrowLeft, Clock, User, MessageSquare, DollarSign, 
 import AuthModal from '../components/AuthModal';
 import { SuccessModal } from '../components/SuccessModal';
 import CalendlyEmbed from '../components/CalendlyEmbed';
+import TimeSelection from '../components/TimeSelection';
 import { useAuth } from '../contexts/AuthContext';
 
 type ContactMethod = 'email' | 'video' | 'phone' | null;
@@ -658,52 +659,12 @@ const Contact: React.FC = () => {
                         </p>
                       </div>
                     ) : (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <label className="text-sm font-medium text-text-secondary uppercase tracking-wide">
-                            Choose Your Preferred Time
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedDate('')}
-                            className="text-sm text-gold hover:text-gold/80 transition-colors"
-                          >
-                            Change Date
-                          </button>
-                        </div>
-
-                        <div className="bg-gold/10 border border-gold/20 p-4 rounded-lg">
-                          <p className="text-gold font-medium">
-                            {(() => {
-                              // Parse date correctly to avoid timezone issues
-                              const [year, month, day] = selectedDate.split('-').map(Number);
-                              const date = new Date(year, month - 1, day); // month is 0-indexed
-                              return date.toLocaleDateString('en-US', {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              });
-                            })()}
-                          </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {availableTimes.map((time) => (
-                            <button
-                              key={time}
-                              type="button"
-                              onClick={() => setSelectedTime(time)}
-                              className={`p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 text-center text-sm sm:text-base ${selectedTime === time
-                                ? 'border-gold bg-gold/10 text-gold font-semibold'
-                                : 'border-graphite bg-surface hover:border-gold/50 hover:bg-gold/5 text-text-primary'
-                                }`}
-                            >
-                              {time}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
+                      <TimeSelection
+                        selectedTime={selectedTime}
+                        onTimeSelect={setSelectedTime}
+                        selectedDate={selectedDate}
+                        onDateChange={() => setSelectedDate('')}
+                      />
                     )}
                   </div>
                 )}
