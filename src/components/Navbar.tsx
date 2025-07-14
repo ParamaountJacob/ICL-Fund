@@ -198,11 +198,11 @@ const Navbar: React.FC = () => {
 
               {/* Right-sliding menu overlay */}
               <motion.div
-                initial={{ opacity: 0, x: 300 }}
+                initial={{ opacity: 0, x: "100%" }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 300 }}
+                exit={{ opacity: 0, x: "100%" }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}
-                className={`fixed top-0 right-0 bottom-0 w-80 md:hidden z-40 ${isHomePage ? 'bg-surface/98 backdrop-blur-lg' : 'bg-background/98 backdrop-blur-lg'
+                className={`fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] md:hidden z-40 ${isHomePage ? 'bg-surface/98 backdrop-blur-lg' : 'bg-background/98 backdrop-blur-lg'
                   } border-l border-graphite shadow-2xl`}
               >
                 {/* Header with close button on right */}
