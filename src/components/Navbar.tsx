@@ -62,7 +62,7 @@ const Navbar: React.FC = () => {
 
   // Header should be transparent on home page when not scrolled
   const headerClasses = isHomePage
-    ? `fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-300 ${isScrolled ? 'bg-background/95 shadow-md backdrop-blur-sm' : 'bg-transparent'
+    ? `fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-500 ${isScrolled ? 'bg-background/95 shadow-md backdrop-blur-sm translate-y-0' : 'bg-transparent -translate-y-full'
     }`
     : 'fixed top-0 left-0 right-0 z-50 py-4 bg-background/95 backdrop-blur-sm shadow-md';
 

@@ -7,91 +7,60 @@ const Hero: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <section id="home" className="min-h-[90vh] pt-20 md:pt-28 pb-8 md:pb-16 flex items-center relative overflow-hidden">
+    <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden">
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10"></div>
         <video
           autoPlay
           muted
           loop
           playsInline
-          className="w-full h-full object-cover opacity-50 grayscale"
+          className="w-full h-full object-cover"
         >
           <source src="https://cdn.shopify.com/videos/c/o/v/0a657f7363044727af7cfa2d4bdfeeb0.mp4" type="video/mp4" />
         </video>
+        <div className="absolute inset-0 bg-black/40"></div>
       </div>
-      <div className="section relative z-20">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="mb-16 text-center"
-          >
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-light mb-4 text-white leading-tight">
-              11-15% Fixed Returns
-            </h1>
-            <p className="text-lg md:text-xl text-gold font-medium mb-8">
-              Engineered for Privacy
-            </p>
 
-            <p className="text-lg md:text-xl text-text-secondary leading-relaxed max-w-2xl mx-auto mb-4">
-              For accredited investors seeking predictable returns independent of market volatility.
-            </p>
-
-            <p className="text-base md:text-lg text-text-secondary/90 leading-relaxed max-w-3xl mx-auto">
-              Turn your tax liability into a yield-generating asset. We help you unlock funds from dormant 401(k)s, tax payments, or crypto holdings and deploy them strategically across short-term, secured business loans.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="grid md:grid-cols-3 gap-6 mb-16"
-          >
-            <div className="bg-surface/30 backdrop-blur-sm p-5 rounded-lg border border-graphite/50">
-              <FileText className="w-7 h-7 text-gold mb-3" />
-              <h3 className="text-base font-semibold mb-2">Self-Directed Retirement</h3>
-              <p className="text-text-secondary text-sm leading-relaxed">
-                Direct 401(k)/IRA funds into high-yield investments while keeping tax benefits.
-              </p>
-            </div>
-
-            <div className="bg-surface/30 backdrop-blur-sm p-5 rounded-lg border border-graphite/50">
-              <CircleDollarSign className="w-7 h-7 text-gold mb-3" />
-              <h3 className="text-base font-semibold mb-2">Tax Repositioning</h3>
-              <p className="text-text-secondary text-sm leading-relaxed">
-                Transform tax payments into investment opportunities with IRS-approved strategies.
-              </p>
-            </div>
-
-            <div className="bg-surface/30 backdrop-blur-sm p-5 rounded-lg border border-graphite/50">
-              <Wallet className="w-7 h-7 text-gold mb-3" />
-              <h3 className="text-base font-semibold mb-2">Crypto Income Stream</h3>
-              <p className="text-text-secondary text-sm leading-relaxed">
-                Convert volatile crypto holdings into steady monthly income.
-              </p>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <button
-              onClick={() => navigate('/contact', { state: { consultation: true } })}
-              className="button"
-            >
-              Schedule Free Consultation
-            </button>
-            <a href="#process" className="button-gold">
-              How It Works
-            </a>
-          </motion.div>
+      {/* Centered Logo */}
+      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-gold rounded-full flex items-center justify-center">
+            <div className="w-4 h-4 border-2 border-background rounded-full"></div>
+          </div>
+          <span className="text-white font-light text-lg tracking-wide">INNERCIRCLE</span>
         </div>
+      </div>
+
+      {/* Hero Text */}
+      <div className="relative z-20 text-center px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 0.5 }}
+        >
+          <h1 className="text-4xl md:text-6xl lg:text-8xl font-light text-white leading-tight tracking-wide">
+            Engineered
+          </h1>
+          <h1 className="text-4xl md:text-6xl lg:text-8xl font-light text-gold leading-tight tracking-wide mt-2">
+            for Privacy
+          </h1>
+        </motion.div>
+
+        {/* Subtle scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 2 }}
+          className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
+        >
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
+            <motion.div
+              animate={{ y: [0, 12, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="w-1 h-3 bg-white/50 rounded-full mt-2"
+            />
+          </div>
+        </motion.div>
       </div>
     </section>
   );
