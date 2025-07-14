@@ -33,8 +33,8 @@ const InvestorInfo: React.FC = () => {
       return;
     }
 
-    // User is logged in, proceed with investment process
-    navigate('/onboarding');
+    // User is logged in, proceed to contact page
+    navigate('/contact');
   };
 
   const handleViewPitchDeck = () => {
@@ -55,7 +55,7 @@ const InvestorInfo: React.FC = () => {
 
     // Execute the pending action after successful authentication
     if (pendingAction === 'onboarding') {
-      navigate('/onboarding');
+      navigate('/contact');
     } else if (pendingAction === 'pitch-deck') {
       navigate('/pitch-deck');
     }
