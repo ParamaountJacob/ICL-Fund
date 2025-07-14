@@ -1,26 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { L                        {/* Key Metrics - Card Style */ }
-    < motion.div
-initial = {{ opacity: 0, y: 20 }}
-animate = {{ opacity: 1, y: 0 }}
-transition = {{ duration: 0.8, delay: 1.0 }}
-className = "grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" > from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Shield, TrendingUp, Clock, Eye, ArrowRight, Phone, Mail, Globe } from 'lucide-react';
 
 const Overview: React.FC = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4 py-8">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4">
             {/* Business Card Container - Desktop: Card Proportions, Mobile: Full Screen */}
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, rotateY: -15 }}
                 animate={{ opacity: 1, scale: 1, rotateY: 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
-<<<<<<< HEAD
-                className="w-full max-w-5xl mx-auto"
-=======
-                className="w-full max-w-5xl mx-auto my-8"
->>>>>>> 713dd8d1aacaf92690d87fa16cb5306882b46748
+                className="w-full max-w-6xl mx-auto"
             >
                 {/* Main Business Card */}
                 <div className="relative bg-gradient-to-br from-gray-900 to-black rounded-xl overflow-hidden business-card-shadow border border-gold/30">
@@ -45,9 +36,9 @@ const Overview: React.FC = () => {
                     </div>
 
                     {/* Card Content */}
-                    <div className="relative z-10 p-6 md:p-10">
+                    <div className="relative z-10 p-8 md:p-12">
                         {/* Header Section - Logo & Company Name */}
-                        <div className="text-center mb-6">
+                        <div className="text-center mb-8">
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -100,8 +91,8 @@ const Overview: React.FC = () => {
                             </div>
                             <div className="text-center p-4 luxury-glass rounded-lg backdrop-blur-sm">
                                 <Clock className="w-8 h-8 text-gold mx-auto mb-2" />
-                                <h3 className="text-xl font-bold text-white mb-1">12-24 Months</h3>
-                                <p className="text-gold/70 text-sm">Investment Tiers</p>
+                                <h3 className="text-xl font-bold text-white mb-1">6 Months</h3>
+                                <p className="text-gold/70 text-sm">Avg. Terms</p>
                             </div>
                             <div className="text-center p-4 luxury-glass rounded-lg backdrop-blur-sm">
                                 <Eye className="w-8 h-8 text-gold mx-auto mb-2" />
