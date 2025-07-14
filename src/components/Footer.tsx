@@ -10,9 +10,9 @@ const Footer: React.FC = () => {
       <div className="container mx-auto px-6">
         <div className="flex flex-col items-center">
           <div className="flex items-center space-x-2 mb-8">
-            <img 
-              src="https://res.cloudinary.com/digjsdron/image/upload/v1746553597/icl-logo-final-2_t6lkyg.webp" 
-              alt="Inner Circle Lending" 
+            <img
+              src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
+              alt="Inner Circle Lending"
               className="h-6 w-auto"
             />
             <span className="font-display font-semibold text-lg uppercase tracking-wide">InnerCircle</span>
