@@ -210,8 +210,9 @@ const Navbar: React.FC = () => {
               className={`fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] md:hidden z-[9999] ${isHomePage ? 'bg-surface/95 backdrop-blur-lg border-l border-graphite/30' : 'bg-background/95 backdrop-blur-lg border-l border-graphite/30'
                 } shadow-2xl overflow-hidden`}
             >
-              {/* Header with close button on right */}
-              <div className="flex items-center justify-end px-6 py-4 border-b border-graphite/20">
+              {/* Header with Menu text and close button */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-graphite/20">
+                <h2 className="text-lg font-semibold text-text-primary uppercase tracking-wide">Menu</h2>
                 <button
                   className="flex items-center p-2 hover:bg-graphite/10 rounded-lg transition-colors"
                   onClick={() => setIsOpen(false)}
