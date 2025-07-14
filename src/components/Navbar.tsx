@@ -205,11 +205,11 @@ const Navbar: React.FC = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className={`fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] md:hidden z-[9999] ${isHomePage ? 'bg-surface/98 backdrop-blur-lg' : 'bg-background/98 backdrop-blur-lg'
-                } border-l border-graphite shadow-2xl overflow-hidden`}
+              className={`fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] md:hidden z-[9999] ${isHomePage ? 'bg-surface border-l border-graphite/30' : 'bg-background border-l border-graphite/30'
+                } shadow-2xl overflow-hidden`}
             >
               {/* Header with close button on right */}
-              <div className="flex items-center justify-end px-6 py-4 border-b border-graphite/20 bg-inherit">
+              <div className="flex items-center justify-end px-6 py-4 border-b border-graphite/20">
                 <button
                   className="flex items-center p-2 hover:bg-graphite/10 rounded-lg transition-colors"
                   onClick={() => setIsOpen(false)}
@@ -220,7 +220,7 @@ const Navbar: React.FC = () => {
               </div>
 
               {/* Menu Content */}
-              <div className="px-6 py-4 h-full overflow-y-auto bg-inherit">
+              <div className="px-6 py-4 h-full overflow-y-auto">
                 <div className="flex flex-col space-y-1">
                   <Link to="/"
                     className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
