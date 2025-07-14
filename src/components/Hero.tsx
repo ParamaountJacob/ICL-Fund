@@ -39,13 +39,13 @@ const Hero: React.FC = () => {
         ></motion.div>
       </motion.div>
 
-      {/* Centered Logo - will transform to navbar */}
+      {/* Centered Logo - will transform to navbar slowly */}
       <motion.div
-        className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30"
+        className="absolute top-8 w-full z-30 flex justify-center"
         style={{
-          y: useTransform(scrollY, [0, 200], [0, -40]),
-          opacity,
-          scale: useTransform(scrollY, [0, 200], [1, 0.8])
+          y: useTransform(scrollY, [0, 600], [0, -60]),
+          opacity: useTransform(scrollY, [0, 500], [1, 0]),
+          scale: useTransform(scrollY, [0, 600], [1, 0.7])
         }}
       >
         <div className="flex items-center justify-center gap-3">

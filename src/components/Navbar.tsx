@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     // Scroll listener for homepage header transparency
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100); // Appear earlier to sync with logo transform
+      setIsScrolled(window.scrollY > 500); // Much later appearance - after logo finishes sliding
     };
 
     if (pathname === '/') {
@@ -62,7 +62,7 @@ const Navbar: React.FC = () => {
 
   // Header should be transparent on home page when not scrolled
   const headerClasses = isHomePage
-    ? `fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-700 ease-out ${isScrolled ? 'bg-background/95 shadow-md backdrop-blur-sm translate-y-0 opacity-100' : 'bg-transparent translate-y-0 opacity-0'
+    ? `fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-1000 ease-out ${isScrolled ? 'bg-background/95 shadow-md backdrop-blur-sm translate-y-0 opacity-100' : 'bg-transparent translate-y-0 opacity-0'
     }`
     : 'fixed top-0 left-0 right-0 z-50 py-4 bg-background/95 backdrop-blur-sm shadow-md';
 
