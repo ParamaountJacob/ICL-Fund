@@ -6,17 +6,17 @@ const Hero: React.FC = () => {
   const navigate = useNavigate();
   const { scrollY } = useScroll();
 
-  // Transform values for parallax effect - optimized for desktop and mobile
+  // Transform values for parallax effect - optimized for desktop and mobile with conservative scaling
   const y = useTransform(scrollY, [0, 800], [0, -200]);
   const opacity = useTransform(scrollY, [0, 600], [1, 0]); // Fade out later
-  const scale = useTransform(scrollY, [0, 800], [1, 1.1]);
+  const scale = useTransform(scrollY, [0, 800], [1, 1.05]); // Reduced scale to prevent overflow
   const blurOverlay = useTransform(scrollY, [0, 300], [0, 1]);
 
   return (
     <motion.section
       id="home"
       className="h-screen flex items-center justify-center relative overflow-hidden"
-      style={{ position: 'fixed', width: '100%', height: '100vh', top: 0, zIndex: 1, willChange: 'transform' }}
+      style={{ position: 'fixed', width: '100vw', height: '100vh', top: 0, left: 0, zIndex: 1, willChange: 'transform' }}
     >
       <motion.div
         className="absolute inset-0 z-0"
@@ -28,7 +28,7 @@ const Hero: React.FC = () => {
           loop
           playsInline
           className="w-full h-full object-cover"
-          style={{ minHeight: '100vh', minWidth: '100vw' }}
+          style={{ minHeight: '100vh', minWidth: '100vw', maxWidth: '100vw' }}
         >
           <source src="https://res.cloudinary.com/digjsdron/video/upload/v1752517183/TempVid-1_vzn8mn.mp4" type="video/mp4" />
         </video>
@@ -66,7 +66,7 @@ const Hero: React.FC = () => {
 
       {/* Hero Text - Appears immediately, perfect mobile size, smaller desktop */}
       <motion.div
-        className="relative z-20 text-center px-4 md:px-6 -mt-12 md:-mt-16"
+        className="relative z-20 text-center px-4 md:px-6 -mt-12 md:-mt-16 w-full max-w-7xl mx-auto"
         style={{
           y,
           opacity,
@@ -74,14 +74,14 @@ const Hero: React.FC = () => {
           willChange: 'transform'
         }}
       >
-        <div>
+        <div className="overflow-hidden">
           <h1
-            className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-thin text-white leading-[0.9] tracking-wider drop-shadow-2xl mb-2 md:mb-3"
+            className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-thin text-white leading-[0.9] tracking-wide md:tracking-wider drop-shadow-2xl mb-2 md:mb-3"
           >
             The Power
           </h1>
           <h1
-            className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-thin text-gold leading-[0.9] tracking-wider drop-shadow-2xl"
+            className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-thin text-gold leading-[0.9] tracking-wide md:tracking-wider drop-shadow-2xl"
           >
             of Certainty
           </h1>

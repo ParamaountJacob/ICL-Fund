@@ -68,7 +68,7 @@ function ScrollToTop() {
 function AppContent() {
   // Simplified - no profile checking or force updates
   return (
-    <div className="min-h-screen bg-background text-text-primary">
+    <div className="min-h-screen bg-background text-text-primary overflow-x-hidden max-w-full">
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />

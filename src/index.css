@@ -7,14 +7,23 @@
 @layer base {
   html {
     @apply bg-gradient-to-b from-background via-surface to-background text-text-primary scroll-smooth;
+    overflow-x: hidden;
   }
-  
+
   body {
     @apply antialiased font-sans leading-relaxed;
     letter-spacing: -0.01em;
+    overflow-x: hidden;
+    width: 100vw;
+    max-width: 100vw;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display font-semibold tracking-tight;
   }
 
@@ -29,7 +38,7 @@
     background-size: 100% 100%;
     position: relative;
   }
-  
+
   .bg-premium-gradient::before {
     content: '';
     position: absolute;
@@ -37,11 +46,11 @@
     background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
     pointer-events: none;
   }
-  
+
   .bg-premium-pattern {
     position: relative;
   }
-  
+
   .bg-premium-pattern::before {
     content: '';
     position: absolute;
@@ -51,45 +60,40 @@
     pointer-events: none;
   }
 }
+
 @layer components {
   .section {
     @apply relative py-8 md:py-24 lg:py-32 px-6 md:px-8 lg:px-12 max-w-[1400px] mx-auto;
   }
-  
+
   .heading-xl {
     @apply font-display font-semibold text-4xl sm:text-5xl md:text-display-lg xl:text-display-xl leading-tight;
   }
-  
+
   .heading-lg {
     @apply font-display font-semibold text-3xl sm:text-4xl md:text-5xl leading-tight;
   }
-  
+
   .heading {
     @apply font-display font-semibold text-2xl sm:text-3xl leading-tight;
   }
-  
+
   .button {
-    @apply inline-block px-6 py-3 bg-transparent border border-text-primary text-text-primary relative
-           hover:bg-text-primary hover:text-background transition-all duration-300 ease-in-out
-           after:absolute after:inset-0 after:bg-gradient-radial after:from-white/5 after:to-transparent after:opacity-0
-           hover:after:opacity-100 after:transition-opacity;
+    @apply inline-block px-6 py-3 bg-transparent border border-text-primary text-text-primary relative hover:bg-text-primary hover:text-background transition-all duration-300 ease-in-out after:absolute after:inset-0 after:bg-gradient-radial after:from-white/5 after:to-transparent after:opacity-0 hover:after:opacity-100 after:transition-opacity;
   }
-  
+
   .button-gold {
-    @apply inline-block px-6 py-3 bg-transparent border border-gold text-gold relative
-           hover:bg-gold/10 transition-all duration-300 ease-in-out
-           after:absolute after:inset-0 after:bg-gradient-radial after:from-gold/10 after:to-transparent after:opacity-0
-           hover:after:opacity-100 after:transition-opacity;
+    @apply inline-block px-6 py-3 bg-transparent border border-gold text-gold relative hover:bg-gold/10 transition-all duration-300 ease-in-out after:absolute after:inset-0 after:bg-gradient-radial after:from-gold/10 after:to-transparent after:opacity-0 hover:after:opacity-100 after:transition-opacity;
   }
-  
+
   .nav-link {
     @apply relative inline-block py-2 text-sm uppercase tracking-wide text-text-primary/70 hover:text-text-primary transition-colors duration-300 ease-in-out;
   }
-  
+
   .nav-link::after {
     @apply content-[''] absolute bottom-0 left-0 w-0 h-[1px] bg-gold transition-all duration-300 ease-in-out;
   }
-  
+
   .nav-link:hover::after {
     @apply w-full;
   }
@@ -104,18 +108,18 @@
   select {
     @apply text-gray-900 bg-white;
   }
-  
+
   /* Ensure form elements have proper contrast */
   input::placeholder,
   textarea::placeholder {
     @apply text-gray-500;
   }
-  
+
   /* Admin dashboard specific fixes */
   .admin-select {
     @apply text-gray-900 bg-white border-gray-300;
   }
-  
+
   .admin-select option {
     @apply text-gray-900 bg-white;
   }
@@ -124,39 +128,39 @@
   select {
     @apply text-gray-900 bg-white;
   }
-  
+
   select option {
     @apply text-gray-900 bg-white;
   }
-  
+
   /* Ensure form elements have proper contrast */
   input[type="text"],
-  input[type="email"], 
+  input[type="email"],
   input[type="tel"],
   input[type="number"],
   textarea,
   select {
     @apply text-gray-900;
   }
-  
+
   /* Admin dashboard specific fixes */
   .admin-select {
     @apply text-gray-900 bg-white border-gray-300;
   }
-  
+
   .admin-select option {
     @apply text-gray-900 bg-white;
   }
-  
+
   /* Role badge colors */
   .role-badge.bg-gold {
     @apply text-background font-semibold;
   }
-  
+
   .role-badge.bg-silver {
     @apply text-gray-800 font-semibold;
   }
-  
+
   .role-badge.bg-blue-100 {
     @apply text-blue-800;
   }
