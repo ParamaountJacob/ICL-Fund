@@ -143,7 +143,7 @@ const Overview: React.FC = () => {
                                     <div className="flex items-center space-x-4 text-sm text-white/80">
                                         <div className="flex items-center space-x-2">
                                             <Phone className="w-4 h-4 text-gold" />
-                                            <span>847-736-2496</span>
+                                            <span>713-913-3179</span>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <Globe className="w-4 h-4 text-gold" />
