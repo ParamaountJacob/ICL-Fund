@@ -32,34 +32,34 @@ const About: React.FC = () => {
             custom={0}
             className="mb-16"
           >
-            <h2 className="heading-lg mb-8 text-center">You're Losing Capital Every Year</h2>
+            <h2 className="heading-lg mb-8 text-center">Maximize Your Capital Potential</h2>
             <p className="text-center text-text-secondary mb-12 max-w-2xl mx-auto">
-              And it's not from market volatility.
+              Smart investors are discovering strategic alternatives to traditional approaches.
             </p>
 
             <div className="grid md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-surface/60 p-6 rounded-lg border border-red-500/20 text-center">
-                <AlertTriangle className="w-10 h-10 text-red-400 mb-4 mx-auto" />
-                <h3 className="text-lg font-semibold mb-3 text-red-400">High Tax Burden</h3>
-                <p className="text-text-secondary text-sm">Losing 30-50% of income when strategic alternatives exist.</p>
+              <div className="bg-surface/60 p-6 rounded-lg border border-gold/20 text-center">
+                <AlertTriangle className="w-10 h-10 text-gold mb-4 mx-auto" />
+                <h3 className="text-lg font-semibold mb-3 text-gold">Tax Optimization</h3>
+                <p className="text-text-secondary text-sm">Strategic alternatives can enhance your after-tax returns significantly.</p>
               </div>
 
-              <div className="bg-surface/60 p-6 rounded-lg border border-red-500/20 text-center">
-                <TrendingDown className="w-10 h-10 text-red-400 mb-4 mx-auto" />
-                <h3 className="text-lg font-semibold mb-3 text-red-400">Market Volatility</h3>
-                <p className="text-text-secondary text-sm">Traditional investments leave you vulnerable to unpredictable swings.</p>
+              <div className="bg-surface/60 p-6 rounded-lg border border-gold/20 text-center">
+                <TrendingDown className="w-10 h-10 text-gold mb-4 mx-auto" />
+                <h3 className="text-lg font-semibold mb-3 text-gold">Predictable Returns</h3>
+                <p className="text-text-secondary text-sm">Fixed-return investments provide stability in an unpredictable market.</p>
               </div>
 
-              <div className="bg-surface/60 p-6 rounded-lg border border-red-500/20 text-center">
-                <DollarSign className="w-10 h-10 text-red-400 mb-4 mx-auto" />
-                <h3 className="text-lg font-semibold mb-3 text-red-400">High-Risk Drama</h3>
-                <p className="text-text-secondary text-sm">Many 'high-return' deals come with stress wealthy investors want to avoid.</p>
+              <div className="bg-surface/60 p-6 rounded-lg border border-gold/20 text-center">
+                <DollarSign className="w-10 h-10 text-gold mb-4 mx-auto" />
+                <h3 className="text-lg font-semibold mb-3 text-gold">Stress-Free Growth</h3>
+                <p className="text-text-secondary text-sm">Sophisticated investors prefer reliable returns over high-risk, high-stress opportunities.</p>
               </div>
             </div>
 
             <div className="text-center">
               <p className="text-lg text-text-secondary">
-                <strong>We offer something different:</strong> fixed returns, private structure, tax alignment.
+                <strong>We specialize in this approach:</strong> fixed returns, private structure, tax alignment.
               </p>
             </div>
           </motion.div>
