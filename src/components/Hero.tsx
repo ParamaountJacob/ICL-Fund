@@ -65,7 +65,7 @@ const Hero: React.FC = () => {
 
       {/* Hero Text - Appears immediately, perfect mobile size, smaller desktop */}
       <motion.div
-        className="relative z-20 text-center px-4 md:px-6 mt-4 md:mt-8"
+        className="relative z-20 text-center px-4 md:px-6 -mt-12 md:-mt-16"
         style={{
           y,
           opacity,
