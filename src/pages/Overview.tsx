@@ -5,13 +5,13 @@ import { Shield, TrendingUp, Clock, Eye, ArrowRight, Phone, Mail, Globe } from '
 
 const Overview: React.FC = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-6 py-8">
             {/* Business Card Container - Desktop: Card Proportions, Mobile: Full Screen */}
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, rotateY: -15 }}
                 animate={{ opacity: 1, scale: 1, rotateY: 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
-                className="w-full max-w-6xl mx-auto"
+                className="w-full max-w-5xl mx-auto"
             >
                 {/* Main Business Card */}
                 <div className="relative bg-gradient-to-br from-gray-900 to-black rounded-xl overflow-hidden business-card-shadow border border-gold/30">
@@ -36,7 +36,7 @@ const Overview: React.FC = () => {
                     </div>
 
                     {/* Card Content */}
-                    <div className="relative z-10 p-8 md:p-12">
+                    <div className="relative z-10 p-6 md:p-10 lg:p-12">
                         {/* Header Section - Logo & Company Name */}
                         <div className="text-center mb-8">
                             <motion.div
@@ -91,8 +91,8 @@ const Overview: React.FC = () => {
                             </div>
                             <div className="text-center p-4 luxury-glass rounded-lg backdrop-blur-sm">
                                 <Clock className="w-8 h-8 text-gold mx-auto mb-2" />
-                                <h3 className="text-xl font-bold text-white mb-1">6 Months</h3>
-                                <p className="text-gold/70 text-sm">Avg. Terms</p>
+                                <h3 className="text-xl font-bold text-white mb-1">12-24 Months</h3>
+                                <p className="text-gold/70 text-sm">Investment Tiers</p>
                             </div>
                             <div className="text-center p-4 luxury-glass rounded-lg backdrop-blur-sm">
                                 <Eye className="w-8 h-8 text-gold mx-auto mb-2" />
