@@ -5,7 +5,7 @@ import { Shield, TrendingUp, Clock, Eye, ArrowRight, Phone, Mail, Globe } from '
 
 const Overview: React.FC = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-6 py-8">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-6 py-8 pt-24 md:pt-32">
             {/* Business Card Container - Desktop: Card Proportions, Mobile: Full Screen */}
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, rotateY: -15 }}
@@ -91,7 +91,7 @@ const Overview: React.FC = () => {
                             </div>
                             <div className="text-center p-4 luxury-glass rounded-lg backdrop-blur-sm">
                                 <Clock className="w-8 h-8 text-gold mx-auto mb-2" />
-                                <h3 className="text-xl font-bold text-white mb-1">12-24 Months</h3>
+                                <h3 className="text-xl font-bold text-white mb-1">1-2 Years</h3>
                                 <p className="text-gold/70 text-sm">Investment Tiers</p>
                             </div>
                             <div className="text-center p-4 luxury-glass rounded-lg backdrop-blur-sm">
@@ -191,21 +191,6 @@ const Overview: React.FC = () => {
                         }}></div>
                     </div>
                 </div>
-
-                {/* QR Code Section - Like on Business Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 1.8 }}
-                    className="text-center mt-8"
-                >
-                    <p className="text-white/60 text-sm mb-2">Scan for instant access</p>
-                    <div className="inline-block p-3 bg-white rounded-lg">
-                        <div className="w-16 h-16 bg-black flex items-center justify-center">
-                            <span className="text-white text-xs font-mono">QR</span>
-                        </div>
-                    </div>
-                </motion.div>
             </motion.div>
         </div>
     );
