@@ -71,7 +71,7 @@ const Navbar: React.FC = () => {
       style={headerStyle}
       transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
     >
-      <div className="container px-4 md:px-6 mx-auto flex items-center justify-between max-w-full overflow-hidden">
+      <div className="container px-4 md:px-6 mx-auto flex items-center justify-between max-w-full">
         <Link to="/" className="flex items-center space-x-2 text-text-primary">
           <img
             src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
@@ -185,133 +185,132 @@ const Navbar: React.FC = () => {
             {isOpen ? <X className="h-6 w-6 text-text-primary" /> : <Menu className="h-6 w-6 text-text-primary" />}
           </button>
         </div>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isOpen && (
-            <>
-              {/* Mobile backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] md:hidden"
-                onClick={() => setIsOpen(false)}
-              />
-
-              {/* Right-sliding menu overlay */}
-              <motion.div
-                initial={{ x: "100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "100%" }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-                className={`fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] md:hidden z-[110] ${isHomePage ? 'bg-surface/98 backdrop-blur-lg' : 'bg-background/98 backdrop-blur-lg'
-                  } border-l border-graphite shadow-2xl overflow-hidden`}
-              >
-                {/* Header with close button on right */}
-                <div className="flex items-center justify-end px-6 py-4 border-b border-graphite/20 bg-inherit">
-                  <button
-                    className="flex items-center p-2 hover:bg-graphite/10 rounded-lg transition-colors"
-                    onClick={() => setIsOpen(false)}
-                    aria-label="Close Menu"
-                  >
-                    <X className="h-6 w-6 text-text-primary" />
-                  </button>
-                </div>
-
-                {/* Menu Content */}
-                <div className="px-6 py-4 h-full overflow-y-auto bg-inherit">
-                  <div className="flex flex-col space-y-1">
-                    <Link to="/"
-                      className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Home
-                    </Link>
-                    <Link to="/investor-info"
-                      className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Investor Info
-                    </Link>
-                    <Link to="/about"
-                      className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      About
-                    </Link>
-                    <Link to="/faq"
-                      className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      FAQ
-                    </Link>
-                    <Link to="/contact"
-                      className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Contact
-                    </Link>
-
-                    {/* User-specific mobile menu items */}
-                    {user && (
-                      <>
-                        <div className="py-2">
-                          <div className="w-full h-px bg-gold/30"></div>
-                        </div>
-                        <Link to="/pitch-deck"
-                          className="flex items-center gap-4 py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <FileText className="w-5 h-5" />
-                          Pitch Deck
-                        </Link>
-                        <button
-                          onClick={() => {
-                            setIsOpen(false);
-                            setShowNotificationModal(true);
-                          }}
-                          className="flex items-center justify-between py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors w-full text-left border-b border-graphite/20"
-                        >
-                          <div className="flex items-center gap-4">
-                            <Bell className="w-5 h-5" />
-                            Notifications
-                          </div>
-                          {unreadCount > 0 && (
-                            <div className="bg-red-500 text-white text-sm rounded-full w-6 h-6 flex items-center justify-center font-medium">
-                              {unreadCount > 9 ? '9+' : unreadCount}
-                            </div>
-                          )}
-                        </button>
-                        <Link to="/profile"
-                          className="flex items-center gap-4 py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <User className="w-5 h-5" />
-                          Profile
-                        </Link>
-                        <div className="py-2">
-                          <div className="w-full h-px bg-gold/30"></div>
-                        </div>
-                        <button
-                          onClick={() => {
-                            handleSignOut();
-                            setIsOpen(false);
-                          }}
-                          className="flex items-center gap-4 py-4 text-lg font-medium text-red-500 hover:text-red-400 transition-colors w-full text-left"
-                        >
-                          <LogOut className="w-5 h-5" />
-                          Sign Out
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
       </div>
+
+      {/* Mobile Menu - Moved outside header container */}
+      <AnimatePresence>
+        {isOpen && (
+          <>              {/* Mobile backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] md:hidden"
+              onClick={() => setIsOpen(false)}
+            />
+
+            {/* Right-sliding menu overlay */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className={`fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] md:hidden z-[9999] ${isHomePage ? 'bg-surface/98 backdrop-blur-lg' : 'bg-background/98 backdrop-blur-lg'
+                } border-l border-graphite shadow-2xl overflow-hidden`}
+            >
+              {/* Header with close button on right */}
+              <div className="flex items-center justify-end px-6 py-4 border-b border-graphite/20 bg-inherit">
+                <button
+                  className="flex items-center p-2 hover:bg-graphite/10 rounded-lg transition-colors"
+                  onClick={() => setIsOpen(false)}
+                  aria-label="Close Menu"
+                >
+                  <X className="h-6 w-6 text-text-primary" />
+                </button>
+              </div>
+
+              {/* Menu Content */}
+              <div className="px-6 py-4 h-full overflow-y-auto bg-inherit">
+                <div className="flex flex-col space-y-1">
+                  <Link to="/"
+                    className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Home
+                  </Link>
+                  <Link to="/investor-info"
+                    className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Investor Info
+                  </Link>
+                  <Link to="/about"
+                    className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    About
+                  </Link>
+                  <Link to="/faq"
+                    className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    FAQ
+                  </Link>
+                  <Link to="/contact"
+                    className="block py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Contact
+                  </Link>
+
+                  {/* User-specific mobile menu items */}
+                  {user && (
+                    <>
+                      <div className="py-2">
+                        <div className="w-full h-px bg-gold/30"></div>
+                      </div>
+                      <Link to="/pitch-deck"
+                        className="flex items-center gap-4 py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <FileText className="w-5 h-5" />
+                        Pitch Deck
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setIsOpen(false);
+                          setShowNotificationModal(true);
+                        }}
+                        className="flex items-center justify-between py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors w-full text-left border-b border-graphite/20"
+                      >
+                        <div className="flex items-center gap-4">
+                          <Bell className="w-5 h-5" />
+                          Notifications
+                        </div>
+                        {unreadCount > 0 && (
+                          <div className="bg-red-500 text-white text-sm rounded-full w-6 h-6 flex items-center justify-center font-medium">
+                            {unreadCount > 9 ? '9+' : unreadCount}
+                          </div>
+                        )}
+                      </button>
+                      <Link to="/profile"
+                        className="flex items-center gap-4 py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <User className="w-5 h-5" />
+                        Profile
+                      </Link>
+                      <div className="py-2">
+                        <div className="w-full h-px bg-gold/30"></div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          handleSignOut();
+                          setIsOpen(false);
+                        }}
+                        className="flex items-center gap-4 py-4 text-lg font-medium text-red-500 hover:text-red-400 transition-colors w-full text-left"
+                      >
+                        <LogOut className="w-5 h-5" />
+                        Sign Out
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Notification Modal */}
       <NotificationModal
