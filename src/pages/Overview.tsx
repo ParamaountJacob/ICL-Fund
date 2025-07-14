@@ -212,5 +212,3 @@ const Overview: React.FC = () => {
 };
 
 export default Overview;
-
-export default Overview;
