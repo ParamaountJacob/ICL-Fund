@@ -49,10 +49,10 @@ const Navbar: React.FC = () => {
   // Determine if this is the home page
   const isHomePage = pathname === '/';
 
-  // Get scroll-based transform for smooth sliding - clamped to prevent overshoot
+  // Get scroll-based transform for smooth sliding - adjusted thresholds to prevent clipping
   const { scrollY } = useScroll();
-  const headerY = useTransform(scrollY, [650, 1150], [-80, 0], { clamp: true });
-  const headerOpacity = useTransform(scrollY, [650, 1150], [0, 1], { clamp: true });
+  const headerY = useTransform(scrollY, [500, 800], [-60, 0], { clamp: true });
+  const headerOpacity = useTransform(scrollY, [500, 800], [0, 1], { clamp: true });
 
   // Header should slide smoothly based on scroll position
   const headerClasses = isHomePage
@@ -61,14 +61,15 @@ const Navbar: React.FC = () => {
 
   const headerStyle = isHomePage ? {
     y: headerY,
-    opacity: headerOpacity
+    opacity: headerOpacity,
+    willChange: 'transform, opacity'
   } : {};
 
   return (
     <motion.header
       className={headerClasses}
       style={headerStyle}
-      transition={{ type: "spring", stiffness: 400, damping: 40 }}
+      transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
     >
       <div className="container px-4 md:px-6 mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2 text-text-primary">

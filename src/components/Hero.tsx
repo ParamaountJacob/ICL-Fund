@@ -16,11 +16,11 @@ const Hero: React.FC = () => {
     <motion.section
       id="home"
       className="h-screen flex items-center justify-center relative overflow-hidden"
-      style={{ position: 'fixed', width: '100%', height: '100vh', top: 0, zIndex: 1 }}
+      style={{ position: 'fixed', width: '100%', height: '100vh', top: 0, zIndex: 1, willChange: 'transform' }}
     >
       <motion.div
         className="absolute inset-0 z-0"
-        style={{ scale }}
+        style={{ scale, willChange: 'transform' }}
       >
         <video
           autoPlay
@@ -45,7 +45,8 @@ const Hero: React.FC = () => {
         style={{
           y: useTransform(scrollY, [0, 600], [0, -80]),
           opacity: useTransform(scrollY, [0, 500], [1, 0]),
-          scale: useTransform(scrollY, [0, 600], [1, 0.6])
+          scale: useTransform(scrollY, [0, 600], [1, 0.6]),
+          willChange: 'transform'
         }}
       >
         <motion.div
@@ -69,7 +70,8 @@ const Hero: React.FC = () => {
         style={{
           y,
           opacity,
-          scale: useTransform(scrollY, [0, 400], [1, 1.02])
+          scale: useTransform(scrollY, [0, 400], [1, 1.02]),
+          willChange: 'transform'
         }}
       >
         <div>
