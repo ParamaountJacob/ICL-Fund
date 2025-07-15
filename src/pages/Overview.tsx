@@ -73,7 +73,7 @@ const Overview: React.FC = () => {
                 className="hidden"
                 aria-hidden="true"
             >
-                <source src="https://res.cloudinary.com/digjsdron/video/upload/v1752517183/TempVid-1_vzn8mn.mp4" type="video/mp4" />
+                <source src="https://res.cloudinary.com/digjsdron/video/upload/v1752590378/Homescreen_q1odxc.mp4" type="video/mp4" />
             </video>
 
             {/* Page Transition Overlay */}
