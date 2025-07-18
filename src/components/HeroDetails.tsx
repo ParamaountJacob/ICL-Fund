@@ -79,7 +79,7 @@ const HeroDetails: React.FC = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="flex flex-col sm:flex-row gap-6 justify-center relative"
+                        className="flex flex-col items-center sm:flex-row gap-6 justify-center relative"
                     >
                         {/* Golden glow behind buttons */}
                         <div className="absolute inset-0 bg-gold/5 rounded-lg blur-2xl transform scale-150"></div>
