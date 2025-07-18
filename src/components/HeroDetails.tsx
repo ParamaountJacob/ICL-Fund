@@ -79,66 +79,30 @@ const HeroDetails: React.FC = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="flex flex-col sm:flex-row gap-6 justify-center relative mb-12"
+                        className="flex flex-col sm:flex-row gap-6 justify-center items-center relative mb-16"
                     >
                         {/* Golden glow behind buttons */}
                         <div className="absolute inset-0 bg-gold/5 rounded-lg blur-2xl transform scale-150"></div>
 
                         <button
                             onClick={() => navigate('/contact', { state: { consultation: true } })}
-                            className="button text-lg px-8 py-4 relative z-10"
+                            className="button text-lg px-8 py-4 relative z-10 w-full sm:w-auto sm:min-w-[240px]"
                         >
                             Schedule Free Consultation
                         </button>
-                        <a href="#unlock" className="button-gold text-lg px-8 py-4 relative z-10">
+                        <a href="#unlock" className="button-gold text-lg px-8 py-4 relative z-10 w-full sm:w-auto sm:min-w-[240px]">
                             Learn More
                         </a>
                     </motion.div>
 
-                    {/* Safety Button with Scroll Indicator */}
+                    {/* Discover More Below with Arrow */}
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                         transition={{ duration: 0.8, delay: 0.6 }}
-                        className="flex flex-col items-center justify-center space-y-6"
+                        className="flex flex-col items-center justify-center space-y-4 mt-8"
                     >
-                        {/* Safety Button */}
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => navigate('/overview')}
-                            className="flex items-center space-x-3 px-6 py-3 bg-surface/50 border border-gold/30 rounded-lg hover:border-gold/50 hover:bg-surface/70 transition-all duration-300 group"
-                        >
-                            <span className="text-gold/90 font-medium">Explore Our Safety Framework</span>
-                            <motion.div
-                                animate={{
-                                    y: [0, 4, 0],
-                                }}
-                                transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    ease: "easeInOut"
-                                }}
-                            >
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    className="text-gold/70 group-hover:text-gold transition-colors"
-                                >
-                                    <path
-                                        d="M7 10L12 15L17 10"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-                            </motion.div>
-                        </motion.button>
-
-                        {/* Subtle continuation hint */}
+                        {/* Discover more text */}
                         <motion.p
                             animate={{ opacity: [0.4, 0.7, 0.4] }}
                             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -146,6 +110,35 @@ const HeroDetails: React.FC = () => {
                         >
                             Discover more below
                         </motion.p>
+
+                        {/* Pulsing down arrow */}
+                        <motion.div
+                            animate={{
+                                y: [0, 6, 0],
+                                opacity: [0.5, 1, 0.5]
+                            }}
+                            transition={{
+                                duration: 2.5,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }}
+                        >
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                className="text-gold/60"
+                            >
+                                <path
+                                    d="M7 10L12 15L17 10"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </motion.div>
                     </motion.div>
                 </div>
             </div>
