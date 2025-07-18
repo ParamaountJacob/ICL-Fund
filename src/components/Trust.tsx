@@ -63,51 +63,6 @@ const Trust: React.FC = () => {
             </p>
           </motion.div>
         </div>
-
-        {/* Clean Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="flex flex-col items-center justify-center mt-16 mb-8"
-        >
-          <motion.p
-            animate={{ opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="text-gold/70 text-sm tracking-widest uppercase font-light mb-4"
-          >
-            Scroll to Explore
-          </motion.p>
-
-          <motion.div
-            animate={{
-              y: [0, 8, 0],
-              opacity: [0.7, 1, 0.7]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="relative"
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              className="text-gold"
-            >
-              <path
-                d="M7 10L12 15L17 10"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </motion.div>
-        </motion.div>
       </div>
     </section>
   );
