@@ -314,10 +314,10 @@ const Overview: React.FC = () => {
                             Scroll to Explore
                         </motion.p>
 
-                        {/* Animated chevron */}
+                        {/* Animated stability icon */}
                         <motion.div
                             animate={{
-                                y: [0, 8, 0],
+                                scale: [1, 1.1, 1],
                                 opacity: [0.7, 1, 0.7]
                             }}
                             transition={{
@@ -327,10 +327,10 @@ const Overview: React.FC = () => {
                             }}
                             className="relative"
                         >
-                            {/* Glow effect behind chevron */}
+                            {/* Glow effect behind icon */}
                             <div className="absolute inset-0 bg-gold/20 blur-md rounded-full w-8 h-8 -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"></div>
 
-                            {/* Chevron icon */}
+                            {/* Shield/Stability icon */}
                             <svg
                                 width="24"
                                 height="24"
@@ -339,16 +339,24 @@ const Overview: React.FC = () => {
                                 className="text-gold relative z-10"
                             >
                                 <path
-                                    d="M7 10L12 15L17 10"
+                                    d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"
                                     stroke="currentColor"
-                                    strokeWidth="2"
+                                    strokeWidth="1.5"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
+                                    fill="currentColor"
+                                    fillOpacity="0.1"
+                                />
+                                <circle
+                                    cx="12"
+                                    cy="12"
+                                    r="3"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                    fill="none"
                                 />
                             </svg>
-                        </motion.div>
-
-                        {/* Subtle line indicator */}
+                        </motion.div>                        {/* Subtle line indicator */}
                         <motion.div
                             animate={{ scaleY: [0.5, 1, 0.5] }}
                             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
