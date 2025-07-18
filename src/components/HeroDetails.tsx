@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useInView, motion } from 'framer-motion';
-import { CircleDollarSign, FileText, Wallet } from 'lucide-react';
+import { CircleDollarSign, FileText, Wallet, TrendingUp, Shield, Settings, Users, Gem } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const HeroDetails: React.FC = () => {
@@ -110,13 +110,13 @@ const HeroDetails: React.FC = () => {
                             <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-gold/10 to-gold/5 rounded-2xl blur-xl transform scale-110"></div>
 
                             {/* Navigation Pills */}
-                            <div className="relative flex flex-wrap justify-center gap-3 p-4 bg-surface/30 backdrop-blur-md border border-gold/20 rounded-2xl">
+                            <div className="relative flex flex-col sm:flex-row sm:flex-wrap justify-center gap-3 p-4 bg-surface/30 backdrop-blur-md border border-gold/20 rounded-2xl max-w-2xl mx-auto">
                                 {[
-                                    { label: 'Returns', anchor: '#returns', icon: '📈' },
-                                    { label: 'Security', anchor: '#security', icon: '🛡️' },
-                                    { label: 'Process', anchor: '#process', icon: '⚙️' },
-                                    { label: 'Leadership', anchor: '#leadership', icon: '👔' },
-                                    { label: 'Investment', anchor: '#investment', icon: '💎' }
+                                    { label: 'Returns', anchor: '#returns', Icon: TrendingUp },
+                                    { label: 'Security', anchor: '#security', Icon: Shield },
+                                    { label: 'Process', anchor: '#process', Icon: Settings },
+                                    { label: 'Leadership', anchor: '#leadership', Icon: Users },
+                                    { label: 'Investment', anchor: '#investment', Icon: Gem }
                                 ].map((item, index) => (
                                     <motion.a
                                         key={item.label}
@@ -125,21 +125,19 @@ const HeroDetails: React.FC = () => {
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ duration: 0.4, delay: 0.8 + (index * 0.1) }}
                                         whileHover={{
-                                            scale: 1.05,
+                                            scale: 1.02,
                                             backgroundColor: 'rgba(212, 175, 55, 0.1)'
                                         }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="group flex items-center space-x-2 px-4 py-3 bg-surface/40 hover:bg-surface/60 border border-gold/30 hover:border-gold/60 rounded-xl transition-all duration-300 backdrop-blur-sm"
+                                        whileTap={{ scale: 0.98 }}
+                                        className="group flex items-center justify-center sm:justify-start space-x-3 px-6 py-4 bg-surface/40 hover:bg-surface/60 border border-gold/30 hover:border-gold/60 rounded-xl transition-all duration-300 backdrop-blur-sm relative overflow-hidden"
                                     >
-                                        <span className="text-lg group-hover:scale-110 transition-transform duration-300">
-                                            {item.icon}
-                                        </span>
+                                        <item.Icon className="w-5 h-5 text-gold/80 group-hover:text-gold transition-colors duration-300" strokeWidth={1.5} />
                                         <span className="text-gold/90 group-hover:text-gold font-medium text-sm tracking-wide">
                                             {item.label}
                                         </span>
 
                                         {/* Subtle shine effect on hover */}
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                     </motion.a>
                                 ))}
                             </div>
