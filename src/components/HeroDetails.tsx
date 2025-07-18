@@ -110,7 +110,7 @@ const HeroDetails: React.FC = () => {
                             <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-gold/10 to-gold/5 rounded-2xl blur-xl transform scale-110"></div>
 
                             {/* Navigation Pills */}
-                            <div className="relative flex flex-col sm:flex-row sm:flex-wrap justify-center gap-4 p-6 bg-surface/30 backdrop-blur-md border border-gold/20 rounded-2xl max-w-4xl mx-auto">
+                            <div className="relative flex flex-col sm:flex-row sm:flex-wrap justify-center gap-5 p-8 bg-surface/30 backdrop-blur-md border border-gold/20 rounded-2xl max-w-5xl mx-auto">
                                 {[
                                     { label: 'Returns', anchor: '#returns', Icon: TrendingUp },
                                     { label: 'Security', anchor: '#security', Icon: Shield },
@@ -129,7 +129,7 @@ const HeroDetails: React.FC = () => {
                                             backgroundColor: 'rgba(212, 175, 55, 0.1)'
                                         }}
                                         whileTap={{ scale: 0.98 }}
-                                        className="group flex items-center justify-center sm:justify-start space-x-3 px-8 py-5 bg-surface/40 hover:bg-surface/60 border border-gold/30 hover:border-gold/60 rounded-xl transition-all duration-300 backdrop-blur-sm relative overflow-hidden min-w-[140px] sm:min-w-[160px]"
+                                        className="group flex items-center justify-center sm:justify-start space-x-4 px-10 py-6 bg-surface/40 hover:bg-surface/60 border border-gold/30 hover:border-gold/60 rounded-xl transition-all duration-300 backdrop-blur-sm relative overflow-hidden min-w-[160px] sm:min-w-[200px]"
                                     >
                                         <item.Icon className="w-5 h-5 text-gold/80 group-hover:text-gold transition-colors duration-300" strokeWidth={1.5} />
                                         <span className="text-gold/90 group-hover:text-gold font-medium text-sm tracking-wide">
