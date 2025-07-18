@@ -112,11 +112,11 @@ const HeroDetails: React.FC = () => {
                             {/* Navigation Pills */}
                             <div className="relative flex flex-col sm:flex-row sm:flex-wrap justify-center gap-5 p-8 bg-surface/30 backdrop-blur-md border border-gold/20 rounded-2xl max-w-5xl mx-auto">
                                 {[
-                                    { label: 'Returns', anchor: '#returns', Icon: TrendingUp },
+                                    { label: 'About', anchor: '#unlock', Icon: TrendingUp },
                                     { label: 'Security', anchor: '#security', Icon: Shield },
                                     { label: 'Process', anchor: '#process', Icon: Settings },
                                     { label: 'Leadership', anchor: '#leadership', Icon: Users },
-                                    { label: 'Investment', anchor: '#investment', Icon: Gem }
+                                    { label: 'Investors', anchor: '#investor', Icon: Gem }
                                 ].map((item, index) => (
                                     <motion.a
                                         key={item.label}
@@ -129,7 +129,7 @@ const HeroDetails: React.FC = () => {
                                             backgroundColor: 'rgba(212, 175, 55, 0.1)'
                                         }}
                                         whileTap={{ scale: 0.98 }}
-                                        className="group flex items-center justify-center sm:justify-start space-x-4 px-10 py-6 bg-surface/40 hover:bg-surface/60 border border-gold/30 hover:border-gold/60 rounded-xl transition-all duration-300 backdrop-blur-sm relative overflow-hidden min-w-[160px] sm:min-w-[200px]"
+                                        className="group flex items-center justify-center sm:justify-start space-x-4 px-12 py-7 bg-surface/40 hover:bg-surface/60 border border-gold/30 hover:border-gold/60 rounded-xl transition-all duration-300 backdrop-blur-sm relative overflow-hidden min-w-[180px] sm:min-w-[220px] text-lg"
                                     >
                                         <item.Icon className="w-5 h-5 text-gold/80 group-hover:text-gold transition-colors duration-300" strokeWidth={1.5} />
                                         <span className="text-gold/90 group-hover:text-gold font-medium text-sm tracking-wide">

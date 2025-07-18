@@ -6,7 +6,7 @@ const Leadership: React.FC = () => {
   const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
 
   return (
-    <section className="py-12 md:py-32 bg-premium-gradient from-surface to-background bg-premium-pattern">
+    <section id="leadership" className="py-12 md:py-32 bg-premium-gradient from-surface to-background bg-premium-pattern">
       <div className="section" ref={sectionRef}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
