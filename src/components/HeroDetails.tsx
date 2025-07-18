@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useInView, motion } from 'framer-motion';
-import { CircleDollarSign, FileText, Wallet, TrendingUp, Shield, Settings, Users, Gem } from 'lucide-react';
+import { CircleDollarSign, FileText, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const HeroDetails: React.FC = () => {
@@ -97,61 +97,50 @@ const HeroDetails: React.FC = () => {
                         </div>
                     </motion.div>
 
-                    {/* Ultra-Premium Navigation Pills */}
+                    {/* Discover More Below with Arrow */}
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                         transition={{ duration: 0.8, delay: 0.6 }}
-                        className="flex flex-col items-center justify-center space-y-8 mt-8"
+                        className="flex flex-col items-center justify-center space-y-4 mt-8"
                     >
-                        {/* Navigation Container */}
-                        <div className="relative">
-                            {/* Elegant background glow */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-gold/10 to-gold/5 rounded-2xl blur-xl transform scale-110"></div>
-
-                            {/* Navigation Pills */}
-                            <div className="relative flex flex-col sm:flex-row sm:flex-wrap justify-center gap-5 p-8 bg-surface/30 backdrop-blur-md border border-gold/20 rounded-2xl max-w-5xl mx-auto">
-                                {[
-                                    { label: 'About', anchor: '#unlock', Icon: TrendingUp },
-                                    { label: 'Security', anchor: '#security', Icon: Shield },
-                                    { label: 'Process', anchor: '#process', Icon: Settings },
-                                    { label: 'Leadership', anchor: '#leadership', Icon: Users },
-                                    { label: 'Investors', anchor: '#investor', Icon: Gem }
-                                ].map((item, index) => (
-                                    <motion.a
-                                        key={item.label}
-                                        href={item.anchor}
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ duration: 0.4, delay: 0.8 + (index * 0.1) }}
-                                        whileHover={{
-                                            scale: 1.02,
-                                            backgroundColor: 'rgba(212, 175, 55, 0.1)'
-                                        }}
-                                        whileTap={{ scale: 0.98 }}
-                                        className="group flex items-center justify-center sm:justify-start space-x-4 px-12 py-7 bg-surface/40 hover:bg-surface/60 border border-gold/30 hover:border-gold/60 rounded-xl transition-all duration-300 backdrop-blur-sm relative overflow-hidden min-w-[180px] sm:min-w-[220px] text-lg"
-                                    >
-                                        <item.Icon className="w-5 h-5 text-gold/80 group-hover:text-gold transition-colors duration-300" strokeWidth={1.5} />
-                                        <span className="text-gold/90 group-hover:text-gold font-medium text-sm tracking-wide">
-                                            {item.label}
-                                        </span>
-
-                                        {/* Subtle shine effect on hover */}
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    </motion.a>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Elegant subtitle */}
+                        {/* Discover more text */}
                         <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 1.3 }}
-                            className="text-text-secondary/70 text-sm tracking-widest uppercase font-light"
+                            animate={{ opacity: [0.4, 0.7, 0.4] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                            className="text-text-secondary/60 text-sm tracking-wide"
                         >
-                            Explore Our Framework
+                            Discover more below
                         </motion.p>
+
+                        {/* Pulsing down arrow */}
+                        <motion.div
+                            animate={{
+                                y: [0, 6, 0],
+                                opacity: [0.5, 1, 0.5]
+                            }}
+                            transition={{
+                                duration: 2.5,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }}
+                        >
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                className="text-gold/60"
+                            >
+                                <path
+                                    d="M7 10L12 15L17 10"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </motion.div>
                     </motion.div>
                 </div>
             </div>

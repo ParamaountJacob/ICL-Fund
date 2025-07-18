@@ -7,7 +7,7 @@ const Trust: React.FC = () => {
   const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
 
   return (
-    <section id="security" className="py-12 md:py-24 bg-premium-gradient from-surface to-background bg-premium-pattern relative overflow-hidden">
+    <section className="py-12 md:py-24 bg-premium-gradient from-surface to-background bg-premium-pattern relative overflow-hidden">
       <div className="section" ref={sectionRef}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
