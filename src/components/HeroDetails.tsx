@@ -79,20 +79,22 @@ const HeroDetails: React.FC = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="flex flex-col sm:flex-row gap-6 justify-center items-center relative mb-16"
+                        className="relative mb-16"
                     >
                         {/* Golden glow behind buttons */}
                         <div className="absolute inset-0 bg-gold/5 rounded-lg blur-2xl transform scale-150"></div>
 
-                        <button
-                            onClick={() => navigate('/contact', { state: { consultation: true } })}
-                            className="button text-lg px-8 py-4 relative z-10 w-full sm:w-auto sm:min-w-[240px]"
-                        >
-                            Schedule Free Consultation
-                        </button>
-                        <a href="#unlock" className="button-gold text-lg px-8 py-4 relative z-10 w-full sm:w-auto sm:min-w-[240px]">
-                            Learn More
-                        </a>
+                        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                            <button
+                                onClick={() => navigate('/contact', { state: { consultation: true } })}
+                                className="button text-lg px-8 py-4 relative z-10 w-full max-w-xs sm:w-auto sm:min-w-[240px]"
+                            >
+                                Schedule Free Consultation
+                            </button>
+                            <a href="#unlock" className="button-gold text-lg px-8 py-4 relative z-10 w-full max-w-xs sm:w-auto sm:min-w-[240px] text-center">
+                                Learn More
+                            </a>
+                        </div>
                     </motion.div>
 
                     {/* Discover More Below with Arrow */}
