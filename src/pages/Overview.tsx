@@ -250,7 +250,7 @@ const Overview: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex space-x-3">
+                                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 items-center justify-center md:justify-end">
                                     <Link
                                         to="/contact"
                                         className="px-6 py-2 bg-gradient-to-r from-gold to-yellow-600 text-black font-semibold text-sm rounded-lg hover:from-yellow-600 hover:to-gold transition-all duration-300 shadow-lg"
@@ -289,6 +289,73 @@ const Overview: React.FC = () => {
                         }}></div>
                     </div>
                 </div>
+
+                {/* Premium Scroll Indicator - Only visible when detailed section is hidden */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{
+                        opacity: !showDetailedSection ? 1 : 0,
+                        y: !showDetailedSection ? 0 : 20
+                    }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="relative flex flex-col items-center justify-center mt-8 mb-4"
+                >
+                    {/* Subtle background glow */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gold/5 to-transparent blur-xl"></div>
+
+                    {/* Main indicator container */}
+                    <div className="relative flex flex-col items-center space-y-3">
+                        {/* Elegant text hint */}
+                        <motion.p
+                            animate={{ opacity: [0.6, 1, 0.6] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                            className="text-gold/70 text-xs tracking-widest uppercase font-light"
+                        >
+                            Scroll to Explore
+                        </motion.p>
+
+                        {/* Animated chevron */}
+                        <motion.div
+                            animate={{
+                                y: [0, 8, 0],
+                                opacity: [0.7, 1, 0.7]
+                            }}
+                            transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }}
+                            className="relative"
+                        >
+                            {/* Glow effect behind chevron */}
+                            <div className="absolute inset-0 bg-gold/20 blur-md rounded-full w-8 h-8 -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"></div>
+
+                            {/* Chevron icon */}
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                className="text-gold relative z-10"
+                            >
+                                <path
+                                    d="M7 10L12 15L17 10"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </motion.div>
+
+                        {/* Subtle line indicator */}
+                        <motion.div
+                            animate={{ scaleY: [0.5, 1, 0.5] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                            className="w-px h-8 bg-gradient-to-b from-gold/40 via-gold/20 to-transparent"
+                        ></motion.div>
+                    </div>
+                </motion.div>
 
                 {/* Clear Separator */}
                 <motion.div
