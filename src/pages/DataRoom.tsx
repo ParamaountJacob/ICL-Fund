@@ -32,10 +32,20 @@ export default function DataRoom() {
         else setFiles(data ?? []);
     }
 
+    function sanitizeFileName(name: string): string {
+        // Remove or replace problematic characters
+        return name
+            .replace(/[^\w\s.-]/g, '') // Remove special chars except spaces, dots, hyphens
+            .replace(/\s+/g, '_') // Replace spaces with underscores
+            .replace(/_{2,}/g, '_') // Replace multiple underscores with single
+            .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+    }
+
     async function uploadFile(file: File) {
         setUploading(true);
         setError('');
-        const fileName = `${Date.now()}_${file.name}`;
+        const sanitizedName = sanitizeFileName(file.name);
+        const fileName = `${Date.now()}_${sanitizedName}`;
         const { error } = await supabase.storage.from(BUCKET).upload(fileName, file, { upsert: true });
         setUploading(false);
         if (error) setError(error.message);
