@@ -654,23 +654,23 @@ export default function DataRoom() {
                 {/* Hero Content */}
                 <div className="text-center z-10 max-w-4xl mx-auto px-8">
                     <div className="animate-fadeIn">
-                        <h1 className="text-8xl md:text-9xl font-bold text-gold mb-6 tracking-wider">
-                            DATA ROOM
+                        <h1 className="text-4xl md:text-5xl font-semibold text-gold mb-4 tracking-wide">
+                            ICL Data Room
                         </h1>
-                        <p className="text-2xl md:text-3xl text-white/80 mb-8 font-light tracking-wide">
+                        <p className="text-lg md:text-xl text-white/70 mb-6 font-light tracking-wide">
                             Secure Repository for Inner Circle Lending
                         </p>
-                        <div className="flex items-center justify-center gap-8 text-white/70 text-lg font-medium">
+                        <div className="flex items-center justify-center gap-6 text-white/60 text-sm font-medium">
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                                <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
                                 <span>Secure</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-gold rounded-full"></div>
+                                <div className="w-1.5 h-1.5 bg-gold rounded-full"></div>
                                 <span>Encrypted</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
                                 <span>Private</span>
                             </div>
                         </div>
