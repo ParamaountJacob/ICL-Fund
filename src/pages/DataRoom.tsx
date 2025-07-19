@@ -648,7 +648,7 @@ export default function DataRoom() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+        <div className="min-h-screen bg-black">
             {/* Premium Hero Section */}
             <div className="relative min-h-screen flex items-center justify-center hero-grid overflow-hidden">
                 {/* Simplified Connection Lines */}
@@ -701,7 +701,7 @@ export default function DataRoom() {
             </div>
 
             {/* Main Data Room Content */}
-            <div className="bg-black/40 backdrop-blur-md">
+            <div className="bg-black">
                 <div className="max-w-6xl mx-auto p-8">
                     <div className="flex justify-between items-center mb-8">
                         <div>
