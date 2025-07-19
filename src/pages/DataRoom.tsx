@@ -562,7 +562,7 @@ export default function DataRoom() {
                     <div className="flex justify-between items-center mb-8">
                         <div>
                             <h1 className="text-2xl sm:text-3xl font-bold text-gold tracking-wide">ICL Data Room</h1>
-                            <p className="text-white/60 text-sm sm:text-base">Secure Repository for Inner Circle Lending</p>
+                            <p className="text-white/60 text-sm sm:text-base">Secure Repository</p>
                         </div>
                         <button
                             onClick={() => setAuthenticated(false)}
