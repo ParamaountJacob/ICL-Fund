@@ -18,46 +18,14 @@ const styles = `
     }
   }
 
-  .hero-grid {
-    background-image: 
-      linear-gradient(rgba(255, 215, 0, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 215, 0, 0.05) 1px, transparent 1px);
-    background-size: 80px 80px;
-    animation: gridMove 30s linear infinite;
-  }
-
-  @keyframes gridMove {
-    0% { background-position: 0 0; }
-    100% { background-position: 80px 80px; }
-  }
-
-  .connection-line {
-    position: absolute;
-    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
-    height: 1px;
-    animation: pulse 4s ease-in-out infinite;
-  }
-
-  .connection-line:nth-child(1) { top: 30%; left: 15%; width: 120px; animation-delay: 0s; }
-  .connection-line:nth-child(2) { top: 70%; right: 20%; width: 100px; animation-delay: 2s; }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 0.2; transform: scaleX(0.9); }
-    50% { opacity: 0.6; transform: scaleX(1.1); }
-  }
-
-  .data-node {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: rgba(255, 215, 0, 0.6);
-    border-radius: 50%;
-    animation: glow 3s ease-in-out infinite alternate;
-  }
-
-  @keyframes glow {
-    from { box-shadow: 0 0 2px rgba(255, 215, 0, 0.3); }
-    to { box-shadow: 0 0 8px rgba(255, 215, 0, 0.6); }
+  .sophisticated-bg {
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(255, 215, 0, 0.02) 0%, transparent 50%),
+      linear-gradient(135deg, rgba(255, 215, 0, 0.01) 0%, transparent 50%, rgba(255, 215, 0, 0.01) 100%),
+      #000000;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   }
 
   .scroll-indicator {
@@ -648,19 +616,19 @@ export default function DataRoom() {
     }
 
     return (
-        <div className="min-h-screen bg-black">
+        <div className="min-h-screen sophisticated-bg">
             {/* Premium Hero Section */}
-            <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+            <div className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
                 {/* Hero Content */}
-                <div className="text-center z-10 max-w-4xl mx-auto px-8">
+                <div className="text-center z-10 w-full max-w-4xl mx-auto">
                     <div className="animate-fadeIn">
-                        <h1 className="text-4xl md:text-5xl font-semibold text-gold mb-4 tracking-wide">
+                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-gold mb-3 sm:mb-4 tracking-wide">
                             ICL Data Room
                         </h1>
-                        <p className="text-lg md:text-xl text-white/70 mb-6 font-light tracking-wide">
+                        <p className="text-base sm:text-lg lg:text-xl text-white/70 mb-4 sm:mb-6 font-light tracking-wide px-4">
                             Secure Repository for Inner Circle Lending
                         </p>
-                        <div className="flex items-center justify-center gap-6 text-white/60 text-sm font-medium">
+                        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-white/60 text-xs sm:text-sm font-medium">
                             <div className="flex items-center gap-2">
                                 <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
                                 <span>Secure</span>
@@ -678,42 +646,42 @@ export default function DataRoom() {
                 </div>
 
                 {/* Scroll Indicator */}
-                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center">
-                    <div className="text-white/50 mb-2 text-sm tracking-wide">Scroll to Access</div>
-                    <div className="scroll-indicator text-gold text-xl">⬇</div>
+                <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 text-center">
+                    <div className="text-white/50 mb-1 sm:mb-2 text-xs sm:text-sm tracking-wide">Scroll to Access</div>
+                    <div className="scroll-indicator text-gold text-lg sm:text-xl">⬇</div>
                 </div>
 
                 {/* Exit Button */}
                 <button
                     onClick={() => setAuthenticated(false)}
-                    className="absolute top-8 right-8 text-red-400/60 hover:text-red-400 transition-colors duration-200 text-sm flex items-center gap-2 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-xl border border-red-400/20 hover:border-red-400/40"
+                    className="absolute top-4 sm:top-6 lg:top-8 right-4 sm:right-6 lg:right-8 text-red-400/60 hover:text-red-400 transition-colors duration-200 text-xs sm:text-sm flex items-center gap-1 sm:gap-2 bg-black/30 backdrop-blur-sm px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-red-400/20 hover:border-red-400/40"
                 >
-                    🚪 Exit Room
+                    🚪 <span className="hidden sm:inline">Exit Room</span>
                 </button>
             </div>
 
             {/* Main Data Room Content */}
             <div className="bg-black">
-                <div className="max-w-6xl mx-auto p-8">
-                    <div className="flex justify-between items-center mb-8">
+                <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
                         <div>
-                            <h2 className="text-3xl font-bold text-gold mb-2 tracking-wide">Investment Materials</h2>
-                            <p className="text-white/60 text-lg">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-gold mb-1 sm:mb-2 tracking-wide">Investment Materials</h2>
+                            <p className="text-white/60 text-base sm:text-lg">
                                 Access documentation and resources for qualified investors.
                             </p>
                         </div>
-                        <div className="text-right">
-                            <div className="text-sm text-white/50 mb-1">Total Files: {files.length}</div>
+                        <div className="text-left sm:text-right">
+                            <div className="text-xs sm:text-sm text-white/50 mb-1">Total Files: {files.length}</div>
                             <div className="text-xs text-gold/70">Last Updated: {new Date().toLocaleDateString()}</div>
                         </div>
                     </div>
 
                     {/* Navigation */}
-                    <div className="mb-8 border-b border-gold/20">
-                        <div className="flex gap-8">
+                    <div className="mb-6 sm:mb-8 border-b border-gold/20">
+                        <div className="flex gap-4 sm:gap-6 lg:gap-8 overflow-x-auto">
                             <button
                                 onClick={() => setCurrentPage('documents')}
-                                className={`pb-4 px-2 text-base font-medium transition-all duration-300 ${currentPage === 'documents'
+                                className={`pb-3 sm:pb-4 px-1 sm:px-2 text-sm sm:text-base font-medium transition-all duration-300 whitespace-nowrap ${currentPage === 'documents'
                                     ? 'text-gold border-b-2 border-gold'
                                     : 'text-white/60 hover:text-white/90'
                                     }`}
@@ -722,7 +690,7 @@ export default function DataRoom() {
                             </button>
                             <button
                                 onClick={() => setCurrentPage('faq')}
-                                className={`pb-4 px-2 text-base font-medium transition-all duration-300 ${currentPage === 'faq'
+                                className={`pb-3 sm:pb-4 px-1 sm:px-2 text-sm sm:text-base font-medium transition-all duration-300 whitespace-nowrap ${currentPage === 'faq'
                                     ? 'text-gold border-b-2 border-gold'
                                     : 'text-white/60 hover:text-white/90'
                                     }`}
@@ -731,7 +699,7 @@ export default function DataRoom() {
                             </button>
                             <button
                                 onClick={() => setCurrentPage('guide')}
-                                className={`pb-4 px-2 text-base font-medium transition-all duration-300 ${currentPage === 'guide'
+                                className={`pb-3 sm:pb-4 px-1 sm:px-2 text-sm sm:text-base font-medium transition-all duration-300 whitespace-nowrap ${currentPage === 'guide'
                                     ? 'text-gold border-b-2 border-gold'
                                     : 'text-white/60 hover:text-white/90'
                                     }`}
