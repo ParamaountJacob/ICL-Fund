@@ -415,21 +415,6 @@ export default function DataRoom() {
                 </div>
 
                 <div className="mb-8">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-semibold text-gold flex items-center gap-2">
-                            📋 {selectedFolder === 'all' ? 'All Documents' : folders.find(f => f.id === selectedFolder)?.name}
-                            <span className="text-sm text-white/60">({filteredFiles.length})</span>
-                            {searchQuery && (
-                                <span className="text-sm text-gold/70">• Searching "{searchQuery}"</span>
-                            )}
-                        </h2>
-                        <button
-                            onClick={fetchFiles}
-                            className="text-sm px-3 py-1 rounded bg-gold/20 text-gold hover:bg-gold/30 transition"
-                        >
-                            🔄 Refresh
-                        </button>
-                    </div>
                     <div className="grid gap-3">
                         {filteredFiles.length === 0 && (
                             <div className="text-center py-8 text-white/60 border border-gold/10 rounded-lg">
@@ -597,69 +582,21 @@ export default function DataRoom() {
 
     return (
         <div className="min-h-screen sophisticated-bg">
-            {/* Premium Hero Section */}
-            <div className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
-                {/* Hero Content */}
-                <div className="text-center z-10 w-full max-w-4xl mx-auto">
-                    <div className="animate-fadeIn">
-                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-gold mb-3 sm:mb-4 tracking-wide">
-                            ICL Data Room
-                        </h1>
-                        <p className="text-base sm:text-lg lg:text-xl text-white/70 mb-4 sm:mb-6 font-light tracking-wide px-4">
-                            Secure Repository for Inner Circle Lending
-                        </p>
-                        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-white/60 text-xs sm:text-sm font-medium">
-                            <div className="flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                                <span>Secure</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 bg-gold rounded-full"></div>
-                                <span>Encrypted</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-                                <span>Private</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Scroll Indicator */}
-                <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 text-center">
-                    <div className="text-white/50 mb-1 sm:mb-2 text-xs sm:text-sm tracking-wide">Scroll to Access</div>
-                    <div className="scroll-indicator text-gold text-lg sm:text-xl">⬇</div>
-                </div>
-
-                {/* Exit Button */}
-                <button
-                    onClick={() => setAuthenticated(false)}
-                    className="absolute top-4 sm:top-6 lg:top-8 right-4 sm:right-6 lg:right-8 text-red-400/60 hover:text-red-400 transition-colors duration-200 text-xs sm:text-sm flex items-center gap-1 sm:gap-2 bg-black/30 backdrop-blur-sm px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-red-400/20 hover:border-red-400/40"
-                >
-                    🚪 <span className="hidden sm:inline">Exit Room</span>
-                </button>
-            </div>
-
             {/* Main Data Room Content */}
-            <div className="bg-black">
+            <div className="bg-black min-h-screen">
                 <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-                    <div className="flex flex-col mb-6 sm:mb-8 gap-4">
-                        <div className="text-center sm:text-left">
-                            <h2 className="text-2xl sm:text-3xl font-bold text-gold mb-2 tracking-wide">Investment Materials</h2>
-                            <p className="text-white/60 text-base sm:text-lg mb-3 sm:mb-0">
-                                Access documentation and resources for qualified investors.
-                            </p>
+                    {/* Simple Header with Exit Button */}
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gold tracking-wide">ICL Data Room</h1>
+                            <p className="text-white/60 text-sm sm:text-base">Secure Repository for Inner Circle Lending</p>
                         </div>
-                        <div className="flex flex-wrap justify-center sm:justify-start gap-4 text-center">
-                            <div className="bg-black/30 rounded-lg px-4 py-2 border border-gold/20">
-                                <div className="text-sm sm:text-base text-white/70 mb-1">Total Files</div>
-                                <div className="text-lg sm:text-xl font-semibold text-gold">{files.length}</div>
-                            </div>
-                            <div className="bg-black/30 rounded-lg px-4 py-2 border border-gold/20">
-                                <div className="text-sm sm:text-base text-white/70 mb-1">Last Updated</div>
-                                <div className="text-sm sm:text-base font-medium text-gold/80">{new Date().toLocaleDateString()}</div>
-                            </div>
-                        </div>
+                        <button
+                            onClick={() => setAuthenticated(false)}
+                            className="text-red-400/60 hover:text-red-400 transition-colors duration-200 text-sm flex items-center gap-2 bg-black/30 backdrop-blur-sm px-3 py-2 rounded-lg border border-red-400/20 hover:border-red-400/40"
+                        >
+                            🚪 Exit
+                        </button>
                     </div>
 
                     {/* Navigation */}
@@ -794,89 +731,49 @@ export default function DataRoom() {
                         )}
                     </div>
 
-                    {currentPage === 'documents' && (
-                        <div className="bg-black/50 rounded-xl p-4 sm:p-6 border border-gold/20 mt-6">
-                            <h3 className="font-semibold text-gold mb-4 flex items-center gap-2 text-lg sm:text-xl">
-                                💬 Document Requests & Inquiries
-                            </h3>
-                            <form onSubmit={handleRequestSubmit} className="space-y-4">
-                                <textarea
-                                    className="w-full p-4 sm:p-5 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 transition text-base resize-none"
-                                    placeholder="Request specific documents, ask questions about existing materials, or suggest additional content for this data room..."
-                                    value={requestText}
-                                    onChange={e => setRequestText(e.target.value)}
-                                    rows={5}
-                                    required
-                                />
-                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                                    <div className="text-sm text-white/50 order-2 sm:order-1">
-                                        All requests are logged and reviewed by authorized personnel
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        className="px-6 sm:px-8 py-3 sm:py-4 rounded-lg bg-gold/90 text-black font-semibold hover:bg-yellow-500 transition shadow-lg text-base sm:text-lg w-full sm:w-auto order-1 sm:order-2"
-                                    >
-                                        📤 Submit Request
-                                    </button>
-                                </div>
-                            </form>
-                            {requestSuccess && (
-                                <div className="mt-4 p-4 rounded-lg bg-green-500/20 border border-green-500/30 text-green-400 text-sm sm:text-base">
-                                    ✅ Request submitted successfully and will be reviewed promptly.
-                                </div>
-                            )}
-                        </div>
-                    )}
-
                     {error && (
                         <div className="mt-4 p-3 rounded bg-red-500/20 border border-red-500/30 text-red-400 text-sm">
                             ⚠️ {error}
                         </div>
                     )}
-
-                    <div className="text-xs text-white/40 mt-8 border-t border-gold/10 pt-4 text-center">
-                        🛡️ This data room is private and confidential. All access is logged. Please do not forward links without authorization.
-                    </div>
                 </div>
 
                 {/* Enhanced Document Viewer Popup */}
                 {viewingFile && (
-                    <div className="fixed inset-0 bg-black/95 z-50 flex flex-col">
-                        <div className="bg-black/95 w-full h-full flex flex-col border-0">
-                            <div className="flex items-center justify-between p-4 border-b border-gold/20 bg-black/90">
-                                <div className="flex items-center gap-3">
-                                    <div className="relative">
-                                        <div className="text-3xl">
+                    <div className="fixed inset-0 bg-black z-50 flex flex-col" style={{ height: '100vh', width: '100vw' }}>
+                        <div className="bg-black w-full h-full flex flex-col">
+                            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gold/20 bg-black flex-shrink-0">
+                                <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                                    <div className="relative flex-shrink-0">
+                                        <div className="text-xl sm:text-2xl">
                                             {getFileIcon(viewingFile.name)}
                                         </div>
-                                        <div className="absolute -top-1 -right-1 bg-gold/90 text-black text-xs px-1.5 py-0.5 rounded-full font-medium">
+                                        <div className="absolute -top-1 -right-1 bg-gold/90 text-black text-xs px-1 py-0.5 rounded-full font-medium">
                                             {extractVersion(viewingFile.name)}
                                         </div>
                                     </div>
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-white">
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="text-sm sm:text-base font-semibold text-white truncate">
                                             {viewingFile.name.replace(/^\d+_/, '').replace(/v\d+\.?\d*/i, '').replace(/_{2,}/g, '_').replace(/^_|_$/g, '')}
                                         </h3>
-                                        <div className="text-sm text-white/60 flex items-center gap-3">
+                                        <div className="text-xs text-white/60 hidden sm:flex items-center gap-2">
                                             <span>📅 {new Date(viewingFile.updated_at || viewingFile.created_at).toLocaleDateString()}</span>
-                                            <span>🔄 {new Date(viewingFile.updated_at || viewingFile.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                            <span className="text-gold">✨ {extractVersion(viewingFile.name)}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 flex-shrink-0">
                                     <a
                                         href={supabase.storage.from(BUCKET).getPublicUrl(viewingFile.name).data.publicUrl}
                                         download
-                                        className="px-4 py-2 text-sm rounded-lg bg-gold/20 text-gold hover:bg-gold/30 transition flex items-center gap-1"
+                                        className="px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm rounded-lg bg-gold/20 text-gold hover:bg-gold/30 transition flex items-center gap-1"
                                     >
-                                        ⬇️ Download
+                                        ⬇️ <span className="hidden sm:inline">Download</span>
                                     </a>
                                     <button
                                         onClick={closeFileViewer}
-                                        className="px-4 py-2 text-sm rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition flex items-center gap-1"
+                                        className="px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition flex items-center gap-1"
                                     >
-                                        ✕ Close
+                                        ✕ <span className="hidden sm:inline">Close</span>
                                     </button>
                                 </div>
                             </div>
@@ -885,6 +782,7 @@ export default function DataRoom() {
                                     src={supabase.storage.from(BUCKET).getPublicUrl(viewingFile.name).data.publicUrl}
                                     className="w-full h-full border-0"
                                     title={viewingFile.name}
+                                    style={{ width: '100%', height: '100%' }}
                                 />
                             </div>
                         </div>
