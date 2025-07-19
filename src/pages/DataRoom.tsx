@@ -83,7 +83,7 @@ export default function DataRoom() {
     // Check if user is authenticated via AuthContext (admin) or simple login
     useEffect(() => {
         console.log('DataRoom: Checking auth user:', authUser);
-        if (authUser && (authUser.role === 'admin' || authUser.role === 'sub_admin')) {
+        if (authUser && (authUser.userRole === 'admin' || authUser.userRole === 'sub_admin')) {
             console.log('DataRoom: Auto-authenticating admin user');
             setAuthenticated(true);
         }
@@ -547,10 +547,10 @@ export default function DataRoom() {
                         <div className="mt-2 text-xs text-white/40">
                             Try: admin / 123456
                         </div>
-                        {authUser && (authUser.role === 'admin' || authUser.role === 'sub_admin') && (
+                        {authUser && (authUser.userRole === 'admin' || authUser.userRole === 'sub_admin') && (
                             <div className="mt-3 p-2 bg-green-500/10 rounded-lg border border-green-500/20">
                                 <p className="text-green-400 text-xs">
-                                    ✅ Authenticated as admin: {authUser.email}
+                                    ✅ Authenticated as admin: {authUser.user?.email}
                                 </p>
                                 <p className="text-green-300/60 text-xs mt-1">
                                     You already have admin access through the main system
@@ -563,10 +563,10 @@ export default function DataRoom() {
                                 </button>
                             </div>
                         )}
-                        {authUser && !(authUser.role === 'admin' || authUser.role === 'sub_admin') && (
+                        {authUser && !(authUser.userRole === 'admin' || authUser.userRole === 'sub_admin') && (
                             <div className="mt-3 p-2 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
                                 <p className="text-yellow-400 text-xs">
-                                    ⚠️ Logged in as: {authUser.email} (Role: {authUser.role})
+                                    ⚠️ Logged in as: {authUser.user?.email} (Role: {authUser.userRole})
                                 </p>
                                 <p className="text-yellow-300/60 text-xs mt-1">
                                     Data room requires admin access. Use simple login below.
@@ -600,7 +600,7 @@ export default function DataRoom() {
                             Enter Data Room
                         </button>
                     </form>
-                    {authUser && (authUser.role === 'admin' || authUser.role === 'sub_admin') && (
+                    {authUser && (authUser.userRole === 'admin' || authUser.userRole === 'sub_admin') && (
                         <div className="mt-4 text-center">
                             <p className="text-white/60 text-xs">
                                 As an authenticated admin, you can also access the data room directly

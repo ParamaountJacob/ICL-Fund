@@ -44,9 +44,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUser(initialUser);
 
                 if (initialUser) {
-                    // Skip profile/role fetching if database is broken
-                    setProfile(null); // Will be populated from forms
-                    setUserRole('user');
+                    // Fetch profile and role from database
+                    try {
+                        const profileData = await getUserProfile();
+                        setProfile(profileData);
+
+                        const roleData = await checkUserRole();
+                        setUserRole(roleData);
+                    } catch (error) {
+                        logger.error('Error fetching profile/role:', error);
+                        setProfile(null);
+                        setUserRole('user');
+                    }
                 }
             } catch (error) {
                 logger.error('Error initializing auth:', error);
@@ -67,9 +76,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(newUser);
 
             if (newUser) {
-                // Skip profile fetching for now
-                setProfile(null);
-                setUserRole('user');
+                // Fetch profile and role when user logs in
+                try {
+                    const profileData = await getUserProfile();
+                    setProfile(profileData);
+
+                    const roleData = await checkUserRole();
+                    setUserRole(roleData);
+                } catch (error) {
+                    logger.error('Error fetching profile/role on auth change:', error);
+                    setProfile(null);
+                    setUserRole('user');
+                }
             } else {
                 // Clear data when user logs out
                 setProfile(null);

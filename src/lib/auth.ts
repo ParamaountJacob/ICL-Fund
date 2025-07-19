@@ -23,18 +23,18 @@ export const authService = {
 
             const { data: profile } = await supabase
                 .from('user_profiles')
-                .select('role, profile_updated')
-                .eq('id', user.id)
+                .select('role, is_admin, first_name, last_name')
+                .eq('user_id', user.id)
                 .single();
 
             return {
                 id: user.id,
                 email: user.email!,
                 role: profile?.role || 'user',
-                first_name: user.user_metadata?.first_name,
-                last_name: user.user_metadata?.last_name,
+                first_name: profile?.first_name || user.user_metadata?.first_name,
+                last_name: profile?.last_name || user.user_metadata?.last_name,
                 phone: user.user_metadata?.phone,
-                profile_updated: profile?.profile_updated || false
+                profile_updated: true
             };
         } catch (error) {
             console.error('Error getting current user:', error);
