@@ -141,7 +141,11 @@ const Profile: React.FC = () => {
     }
     fetchDocumentAccess();
     if (isAdmin) {
-      fetchAllUsers();
+      // Add error handling for admin functions
+      fetchAllUsers().catch(error => {
+        console.error('Error fetching users in useEffect:', error);
+        // Don't show error to user on page load, just log it
+      });
     }
   }, [authProfile, isAdmin]);
 

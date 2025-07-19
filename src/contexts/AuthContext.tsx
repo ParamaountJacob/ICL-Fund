@@ -51,10 +51,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                         const roleData = await checkUserRole();
                         setUserRole(roleData);
+                        logger.log('AuthContext - Successfully loaded profile/role:', { roleData, profileData });
                     } catch (error) {
                         logger.error('Error fetching profile/role:', error);
+                        // Fallback: check if user is the admin email
+                        if (initialUser.email === 'innercirclelending@gmail.com') {
+                            setUserRole('admin');
+                            logger.log('AuthContext - Set fallback admin role for innercirclelending@gmail.com');
+                        } else {
+                            setUserRole('user');
+                        }
                         setProfile(null);
-                        setUserRole('user');
                     }
                 }
             } catch (error) {
@@ -68,6 +75,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
 
         initializeAuth();
+
+        // Add a safety timeout to ensure loading doesn't get stuck
+        const safetyTimeout = setTimeout(() => {
+            setLoading(false);
+            logger.log('AuthContext - Safety timeout triggered, clearing loading state');
+        }, 10000); // 10 second timeout
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -83,10 +96,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                     const roleData = await checkUserRole();
                     setUserRole(roleData);
+                    logger.log('AuthContext - Auth change: Successfully loaded profile/role:', { roleData, profileData });
                 } catch (error) {
                     logger.error('Error fetching profile/role on auth change:', error);
+                    // Fallback: check if user is the admin email
+                    if (newUser.email === 'innercirclelending@gmail.com') {
+                        setUserRole('admin');
+                        logger.log('AuthContext - Auth change: Set fallback admin role for innercirclelending@gmail.com');
+                    } else {
+                        setUserRole('user');
+                    }
                     setProfile(null);
-                    setUserRole('user');
                 }
             } else {
                 // Clear data when user logs out
@@ -95,7 +115,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         });
 
-        return () => subscription.unsubscribe();
+        return () => {
+            clearTimeout(safetyTimeout);
+            subscription.unsubscribe();
+        };
     }, []);
 
     const signOut = async () => {
