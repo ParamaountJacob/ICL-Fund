@@ -20,6 +20,7 @@ export default function DataRoom() {
     const [requestText, setRequestText] = useState('');
     const [requestSuccess, setRequestSuccess] = useState(false);
     const [dragActive, setDragActive] = useState(false);
+    const [viewingFile, setViewingFile] = useState<any>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -121,6 +122,14 @@ export default function DataRoom() {
         }
     }
 
+    function openFileViewer(file: any) {
+        setViewingFile(file);
+    }
+
+    function closeFileViewer() {
+        setViewingFile(null);
+    }
+
     if (!authenticated) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-6">
@@ -182,24 +191,56 @@ export default function DataRoom() {
                 </div>
 
                 <div className="mb-8 bg-black/50 rounded-lg p-6 border border-gold/20">
-                    <h2 className="text-xl font-semibold text-gold mb-4">About This Data Room</h2>
+                    <h2 className="text-xl font-semibold text-gold mb-4">What Goes in a Data Room?</h2>
+                    <p className="text-white/70 mb-4">A virtual data room contains ALL the documents investors/partners need for due diligence. Think of it as your complete business file cabinet that proves everything you claim about your company.</p>
                     <div className="grid md:grid-cols-2 gap-6 text-white/80">
                         <div>
-                            <h3 className="font-semibold text-gold/90 mb-2">📊 Financial Documents</h3>
-                            <p className="text-sm">Audited financial statements, tax returns, cash flow projections, and budget analyses.</p>
+                            <h3 className="font-semibold text-gold/90 mb-2">📊 Financial Proof</h3>
+                            <p className="text-sm mb-2">Show them the money is real:</p>
+                            <ul className="text-xs text-white/60 space-y-1">
+                                <li>• Bank statements (last 12 months)</li>
+                                <li>• Tax returns (last 3 years)</li>
+                                <li>• Profit & loss statements</li>
+                                <li>• Cash flow projections</li>
+                                <li>• Audited financials (if you have them)</li>
+                            </ul>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gold/90 mb-2">⚖️ Legal & Compliance</h3>
-                            <p className="text-sm">Corporate governance documents, regulatory filings, contracts, and legal opinions.</p>
+                            <h3 className="font-semibold text-gold/90 mb-2">⚖️ Legal Stuff</h3>
+                            <p className="text-sm mb-2">Prove you're legitimate:</p>
+                            <ul className="text-xs text-white/60 space-y-1">
+                                <li>• Articles of incorporation</li>
+                                <li>• Operating agreements</li>
+                                <li>• Any major contracts</li>
+                                <li>• Insurance policies</li>
+                                <li>• Regulatory licenses</li>
+                            </ul>
                         </div>
                         <div>
                             <h3 className="font-semibold text-gold/90 mb-2">🏢 Business Operations</h3>
-                            <p className="text-sm">Business plans, market analysis, operational procedures, and strategic documents.</p>
+                            <p className="text-sm mb-2">Show how you make money:</p>
+                            <ul className="text-xs text-white/60 space-y-1">
+                                <li>• Your detailed business plan</li>
+                                <li>• Market analysis/research</li>
+                                <li>• Customer lists (if allowed)</li>
+                                <li>• Key employee contracts</li>
+                                <li>• Operational procedures</li>
+                            </ul>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gold/90 mb-2">📈 Investment Materials</h3>
-                            <p className="text-sm">Pitch decks, investment memorandums, subscription agreements, and offering documents.</p>
+                            <h3 className="font-semibold text-gold/90 mb-2">📈 The Sales Pitch</h3>
+                            <p className="text-sm mb-2">Get them excited:</p>
+                            <ul className="text-xs text-white/60 space-y-1">
+                                <li>• Your best pitch deck</li>
+                                <li>• Investment memorandum</li>
+                                <li>• Market opportunity analysis</li>
+                                <li>• Growth projections</li>
+                                <li>• Competition analysis</li>
+                            </ul>
                         </div>
+                    </div>
+                    <div className="mt-4 p-3 bg-gold/10 rounded border border-gold/30">
+                        <p className="text-white/80 text-sm"><strong>💡 Pro Tip:</strong> Don't put everything at once. Start with your pitch deck and financials. Add more as investors request specific documents. This lets you control the narrative and see what they're most interested in.</p>
                     </div>
                 </div>
 
@@ -272,7 +313,7 @@ export default function DataRoom() {
                                                     f.name.includes('.zip') ? '📦' : '📄'}
                                 </div>
                                 <div className="flex-1 cursor-pointer"
-                                    onClick={() => window.open(supabase.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl, '_blank')}>
+                                    onClick={() => openFileViewer(f)}>
                                     <div className="font-medium hover:text-gold transition">{f.name.replace(/^\d+_/, '')}</div>
                                     <div className="text-xs text-white/50">
                                         {new Date(f.updated_at || f.created_at).toLocaleDateString()} • Click to view
@@ -280,7 +321,7 @@ export default function DataRoom() {
                                 </div>
                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button
-                                        onClick={() => window.open(supabase.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl, '_blank')}
+                                        onClick={() => openFileViewer(f)}
                                         className="px-3 py-1 text-xs rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition"
                                     >
                                         View
@@ -346,6 +387,53 @@ export default function DataRoom() {
                     🛡️ This data room is private and confidential. All access is logged. Please do not forward links without authorization.
                 </div>
             </div>
+
+            {/* Document Viewer Popup */}
+            {viewingFile && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-black/90 rounded-xl shadow-2xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col border border-gold/30">
+                        <div className="flex items-center justify-between p-4 border-b border-gold/20">
+                            <div className="flex items-center gap-3">
+                                <div className="text-2xl">
+                                    {viewingFile.name.includes('.pdf') ? '📄' :
+                                        viewingFile.name.includes('.doc') ? '📝' :
+                                            viewingFile.name.includes('.xls') ? '📊' :
+                                                viewingFile.name.includes('.ppt') ? '📈' :
+                                                    viewingFile.name.includes('.zip') ? '📦' : '📄'}
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-white">{viewingFile.name.replace(/^\d+_/, '')}</h3>
+                                    <p className="text-sm text-white/60">
+                                        {new Date(viewingFile.updated_at || viewingFile.created_at).toLocaleDateString()}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <a
+                                    href={supabase.storage.from(BUCKET).getPublicUrl(viewingFile.name).data.publicUrl}
+                                    download
+                                    className="px-3 py-1 text-sm rounded bg-gold/20 text-gold hover:bg-gold/30 transition"
+                                >
+                                    Download
+                                </a>
+                                <button
+                                    onClick={closeFileViewer}
+                                    className="px-3 py-1 text-sm rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                            <iframe
+                                src={supabase.storage.from(BUCKET).getPublicUrl(viewingFile.name).data.publicUrl}
+                                className="w-full h-full border-0"
+                                title={viewingFile.name}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
