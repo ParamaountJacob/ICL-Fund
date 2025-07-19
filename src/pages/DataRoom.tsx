@@ -24,6 +24,11 @@ export default function DataRoom() {
     const [currentPage, setCurrentPage] = useState('documents');
     const [selectedFolder, setSelectedFolder] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
+    const [showUploadDialog, setShowUploadDialog] = useState(false);
+    const [pendingFile, setPendingFile] = useState<File | null>(null);
+    const [uploadTargetFolder, setUploadTargetFolder] = useState('');
+    const [showReplaceDialog, setShowReplaceDialog] = useState(false);
+    const [replaceTargetFile, setReplaceTargetFile] = useState<any>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -47,31 +52,80 @@ export default function DataRoom() {
             .toLowerCase(); // Convert to lowercase for consistency
     }
 
-    async function uploadFile(file: File) {
+    async function uploadFile(file: File, targetFolder: string = '', isReplace: boolean = false, existingFile?: any) {
         setUploading(true);
         setError('');
 
-        const sanitizedName = sanitizeFileName(file.name);
-        const fileName = `${Date.now()}_${sanitizedName}`;
+        let finalFileName: string;
 
-        console.log('Original filename:', file.name);
-        console.log('Sanitized filename:', sanitizedName);
-        console.log('Final filename:', fileName);
+        if (isReplace && existingFile) {
+            // For replacement, increment version
+            const currentVersion = extractVersion(existingFile.name);
+            const baseFileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+            const extension = file.name.split('.').pop();
+            const newVersion = incrementVersion(currentVersion);
 
-        const { error } = await supabase.storage.from(BUCKET).upload(fileName, file, { upsert: true });
+            const sanitizedBase = sanitizeFileName(baseFileName);
+            finalFileName = `${Date.now()}_${targetFolder ? targetFolder + '_' : ''}${sanitizedBase}_${newVersion}.${extension}`;
+        } else {
+            // For new upload, use folder prefix and default version
+            const sanitizedName = sanitizeFileName(file.name);
+            const baseFileName = sanitizedName.replace(/\.[^/.]+$/, "");
+            const extension = sanitizedName.split('.').pop();
+
+            // Check if filename already has version, if not add v1.0
+            const hasVersion = /v\d+\.?\d*/i.test(baseFileName);
+            const versionSuffix = hasVersion ? '' : '_v1.0';
+
+            finalFileName = `${Date.now()}_${targetFolder ? targetFolder + '_' : ''}${baseFileName}${versionSuffix}.${extension}`;
+        }
+
+        console.log('Upload details:', {
+            originalName: file.name,
+            targetFolder,
+            isReplace,
+            finalFileName
+        });
+
+        const { error } = await supabase.storage.from(BUCKET).upload(finalFileName, file, { upsert: true });
         setUploading(false);
+
         if (error) {
             console.error('Upload error:', error);
             setError(error.message);
         } else {
             fetchFiles();
+            // Close dialogs
+            setShowUploadDialog(false);
+            setShowReplaceDialog(false);
+            setPendingFile(null);
+            setReplaceTargetFile(null);
         }
+    }
+
+    function incrementVersion(currentVersion: string): string {
+        // Extract numbers from version string like "v1.0" or "v2.1"
+        const match = currentVersion.match(/v(\d+)\.?(\d*)/i);
+        if (match) {
+            const major = parseInt(match[1]);
+            const minor = match[2] ? parseInt(match[2]) : 0;
+            return `v${major}.${minor + 1}`;
+        }
+        return 'v1.1'; // Default increment
     }
 
     async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
         if (!file) return;
-        await uploadFile(file);
+
+        // Show folder selection dialog
+        setPendingFile(file);
+        setShowUploadDialog(true);
+
+        // Reset file input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     }
 
     function handleDrag(e: React.DragEvent) {
@@ -89,7 +143,9 @@ export default function DataRoom() {
         e.stopPropagation();
         setDragActive(false);
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            uploadFile(e.dataTransfer.files[0]);
+            // Show folder selection dialog for dropped files too
+            setPendingFile(e.dataTransfer.files[0]);
+            setShowUploadDialog(true);
         }
     }
 
@@ -388,6 +444,15 @@ export default function DataRoom() {
                                     >
                                         👁️ View
                                     </button>
+                                    <button
+                                        onClick={() => {
+                                            setReplaceTargetFile(f);
+                                            setShowReplaceDialog(true);
+                                        }}
+                                        className="px-3 py-1.5 text-xs rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition flex items-center gap-1"
+                                    >
+                                        🔄 New Version
+                                    </button>
                                     <a
                                         href={supabase.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl}
                                         download
@@ -662,6 +727,151 @@ export default function DataRoom() {
                                 className="w-full h-full border-0"
                                 title={viewingFile.name}
                             />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Upload Folder Selection Dialog */}
+            {showUploadDialog && pendingFile && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-black/90 rounded-xl shadow-2xl max-w-md w-full border border-gold/30">
+                        <div className="p-6">
+                            <h3 className="text-xl font-semibold text-gold mb-4 flex items-center gap-2">
+                                📁 Choose Upload Destination
+                            </h3>
+                            <p className="text-white/80 mb-4">
+                                Uploading: <span className="text-gold font-medium">{pendingFile.name}</span>
+                            </p>
+
+                            {/* Folder Selection */}
+                            <div className="space-y-2 mb-6">
+                                {folders.filter(f => f.id !== 'all').map(folder => (
+                                    <button
+                                        key={folder.id}
+                                        onClick={() => setUploadTargetFolder(folder.id)}
+                                        className={`w-full text-left px-4 py-3 rounded-lg border transition flex items-center gap-3 ${uploadTargetFolder === folder.id
+                                                ? 'bg-gold/20 border-gold/40 text-gold'
+                                                : 'bg-gray-800/50 border-gray-700 text-white/70 hover:bg-gray-700/50'
+                                            }`}
+                                    >
+                                        <span className="text-xl">{folder.icon}</span>
+                                        <div>
+                                            <div className="font-medium">{folder.name}</div>
+                                            <div className="text-xs opacity-60">
+                                                {folder.id === 'prospecting' && 'First impression materials'}
+                                                {folder.id === 'presentation' && 'For interested prospects'}
+                                                {folder.id === 'closing' && 'Legal paperwork for commitments'}
+                                                {folder.id === 'training' && 'Sales training & compliance'}
+                                            </div>
+                                        </div>
+                                    </button>
+                                ))}
+
+                                {/* Custom Folder Option */}
+                                <div>
+                                    <button
+                                        onClick={() => setUploadTargetFolder('custom')}
+                                        className={`w-full text-left px-4 py-3 rounded-lg border transition flex items-center gap-3 ${uploadTargetFolder === 'custom'
+                                                ? 'bg-gold/20 border-gold/40 text-gold'
+                                                : 'bg-gray-800/50 border-gray-700 text-white/70 hover:bg-gray-700/50'
+                                            }`}
+                                    >
+                                        <span className="text-xl">✨</span>
+                                        <div className="font-medium">Custom Folder</div>
+                                    </button>
+
+                                    {uploadTargetFolder === 'custom' && (
+                                        <input
+                                            type="text"
+                                            placeholder="Enter folder name (e.g., 'legal', 'marketing')"
+                                            className="w-full mt-2 p-3 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 transition"
+                                            onChange={(e) => setUploadTargetFolder(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''))}
+                                        />
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        setShowUploadDialog(false);
+                                        setPendingFile(null);
+                                        setUploadTargetFolder('');
+                                    }}
+                                    className="flex-1 px-4 py-2 rounded-lg bg-gray-600/20 text-gray-400 hover:bg-gray-600/30 transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (pendingFile && uploadTargetFolder) {
+                                            uploadFile(pendingFile, uploadTargetFolder, false);
+                                        }
+                                    }}
+                                    disabled={!uploadTargetFolder}
+                                    className="flex-1 px-4 py-2 rounded-lg bg-gold/90 text-black font-semibold hover:bg-yellow-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Upload File
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Replace File / New Version Dialog */}
+            {showReplaceDialog && replaceTargetFile && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-black/90 rounded-xl shadow-2xl max-w-md w-full border border-gold/30">
+                        <div className="p-6">
+                            <h3 className="text-xl font-semibold text-gold mb-4 flex items-center gap-2">
+                                🔄 Create New Version
+                            </h3>
+                            <p className="text-white/80 mb-4">
+                                Creating new version of: <br />
+                                <span className="text-gold font-medium">
+                                    {replaceTargetFile.name.replace(/^\d+_/, '').replace(/v\d+\.?\d*/i, '').replace(/_{2,}/g, '_').replace(/^_|_$/g, '')}
+                                </span>
+                            </p>
+                            <div className="bg-gray-800/50 rounded-lg p-3 mb-4">
+                                <div className="text-sm text-white/70">Current Version: <span className="text-gold">{extractVersion(replaceTargetFile.name)}</span></div>
+                                <div className="text-sm text-white/70">New Version: <span className="text-green-400">{incrementVersion(extractVersion(replaceTargetFile.name))}</span></div>
+                            </div>
+
+                            {/* Upload New Version */}
+                            <div className="mb-6">
+                                <input
+                                    type="file"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            // Extract folder from existing file name
+                                            const folderMatch = replaceTargetFile.name.match(/^\d+_([^_]+)_/);
+                                            const existingFolder = folderMatch ? folderMatch[1] : '';
+                                            uploadFile(file, existingFolder, true, replaceTargetFile);
+                                        }
+                                    }}
+                                    className="w-full p-3 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold transition"
+                                />
+                                <p className="text-xs text-white/60 mt-2">
+                                    💡 Select the updated file to create version {incrementVersion(extractVersion(replaceTargetFile.name))}
+                                </p>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        setShowReplaceDialog(false);
+                                        setReplaceTargetFile(null);
+                                    }}
+                                    className="flex-1 px-4 py-2 rounded-lg bg-gray-600/20 text-gray-400 hover:bg-gray-600/30 transition"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
