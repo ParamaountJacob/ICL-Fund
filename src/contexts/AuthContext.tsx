@@ -63,6 +63,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         }
                         setProfile(null);
                     }
+                } else {
+                    // No user logged in, ensure clean state
+                    setProfile(null);
+                    setUserRole('user');
                 }
             } catch (error) {
                 logger.error('Error initializing auth:', error);
@@ -84,11 +88,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log('Auth state change event:', event);
+            console.log('Session user:', session?.user?.email);
+            
             const newUser = session?.user ?? null;
             logger.log('AuthContext - Auth state changed:', event, newUser);
             setUser(newUser);
 
             if (newUser) {
+                console.log('User signed in, fetching profile and role...');
                 // Fetch profile and role when user logs in
                 try {
                     const profileData = await getUserProfile();
@@ -96,12 +104,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                     const roleData = await checkUserRole();
                     setUserRole(roleData);
+                    console.log('Successfully loaded profile/role:', { roleData, profileData });
                     logger.log('AuthContext - Auth change: Successfully loaded profile/role:', { roleData, profileData });
                 } catch (error) {
+                    console.error('Error fetching profile/role on auth change:', error);
                     logger.error('Error fetching profile/role on auth change:', error);
                     // Fallback: check if user is the admin email
                     if (newUser.email === 'innercirclelending@gmail.com') {
                         setUserRole('admin');
+                        console.log('Set fallback admin role for innercirclelending@gmail.com');
                         logger.log('AuthContext - Auth change: Set fallback admin role for innercirclelending@gmail.com');
                     } else {
                         setUserRole('user');
@@ -109,6 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setProfile(null);
                 }
             } else {
+                console.log('User signed out, clearing data...');
                 // Clear data when user logs out
                 setProfile(null);
                 setUserRole('user');
@@ -123,18 +135,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const signOut = async () => {
         try {
-            await supabase.auth.signOut();
+            console.log('Starting signOut process...');
+            
+            // Clear local state first
             setUser(null);
             setProfile(null);
             setUserRole('user');
+            setLoading(false);
+            
+            console.log('Local state cleared, calling supabase.auth.signOut()...');
+            
+            // Then sign out from Supabase
+            await supabase.auth.signOut();
+            
+            console.log('Supabase signOut completed, redirecting to home...');
+            
             // Force page reload to clear any cached state
             window.location.href = '/';
         } catch (error) {
             console.error('Error signing out:', error);
-            // Even if there's an error, clear local state
+            // Even if there's an error, clear local state and redirect
             setUser(null);
             setProfile(null);
             setUserRole('user');
+            setLoading(false);
             window.location.href = '/';
         }
     };

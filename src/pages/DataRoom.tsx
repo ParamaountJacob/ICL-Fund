@@ -83,6 +83,8 @@ export default function DataRoom() {
     // Check if user is authenticated via AuthContext (admin) or simple login
     useEffect(() => {
         console.log('DataRoom: Checking auth user:', authUser);
+        console.log('DataRoom: User email:', authUser?.user?.email);
+        console.log('DataRoom: User role:', authUser?.userRole);
         if (authUser && (authUser.userRole === 'admin' || authUser.userRole === 'sub_admin')) {
             console.log('DataRoom: Auto-authenticating admin user');
             setAuthenticated(true);
