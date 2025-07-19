@@ -20,46 +20,44 @@ const styles = `
 
   .hero-grid {
     background-image: 
-      linear-gradient(rgba(255, 215, 0, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 215, 0, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: gridMove 20s linear infinite;
+      linear-gradient(rgba(255, 215, 0, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 215, 0, 0.05) 1px, transparent 1px);
+    background-size: 80px 80px;
+    animation: gridMove 30s linear infinite;
   }
 
   @keyframes gridMove {
     0% { background-position: 0 0; }
-    100% { background-position: 50px 50px; }
+    100% { background-position: 80px 80px; }
   }
 
   .connection-line {
     position: absolute;
-    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
-    height: 2px;
-    animation: pulse 3s ease-in-out infinite;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+    height: 1px;
+    animation: pulse 4s ease-in-out infinite;
   }
 
-  .connection-line:nth-child(1) { top: 20%; left: 10%; width: 200px; animation-delay: 0s; }
-  .connection-line:nth-child(2) { top: 40%; right: 15%; width: 150px; animation-delay: 1s; }
-  .connection-line:nth-child(3) { top: 60%; left: 20%; width: 180px; animation-delay: 2s; }
-  .connection-line:nth-child(4) { top: 80%; right: 10%; width: 160px; animation-delay: 0.5s; }
+  .connection-line:nth-child(1) { top: 30%; left: 15%; width: 120px; animation-delay: 0s; }
+  .connection-line:nth-child(2) { top: 70%; right: 20%; width: 100px; animation-delay: 2s; }
 
   @keyframes pulse {
-    0%, 100% { opacity: 0.3; transform: scaleX(0.8); }
-    50% { opacity: 1; transform: scaleX(1.2); }
+    0%, 100% { opacity: 0.2; transform: scaleX(0.9); }
+    50% { opacity: 0.6; transform: scaleX(1.1); }
   }
 
   .data-node {
     position: absolute;
-    width: 8px;
-    height: 8px;
-    background: rgba(255, 215, 0, 0.8);
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 215, 0, 0.6);
     border-radius: 50%;
-    animation: glow 2s ease-in-out infinite alternate;
+    animation: glow 3s ease-in-out infinite alternate;
   }
 
   @keyframes glow {
-    from { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
-    to { box-shadow: 0 0 20px rgba(255, 215, 0, 0.9); }
+    from { box-shadow: 0 0 2px rgba(255, 215, 0, 0.3); }
+    to { box-shadow: 0 0 8px rgba(255, 215, 0, 0.6); }
   }
 
   .scroll-indicator {
@@ -68,8 +66,8 @@ const styles = `
 
   @keyframes bounce {
     0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-10px); }
-    60% { transform: translateY(-5px); }
+    40% { transform: translateY(-8px); }
+    60% { transform: translateY(-4px); }
   }
 `;
 
@@ -653,40 +651,34 @@ export default function DataRoom() {
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
             {/* Premium Hero Section */}
             <div className="relative min-h-screen flex items-center justify-center hero-grid overflow-hidden">
-                {/* Animated Connection Lines */}
-                <div className="connection-line"></div>
-                <div className="connection-line"></div>
+                {/* Simplified Connection Lines */}
                 <div className="connection-line"></div>
                 <div className="connection-line"></div>
 
-                {/* Data Nodes */}
-                <div className="data-node" style={{ top: '15%', left: '20%' }}></div>
-                <div className="data-node" style={{ top: '25%', right: '25%' }}></div>
-                <div className="data-node" style={{ top: '70%', left: '15%' }}></div>
-                <div className="data-node" style={{ top: '75%', right: '20%' }}></div>
-                <div className="data-node" style={{ top: '45%', left: '50%' }}></div>
+                {/* Minimal Data Nodes */}
+                <div className="data-node" style={{ top: '25%', right: '30%' }}></div>
+                <div className="data-node" style={{ top: '75%', left: '25%' }}></div>
 
                 {/* Hero Content */}
                 <div className="text-center z-10 max-w-4xl mx-auto px-8">
                     <div className="animate-fadeIn">
-                        <h1 className="text-8xl md:text-9xl font-bold text-gold mb-6 tracking-wider relative">
+                        <h1 className="text-8xl md:text-9xl font-bold text-gold mb-6 tracking-wider">
                             DATA ROOM
-                            <div className="absolute inset-0 text-gold/20 blur-sm">DATA ROOM</div>
                         </h1>
                         <p className="text-2xl md:text-3xl text-white/80 mb-8 font-light tracking-wide">
                             Secure Repository for Inner Circle Lending
                         </p>
-                        <div className="flex items-center justify-center gap-6 text-white/60 text-lg">
+                        <div className="flex items-center justify-center gap-8 text-white/70 text-lg font-medium">
                             <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                                 <span>Secure</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-gold rounded-full animate-pulse"></div>
+                                <div className="w-2 h-2 bg-gold rounded-full"></div>
                                 <span>Encrypted</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                                 <span>Private</span>
                             </div>
                         </div>
@@ -695,8 +687,8 @@ export default function DataRoom() {
 
                 {/* Scroll Indicator */}
                 <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center">
-                    <div className="text-white/60 mb-2 text-sm">Scroll to Access</div>
-                    <div className="scroll-indicator text-gold text-2xl">⬇</div>
+                    <div className="text-white/50 mb-2 text-sm tracking-wide">Scroll to Access</div>
+                    <div className="scroll-indicator text-gold text-xl">⬇</div>
                 </div>
 
                 {/* Exit Button */}
@@ -903,9 +895,9 @@ export default function DataRoom() {
 
                 {/* Enhanced Document Viewer Popup */}
                 {viewingFile && (
-                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                        <div className="bg-black/90 rounded-xl shadow-2xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col border border-gold/30">
-                            <div className="flex items-center justify-between p-4 border-b border-gold/20">
+                    <div className="fixed inset-0 bg-black/95 z-50 flex flex-col">
+                        <div className="bg-black/95 w-full h-full flex flex-col border-0">
+                            <div className="flex items-center justify-between p-4 border-b border-gold/20 bg-black/90">
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
                                         <div className="text-3xl">
@@ -951,9 +943,7 @@ export default function DataRoom() {
                             </div>
                         </div>
                     </div>
-                )}
-
-                {/* Upload Folder Selection Dialog */}
+                )}                {/* Upload Folder Selection Dialog */}
                 {showUploadDialog && pendingFile && (
                     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                         <div className="bg-black/90 rounded-xl shadow-2xl max-w-md w-full border border-gold/30">
