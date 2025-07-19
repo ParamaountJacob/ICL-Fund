@@ -269,7 +269,9 @@ export default function DataRoom() {
     function getFilteredFiles(): any[] {
         let filtered = selectedFolder === 'all'
             ? files
-            : files.filter(f => f.name.toLowerCase().includes(selectedFolder));
+            : selectedFolder === 'recent'
+                ? getRecentlyUpdated()
+                : files.filter(f => f.name.toLowerCase().includes(selectedFolder));
 
         if (searchQuery.trim()) {
             filtered = filtered.filter(f =>
@@ -283,6 +285,7 @@ export default function DataRoom() {
 
     const folders = [
         { id: 'all', name: 'All Files', icon: '📁' },
+        { id: 'recent', name: 'Recently Updated', icon: '⚡' },
         { id: 'prospecting', name: 'Prospecting', icon: '🎯' },
         { id: 'presentation', name: 'Presentation', icon: '💼' },
         { id: 'closing', name: 'Closing Docs', icon: '📋' },
@@ -319,59 +322,7 @@ export default function DataRoom() {
                     </div>
                 </div>
 
-                {/* Recently Updated Section */}
-                {recentlyUpdated.length > 0 && !searchQuery && (
-                    <div className="mb-6">
-                        <h3 className="text-lg sm:text-xl font-semibold text-gold mb-4 flex items-center gap-2">
-                            ⚡ Recently Updated
-                        </h3>
-                        <div className="grid gap-3">
-                            {recentlyUpdated.map((f) => (
-                                <div
-                                    key={`recent-${f.name}`}
-                                    className="flex items-center gap-3 sm:gap-4 px-4 py-3 sm:py-4 rounded-lg bg-gold/5 border border-gold/20 hover:bg-gold/10 transition-all group cursor-pointer"
-                                    onClick={() => openFileViewer(f)}
-                                >
-                                    <div className="text-xl sm:text-2xl flex-shrink-0">{getFileIcon(f.name)}</div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="font-medium text-white/90 text-sm sm:text-base truncate">
-                                            {f.name.replace(/^\d+_/, '')}
-                                        </div>
-                                        <div className="text-xs sm:text-sm text-gold/70 mt-1 flex flex-wrap gap-2">
-                                            <span>Updated {new Date(f.updated_at || f.created_at).toLocaleDateString()}</span>
-                                            <span>• {extractVersion(f.name)}</span>
-                                        </div>
-                                    </div>
-                                    <div className="text-xs sm:text-sm text-white/60 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block">
-                                        Click to view
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                <div className="mb-6">
-                    <div className="flex flex-wrap gap-2 sm:gap-3 mb-4">
-                        {folders.map(folder => (
-                            <button
-                                key={folder.id}
-                                onClick={() => setSelectedFolder(folder.id)}
-                                className={`px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base transition flex items-center gap-2 flex-shrink-0 ${selectedFolder === folder.id
-                                    ? 'bg-gold/20 text-gold border border-gold/40'
-                                    : 'bg-gray-800/50 text-white/70 border border-gray-700 hover:bg-gray-700/50'
-                                    }`}
-                            >
-                                <span className="text-lg">{folder.icon}</span>
-                                <span className="font-medium">{folder.name}</span>
-                                <span className="text-xs opacity-60 ml-1">
-                                    ({folder.id === 'all' ? files.length : files.filter(f => f.name.toLowerCase().includes(folder.id)).length})
-                                </span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
+                {/* Upload Files Section */}
                 <div className="mb-8">
                     <label className="block text-gold font-semibold mb-3">📤 Upload Files</label>
                     <div
@@ -411,6 +362,28 @@ export default function DataRoom() {
                             onChange={handleUpload}
                             disabled={uploading}
                         />
+                    </div>
+                </div>
+
+                {/* Folder Filters */}
+                <div className="mb-6">
+                    <div className="flex flex-wrap gap-2 sm:gap-3 mb-4">
+                        {folders.map(folder => (
+                            <button
+                                key={folder.id}
+                                onClick={() => setSelectedFolder(folder.id)}
+                                className={`px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base transition flex items-center gap-2 flex-shrink-0 ${selectedFolder === folder.id
+                                    ? 'bg-gold/20 text-gold border border-gold/40'
+                                    : 'bg-gray-800/50 text-white/70 border border-gray-700 hover:bg-gray-700/50'
+                                    }`}
+                            >
+                                <span className="text-lg">{folder.icon}</span>
+                                <span className="font-medium">{folder.name}</span>
+                                <span className="text-xs opacity-60 ml-1">
+                                    ({folder.id === 'all' ? files.length : folder.id === 'recent' ? getRecentlyUpdated().length : files.filter(f => f.name.toLowerCase().includes(folder.id)).length})
+                                </span>
+                            </button>
+                        ))}
                     </div>
                 </div>
 
@@ -583,7 +556,7 @@ export default function DataRoom() {
     return (
         <div className="min-h-screen sophisticated-bg">
             {/* Main Data Room Content */}
-            <div className="bg-black min-h-screen">
+            <div className="bg-black min-h-screen pt-20">
                 <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                     {/* Simple Header with Exit Button */}
                     <div className="flex justify-between items-center mb-8">
