@@ -21,6 +21,8 @@ export default function DataRoom() {
     const [requestSuccess, setRequestSuccess] = useState(false);
     const [dragActive, setDragActive] = useState(false);
     const [viewingFile, setViewingFile] = useState<any>(null);
+    const [currentPage, setCurrentPage] = useState('documents');
+    const [selectedFolder, setSelectedFolder] = useState('all');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -130,6 +132,185 @@ export default function DataRoom() {
         setViewingFile(null);
     }
 
+    const folders = [
+        { id: 'all', name: 'All Files', icon: '📁' },
+        { id: 'prospecting', name: 'Prospecting', icon: '🎯' },
+        { id: 'presentation', name: 'Presentation', icon: '💼' },
+        { id: 'closing', name: 'Closing Docs', icon: '📋' },
+        { id: 'training', name: 'Training', icon: '🎓' }
+    ];
+
+    const filteredFiles = selectedFolder === 'all'
+        ? files
+        : files.filter(f => f.name.toLowerCase().includes(selectedFolder));
+
+    function renderDocumentsPage() {
+        return (
+            <>
+                <div className="mb-6">
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        {folders.map(folder => (
+                            <button
+                                key={folder.id}
+                                onClick={() => setSelectedFolder(folder.id)}
+                                className={`px-3 py-2 rounded-lg text-sm transition flex items-center gap-2 ${selectedFolder === folder.id
+                                        ? 'bg-gold/20 text-gold border border-gold/40'
+                                        : 'bg-gray-800/50 text-white/70 border border-gray-700 hover:bg-gray-700/50'
+                                    }`}
+                            >
+                                <span>{folder.icon}</span>
+                                {folder.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="mb-8">
+                    <label className="block text-gold font-semibold mb-3">Upload Files</label>
+                    <div
+                        className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${dragActive
+                            ? 'border-gold bg-gold/10 scale-105'
+                            : uploading
+                                ? 'border-yellow-500/50 bg-yellow-500/5'
+                                : 'border-gold/30 hover:border-gold/60 bg-black/30 hover:bg-black/50'
+                            }`}
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragEnter={handleDrag}
+                        onDragLeave={handleDrag}
+                        onDragOver={handleDrag}
+                        onDrop={handleDrop}
+                    >
+                        <div className="text-4xl mb-3">
+                            {uploading ? '⏳' : dragActive ? '📥' : '📁'}
+                        </div>
+                        <div className="text-lg mb-2 text-white">
+                            {uploading
+                                ? 'Uploading...'
+                                : dragActive
+                                    ? 'Drop file here'
+                                    : 'Drag and drop or click to select'
+                            }
+                        </div>
+                        <div className="text-sm text-white/60">
+                            Tip: Include folder name in filename (e.g., "prospecting_pitchdeck.pdf")
+                        </div>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            onChange={handleUpload}
+                            disabled={uploading}
+                        />
+                    </div>
+                </div>
+
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-semibold text-gold">
+                            {selectedFolder === 'all' ? 'All Documents' : folders.find(f => f.id === selectedFolder)?.name}
+                        </h2>
+                        <button
+                            onClick={fetchFiles}
+                            className="text-sm px-3 py-1 rounded bg-gold/20 text-gold hover:bg-gold/30 transition"
+                        >
+                            Refresh
+                        </button>
+                    </div>
+                    <div className="grid gap-3">
+                        {filteredFiles.length === 0 && (
+                            <div className="text-center py-8 text-white/60 border border-gold/10 rounded-lg">
+                                <div className="text-3xl mb-2">📂</div>
+                                <div>No files in this folder yet</div>
+                            </div>
+                        )}
+                        {filteredFiles.map((f) => (
+                            <div
+                                key={f.name}
+                                className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-gold/10 text-white/90 border border-gold/10 hover:border-gold/40 transition-all group"
+                            >
+                                <div className="text-2xl">
+                                    {f.name.includes('.pdf') ? '📄' :
+                                        f.name.includes('.doc') ? '📝' :
+                                            f.name.includes('.xls') ? '📊' :
+                                                f.name.includes('.ppt') ? '📈' :
+                                                    f.name.includes('.zip') ? '📦' : '📄'}
+                                </div>
+                                <div className="flex-1 cursor-pointer"
+                                    onClick={() => openFileViewer(f)}>
+                                    <div className="font-medium hover:text-gold transition">{f.name.replace(/^\d+_/, '')}</div>
+                                    <div className="text-xs text-white/50">
+                                        {new Date(f.updated_at || f.created_at).toLocaleDateString()} • Click to view
+                                    </div>
+                                </div>
+                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={() => openFileViewer(f)}
+                                        className="px-3 py-1 text-xs rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition"
+                                    >
+                                        View
+                                    </button>
+                                    <a
+                                        href={supabase.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl}
+                                        download
+                                        className="px-3 py-1 text-xs rounded bg-gold/20 text-gold hover:bg-gold/30 transition"
+                                    >
+                                        Download
+                                    </a>
+                                    <button
+                                        className="px-3 py-1 text-xs rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition"
+                                        onClick={() => handleDelete(f.name)}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    function renderFAQPage() {
+        return (
+            <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-gold mb-6">Sales Team FAQ</h2>
+
+                <div className="space-y-4">
+                    <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
+                        <h3 className="font-semibold text-gold mb-2">What is Inner Circle Lending Fund #1?</h3>
+                        <p className="text-white/80 text-sm">Inner Circle Lending is a private capital fund focused on providing alternative lending solutions. As Fund #1, we're establishing our track record in the private lending space with carefully selected investment opportunities.</p>
+                    </div>
+
+                    <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
+                        <h3 className="font-semibold text-gold mb-2">What are the minimum investment amounts?</h3>
+                        <p className="text-white/80 text-sm">Minimum investments typically start at $25,000 for qualified investors. Specific terms are outlined in the subscription agreement and vary based on the investment structure.</p>
+                    </div>
+
+                    <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
+                        <h3 className="font-semibold text-gold mb-2">Who can invest in the fund?</h3>
+                        <p className="text-white/80 text-sm">We work with accredited investors and qualified purchasers. All investors must complete KYC/AML verification and meet suitability requirements outlined in our investor documentation.</p>
+                    </div>
+
+                    <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
+                        <h3 className="font-semibold text-gold mb-2">What documents do investors need to sign?</h3>
+                        <p className="text-white/80 text-sm">Primary documents include the subscription agreement and promissory note. Additional KYC/AML forms and disclosures may be required based on investment structure.</p>
+                    </div>
+
+                    <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
+                        <h3 className="font-semibold text-gold mb-2">How long is the investment commitment?</h3>
+                        <p className="text-white/80 text-sm">Investment terms vary by opportunity. Typical commitments range from 12-36 months with specific terms outlined in the promissory note and investment documentation.</p>
+                    </div>
+
+                    <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
+                        <h3 className="font-semibold text-gold mb-2">What compliance requirements should I know?</h3>
+                        <p className="text-white/80 text-sm">Always verify accreditation status before discussing specific investment opportunities. Ensure all required disclosures are provided and never guarantee returns or make performance promises.</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     if (!authenticated) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-6">
@@ -176,7 +357,7 @@ export default function DataRoom() {
                     <div>
                         <h1 className="text-3xl font-bold text-gold mb-2">Sales Resource Center</h1>
                         <p className="text-white/80">
-                            Secure repository containing all approved materials, documents, and resources for raising capital for Inner Circle Lending Fund #1.
+                            Secure repository for raising capital for Inner Circle Lending Fund #1.
                         </p>
                     </div>
                     <div className="text-right">
@@ -189,6 +370,100 @@ export default function DataRoom() {
                         </button>
                     </div>
                 </div>
+
+                {/* Navigation */}
+                <div className="mb-6 border-b border-gold/20">
+                    <div className="flex gap-6">
+                        <button
+                            onClick={() => setCurrentPage('documents')}
+                            className={`pb-3 px-1 text-sm font-medium transition ${currentPage === 'documents'
+                                    ? 'text-gold border-b-2 border-gold'
+                                    : 'text-white/70 hover:text-white'
+                                }`}
+                        >
+                            📁 Documents
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage('faq')}
+                            className={`pb-3 px-1 text-sm font-medium transition ${currentPage === 'faq'
+                                    ? 'text-gold border-b-2 border-gold'
+                                    : 'text-white/70 hover:text-white'
+                                }`}
+                        >
+                            ❓ FAQ
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage('guide')}
+                            className={`pb-3 px-1 text-sm font-medium transition ${currentPage === 'guide'
+                                    ? 'text-gold border-b-2 border-gold'
+                                    : 'text-white/70 hover:text-white'
+                                }`}
+                        >
+                            📖 Sales Guide
+                        </button>
+                    </div>
+                </div>
+
+                {/* Page Content */}
+                {currentPage === 'documents' && renderDocumentsPage()}
+                {currentPage === 'faq' && renderFAQPage()}
+                {currentPage === 'guide' && (
+                    <div className="bg-black/50 rounded-lg p-6 border border-gold/20">
+                        <h2 className="text-xl font-semibold text-gold mb-4">Sales Process Guide</h2>
+                        <div className="space-y-4 text-white/80">
+                            <div>
+                                <h3 className="font-semibold text-gold/90 mb-2">🎯 Step 1: Prospecting</h3>
+                                <p className="text-sm">Use pitch deck and one-pagers for initial meetings. Focus on qualifying accreditation status early.</p>
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-gold/90 mb-2">💼 Step 2: Presentation</h3>
+                                <p className="text-sm">Share detailed terms sheet and FAQ responses. Address risk questions thoroughly with provided materials.</p>
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-gold/90 mb-2">📋 Step 3: Closing</h3>
+                                <p className="text-sm">Provide subscription agreement and promissory note. Ensure all required disclosures are completed.</p>
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-gold/90 mb-2">⚠️ Compliance Reminders</h3>
+                                <p className="text-sm">Never guarantee returns. Always verify accreditation. Provide all required risk disclosures.</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {currentPage === 'documents' && (
+                    <div className="bg-black/50 rounded-lg p-6 border border-gold/20 mt-6">
+                        <h3 className="font-semibold text-gold mb-3 flex items-center gap-2">
+                            💬 Document Requests & Inquiries
+                        </h3>
+                        <form onSubmit={handleRequestSubmit}>
+                            <textarea
+                                className="w-full p-4 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 mb-4 transition"
+                                placeholder="Request specific documents, ask questions about existing materials, or suggest additional content for this data room..."
+                                value={requestText}
+                                onChange={e => setRequestText(e.target.value)}
+                                rows={4}
+                                required
+                            />
+                            <div className="flex justify-between items-center">
+                                <div className="text-xs text-white/50">
+                                    All requests are logged and reviewed by authorized personnel
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="px-6 py-2 rounded-lg bg-gold/90 text-black font-semibold hover:bg-yellow-500 transition shadow-lg"
+                                >
+                                    Submit Request
+                                </button>
+                            </div>
+                        </form>
+                        {requestSuccess && (
+                            <div className="mt-3 p-3 rounded bg-green-500/20 border border-green-500/30 text-green-400 text-sm">
+                                ✅ Request submitted successfully and will be reviewed promptly.
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 <div className="mb-8 bg-black/50 rounded-lg p-6 border border-gold/20">
                     <h2 className="text-xl font-semibold text-gold mb-4">Sales Team Resource Center</h2>
