@@ -1,21 +1,75 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-// Add smooth transition styles
+// Enhanced styles for premium hero section and animations
 const styles = `
   .animate-fadeIn {
-    animation: fadeIn 0.5s ease-in-out;
+    animation: fadeIn 0.8s ease-in-out;
   }
   
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(20px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  .hero-grid {
+    background-image: 
+      linear-gradient(rgba(255, 215, 0, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 215, 0, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+  }
+
+  @keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 50px 50px; }
+  }
+
+  .connection-line {
+    position: absolute;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.6), transparent);
+    height: 2px;
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  .connection-line:nth-child(1) { top: 20%; left: 10%; width: 200px; animation-delay: 0s; }
+  .connection-line:nth-child(2) { top: 40%; right: 15%; width: 150px; animation-delay: 1s; }
+  .connection-line:nth-child(3) { top: 60%; left: 20%; width: 180px; animation-delay: 2s; }
+  .connection-line:nth-child(4) { top: 80%; right: 10%; width: 160px; animation-delay: 0.5s; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scaleX(0.8); }
+    50% { opacity: 1; transform: scaleX(1.2); }
+  }
+
+  .data-node {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 215, 0, 0.8);
+    border-radius: 50%;
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+    to { box-shadow: 0 0 20px rgba(255, 215, 0, 0.9); }
+  }
+
+  .scroll-indicator {
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
   }
 `;
 
@@ -552,21 +606,21 @@ export default function DataRoom() {
 
     if (!authenticated) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-900/90 via-black to-gray-900/90 flex items-center justify-center p-8">
-                <div className="bg-black/60 backdrop-blur-md rounded-2xl shadow-2xl p-10 max-w-lg w-full border border-gold/20 transform transition-all duration-500 hover:scale-[1.02]">
+            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4">
+                <div className="bg-black/50 backdrop-blur-lg rounded-3xl shadow-2xl p-8 max-w-md w-full border border-gold/30 transform transition-all duration-700 hover:scale-[1.02]">
                     <div className="text-center mb-8">
-                        <div className="text-5xl mb-6 animate-pulse">🔒</div>
-                        <h1 className="text-3xl font-bold text-gold mb-3 tracking-wide">Data Room Access</h1>
-                        <p className="text-white/60 text-lg">Enter credentials to continue</p>
+                        <div className="text-4xl mb-4 animate-pulse">�</div>
+                        <h1 className="text-2xl font-bold text-gold mb-2 tracking-wide">Secure Access</h1>
+                        <p className="text-white/50 text-sm">Data Room Authentication</p>
                     </div>
-                    <form onSubmit={handlePasswordSubmit} className="space-y-5">
-                        <div className="space-y-4">
+                    <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                        <div className="space-y-3">
                             <input
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 placeholder="Username"
-                                className="w-full p-4 rounded-xl bg-gray-800/50 text-white border border-gold/20 focus:outline-none focus:border-gold/60 focus:ring-2 focus:ring-gold/20 transition-all duration-300 placeholder-white/40"
+                                className="w-full p-3 rounded-xl bg-gray-800/40 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder-white/30"
                                 required
                             />
                             <input
@@ -574,19 +628,19 @@ export default function DataRoom() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Password"
-                                className="w-full p-4 rounded-xl bg-gray-800/50 text-white border border-gold/20 focus:outline-none focus:border-gold/60 focus:ring-2 focus:ring-gold/20 transition-all duration-300 placeholder-white/40"
+                                className="w-full p-3 rounded-xl bg-gray-800/40 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder-white/30"
                                 required
                             />
                         </div>
                         <button
                             type="submit"
-                            className="w-full px-6 py-4 rounded-xl bg-gradient-to-r from-gold/90 to-yellow-500/90 text-black font-semibold hover:from-gold hover:to-yellow-500 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-gold/20"
+                            className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-gold/80 to-yellow-500/80 text-black font-semibold hover:from-gold hover:to-yellow-500 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-gold/30"
                         >
-                            Access Data Room
+                            Enter Data Room
                         </button>
                     </form>
                     {error && (
-                        <div className="text-red-400 text-center mt-4 p-3 bg-red-500/10 rounded-lg border border-red-500/20 text-sm">
+                        <div className="text-red-400 text-center mt-4 p-2 bg-red-500/10 rounded-lg border border-red-500/20 text-xs">
                             {error}
                         </div>
                     )}
@@ -596,399 +650,454 @@ export default function DataRoom() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900/80 via-black to-gray-900/80 p-8">
-            <div className="max-w-6xl mx-auto bg-black/40 backdrop-blur-md rounded-2xl shadow-2xl p-10 mt-6 border border-gold/10">
-                <div className="flex justify-between items-center mb-10">
-                    <div>
-                        <h1 className="text-4xl font-bold text-gold mb-3 tracking-wide">Data Room</h1>
-                        <p className="text-white/70 text-lg">
-                            Secure repository for Inner Circle Lending investment materials and documentation.
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+            {/* Premium Hero Section */}
+            <div className="relative min-h-screen flex items-center justify-center hero-grid overflow-hidden">
+                {/* Animated Connection Lines */}
+                <div className="connection-line"></div>
+                <div className="connection-line"></div>
+                <div className="connection-line"></div>
+                <div className="connection-line"></div>
+
+                {/* Data Nodes */}
+                <div className="data-node" style={{ top: '15%', left: '20%' }}></div>
+                <div className="data-node" style={{ top: '25%', right: '25%' }}></div>
+                <div className="data-node" style={{ top: '70%', left: '15%' }}></div>
+                <div className="data-node" style={{ top: '75%', right: '20%' }}></div>
+                <div className="data-node" style={{ top: '45%', left: '50%' }}></div>
+
+                {/* Hero Content */}
+                <div className="text-center z-10 max-w-4xl mx-auto px-8">
+                    <div className="animate-fadeIn">
+                        <h1 className="text-8xl md:text-9xl font-bold text-gold mb-6 tracking-wider relative">
+                            DATA ROOM
+                            <div className="absolute inset-0 text-gold/20 blur-sm">DATA ROOM</div>
+                        </h1>
+                        <p className="text-2xl md:text-3xl text-white/80 mb-8 font-light tracking-wide">
+                            Secure Repository for Inner Circle Lending
                         </p>
-                    </div>
-                    <div className="text-right">
-                        <div className="text-sm text-white/50 mb-2">Files: {files.length}</div>
-                        <button
-                            onClick={() => setAuthenticated(false)}
-                            className="text-xs text-red-400/80 hover:text-red-400 transition-colors duration-200"
-                        >
-                            Exit Room
-                        </button>
-                    </div>
-                </div>
-
-                {/* Navigation */}
-                <div className="mb-10 border-b border-gold/10">
-                    <div className="flex gap-8">
-                        <button
-                            onClick={() => setCurrentPage('documents')}
-                            className={`pb-4 px-2 text-base font-medium transition-all duration-300 ${currentPage === 'documents'
-                                ? 'text-gold border-b-2 border-gold'
-                                : 'text-white/60 hover:text-white/90'
-                                }`}
-                        >
-                            📁 Documents
-                        </button>
-                        <button
-                            onClick={() => setCurrentPage('faq')}
-                            className={`pb-4 px-2 text-base font-medium transition-all duration-300 ${currentPage === 'faq'
-                                ? 'text-gold border-b-2 border-gold'
-                                : 'text-white/60 hover:text-white/90'
-                                }`}
-                        >
-                            ❓ FAQ
-                        </button>
-                        <button
-                            onClick={() => setCurrentPage('guide')}
-                            className={`pb-4 px-2 text-base font-medium transition-all duration-300 ${currentPage === 'guide'
-                                ? 'text-gold border-b-2 border-gold'
-                                : 'text-white/60 hover:text-white/90'
-                                }`}
-                        >
-                            📖 Investment Guide
-                        </button>
+                        <div className="flex items-center justify-center gap-6 text-white/60 text-lg">
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                                <span>Secure</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 bg-gold rounded-full animate-pulse"></div>
+                                <span>Encrypted</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                                <span>Private</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Page Content with Smooth Transitions */}
-                <div className="transition-all duration-500 ease-in-out">
-                    {currentPage === 'documents' && (
-                        <div className="animate-fadeIn">
-                            {renderDocumentsPage()}
-                        </div>
-                    )}
-                    {currentPage === 'faq' && (
-                        <div className="animate-fadeIn">
-                            {renderFAQPage()}
-                        </div>
-                    )}
-                    {currentPage === 'guide' && (
-                        <div className="animate-fadeIn space-y-10">
-                            <h2 className="text-3xl font-semibold text-gold mb-8">Investment Guide</h2>
-
-                            {/* Investment Tiers */}
-                            <div className="bg-black/30 backdrop-blur-sm rounded-xl p-8 border border-gold/10">
-                                <h3 className="font-semibold text-gold mb-6 text-xl">📊 Investment Tiers & Returns</h3>
-                                <div className="grid md:grid-cols-2 gap-6 text-white/80">
-                                    <div className="bg-gray-800/30 rounded-xl p-6 border border-gold/10 hover:border-gold/30 transition-all duration-300">
-                                        <h4 className="font-semibold text-gold/90 mb-3 text-lg">Tier 1: $200K - $349K</h4>
-                                        <p className="text-base">11% (1-year) | 12% (2-year)</p>
-                                    </div>
-                                    <div className="bg-gray-800/30 rounded-xl p-6 border border-gold/10 hover:border-gold/30 transition-all duration-300">
-                                        <h4 className="font-semibold text-gold/90 mb-3 text-lg">Tier 2: $350K - $499K</h4>
-                                        <p className="text-base">12% (1-year) | 13% (2-year)</p>
-                                    </div>
-                                    <div className="bg-gray-800/30 rounded-xl p-6 border border-gold/10 hover:border-gold/30 transition-all duration-300">
-                                        <h4 className="font-semibold text-gold/90 mb-3 text-lg">Tier 3: $500K - $999K</h4>
-                                        <p className="text-base">13% (1-year) | 14% (2-year)</p>
-                                    </div>
-                                    <div className="bg-gray-800/30 rounded-xl p-6 border border-gold/10 hover:border-gold/30 transition-all duration-300">
-                                        <h4 className="font-semibold text-gold/90 mb-3 text-lg">Tier 4: $1M+</h4>
-                                        <p className="text-base">14% (1-year) | 15% (2-year)</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Investment Process */}
-                            <div className="bg-black/50 rounded-lg p-6 border border-gold/20">
-                                <h3 className="font-semibold text-gold mb-4">🎯 Investment Process</h3>
-                                <div className="space-y-4 text-white/80">
-                                    <div>
-                                        <h4 className="font-semibold text-gold/90 mb-2">Step 1: Qualification & Selection</h4>
-                                        <p className="text-sm">Verify accredited investor status. Choose investment amount ($200K minimum) and term (12 or 24 months). Two-year terms receive +1% bonus rate.</p>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold text-gold/90 mb-2">Step 2: Documentation</h4>
-                                        <p className="text-sm">Receive promissory note with contractually fixed annual yield. Simple, transparent structure with no complex equity arrangements.</p>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold text-gold/90 mb-2">Step 3: Capital Deployment</h4>
-                                        <p className="text-sm">Funds deployed across short-term (1-6 month) secured business loans to privacy-focused borrowers who value discretion over lowest rates.</p>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold text-gold/90 mb-2">Step 4: Returns</h4>
-                                        <p className="text-sm">Receive consistent, fixed payouts on your preferred schedule: monthly, quarterly, or annually. No surprises, no market volatility.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Key Value Propositions */}
-                            <div className="bg-black/50 rounded-lg p-6 border border-gold/20">
-                                <h3 className="font-semibold text-gold mb-4">💡 Key Selling Points</h3>
-                                <div className="space-y-4 text-white/80">
-                                    <div>
-                                        <h4 className="font-semibold text-gold/90 mb-2">🛡️ Security & Protection</h4>
-                                        <p className="text-sm">Family-run 506(c) firm with decades of experience. Collateralized loans, surety bonds, reserve funds. Wayne Griswold personally oversees every deal.</p>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold text-gold/90 mb-2">� Strategic Advantages</h4>
-                                        <p className="text-sm">Short-term deployment model allows rapid capital reallocation. Privacy-premium niches generate superior yields. Agile response to market opportunities.</p>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold text-gold/90 mb-2">💰 Tax Optimization</h4>
-                                        <p className="text-sm">Self-directed retirement strategies: direct 401(k)/IRA funds into high-yield investments. Tax repositioning: transform tax payments into yield-generating assets.</p>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold text-gold/90 mb-2">📈 Predictable Performance</h4>
-                                        <p className="text-sm">Fixed returns independent of market volatility. Consistent 11-15% annual yields. No correlation to stock market ups and downs.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Compliance Notes */}
-                            <div className="bg-red-900/20 rounded-lg p-4 border border-red-500/30">
-                                <h4 className="font-semibold text-red-400 mb-2">⚠️ Compliance Reminders</h4>
-                                <div className="text-red-300/80 text-sm space-y-1">
-                                    <p>• Verify accredited investor status before discussing specific opportunities</p>
-                                    <p>• Provide all required risk disclosures and disclaimers</p>
-                                    <p>• Past performance does not guarantee future results</p>
-                                    <p>• All investments involve risk of loss</p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                {/* Scroll Indicator */}
+                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center">
+                    <div className="text-white/60 mb-2 text-sm">Scroll to Access</div>
+                    <div className="scroll-indicator text-gold text-2xl">⬇</div>
                 </div>
 
-                {currentPage === 'documents' && (
-                    <div className="bg-black/50 rounded-lg p-6 border border-gold/20 mt-6">
-                        <h3 className="font-semibold text-gold mb-3 flex items-center gap-2">
-                            💬 Document Requests & Inquiries
-                        </h3>
-                        <form onSubmit={handleRequestSubmit}>
-                            <textarea
-                                className="w-full p-4 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 mb-4 transition"
-                                placeholder="Request specific documents, ask questions about existing materials, or suggest additional content for this data room..."
-                                value={requestText}
-                                onChange={e => setRequestText(e.target.value)}
-                                rows={4}
-                                required
-                            />
-                            <div className="flex justify-between items-center">
-                                <div className="text-xs text-white/50">
-                                    All requests are logged and reviewed by authorized personnel
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="px-6 py-2 rounded-lg bg-gold/90 text-black font-semibold hover:bg-yellow-500 transition shadow-lg"
-                                >
-                                    Submit Request
-                                </button>
+                {/* Exit Button */}
+                <button
+                    onClick={() => setAuthenticated(false)}
+                    className="absolute top-8 right-8 text-red-400/60 hover:text-red-400 transition-colors duration-200 text-sm flex items-center gap-2 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-xl border border-red-400/20 hover:border-red-400/40"
+                >
+                    🚪 Exit Room
+                </button>
+            </div>
+
+            {/* Main Data Room Content */}
+            <div className="bg-black/40 backdrop-blur-md">
+                <div className="max-w-6xl mx-auto p-8">
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 className="text-3xl font-bold text-gold mb-2 tracking-wide">Investment Materials</h2>
+                            <p className="text-white/60 text-lg">
+                                Access documentation and resources for qualified investors.
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-sm text-white/50 mb-1">Total Files: {files.length}</div>
+                            <div className="text-xs text-gold/70">Last Updated: {new Date().toLocaleDateString()}</div>
+                        </div>
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="mb-8 border-b border-gold/20">
+                        <div className="flex gap-8">
+                            <button
+                                onClick={() => setCurrentPage('documents')}
+                                className={`pb-4 px-2 text-base font-medium transition-all duration-300 ${currentPage === 'documents'
+                                    ? 'text-gold border-b-2 border-gold'
+                                    : 'text-white/60 hover:text-white/90'
+                                    }`}
+                            >
+                                📁 Documents
+                            </button>
+                            <button
+                                onClick={() => setCurrentPage('faq')}
+                                className={`pb-4 px-2 text-base font-medium transition-all duration-300 ${currentPage === 'faq'
+                                    ? 'text-gold border-b-2 border-gold'
+                                    : 'text-white/60 hover:text-white/90'
+                                    }`}
+                            >
+                                ❓ FAQ
+                            </button>
+                            <button
+                                onClick={() => setCurrentPage('guide')}
+                                className={`pb-4 px-2 text-base font-medium transition-all duration-300 ${currentPage === 'guide'
+                                    ? 'text-gold border-b-2 border-gold'
+                                    : 'text-white/60 hover:text-white/90'
+                                    }`}
+                            >
+                                📖 Investment Guide
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Page Content with Smooth Transitions */}
+                    <div className="transition-all duration-500 ease-in-out">
+                        {currentPage === 'documents' && (
+                            <div className="animate-fadeIn">
+                                {renderDocumentsPage()}
                             </div>
-                        </form>
-                        {requestSuccess && (
-                            <div className="mt-3 p-3 rounded bg-green-500/20 border border-green-500/30 text-green-400 text-sm">
-                                ✅ Request submitted successfully and will be reviewed promptly.
+                        )}
+                        {currentPage === 'faq' && (
+                            <div className="animate-fadeIn">
+                                {renderFAQPage()}
+                            </div>
+                        )}
+                        {currentPage === 'guide' && (
+                            <div className="animate-fadeIn space-y-10">
+                                <h2 className="text-3xl font-semibold text-gold mb-8">Investment Guide</h2>
+
+                                {/* Investment Tiers */}
+                                <div className="bg-black/30 backdrop-blur-sm rounded-xl p-8 border border-gold/10">
+                                    <h3 className="font-semibold text-gold mb-6 text-xl">📊 Investment Tiers & Returns</h3>
+                                    <div className="grid md:grid-cols-2 gap-6 text-white/80">
+                                        <div className="bg-gray-800/30 rounded-xl p-6 border border-gold/10 hover:border-gold/30 transition-all duration-300">
+                                            <h4 className="font-semibold text-gold/90 mb-3 text-lg">Tier 1: $200K - $349K</h4>
+                                            <p className="text-base">11% (1-year) | 12% (2-year)</p>
+                                        </div>
+                                        <div className="bg-gray-800/30 rounded-xl p-6 border border-gold/10 hover:border-gold/30 transition-all duration-300">
+                                            <h4 className="font-semibold text-gold/90 mb-3 text-lg">Tier 2: $350K - $499K</h4>
+                                            <p className="text-base">12% (1-year) | 13% (2-year)</p>
+                                        </div>
+                                        <div className="bg-gray-800/30 rounded-xl p-6 border border-gold/10 hover:border-gold/30 transition-all duration-300">
+                                            <h4 className="font-semibold text-gold/90 mb-3 text-lg">Tier 3: $500K - $999K</h4>
+                                            <p className="text-base">13% (1-year) | 14% (2-year)</p>
+                                        </div>
+                                        <div className="bg-gray-800/30 rounded-xl p-6 border border-gold/10 hover:border-gold/30 transition-all duration-300">
+                                            <h4 className="font-semibold text-gold/90 mb-3 text-lg">Tier 4: $1M+</h4>
+                                            <p className="text-base">14% (1-year) | 15% (2-year)</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Investment Process */}
+                                <div className="bg-black/50 rounded-lg p-6 border border-gold/20">
+                                    <h3 className="font-semibold text-gold mb-4">🎯 Investment Process</h3>
+                                    <div className="space-y-4 text-white/80">
+                                        <div>
+                                            <h4 className="font-semibold text-gold/90 mb-2">Step 1: Qualification & Selection</h4>
+                                            <p className="text-sm">Verify accredited investor status. Choose investment amount ($200K minimum) and term (12 or 24 months). Two-year terms receive +1% bonus rate.</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-gold/90 mb-2">Step 2: Documentation</h4>
+                                            <p className="text-sm">Receive promissory note with contractually fixed annual yield. Simple, transparent structure with no complex equity arrangements.</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-gold/90 mb-2">Step 3: Capital Deployment</h4>
+                                            <p className="text-sm">Funds deployed across short-term (1-6 month) secured business loans to privacy-focused borrowers who value discretion over lowest rates.</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-gold/90 mb-2">Step 4: Returns</h4>
+                                            <p className="text-sm">Receive consistent, fixed payouts on your preferred schedule: monthly, quarterly, or annually. No surprises, no market volatility.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Key Value Propositions */}
+                                <div className="bg-black/50 rounded-lg p-6 border border-gold/20">
+                                    <h3 className="font-semibold text-gold mb-4">💡 Key Selling Points</h3>
+                                    <div className="space-y-4 text-white/80">
+                                        <div>
+                                            <h4 className="font-semibold text-gold/90 mb-2">🛡️ Security & Protection</h4>
+                                            <p className="text-sm">Family-run 506(c) firm with decades of experience. Collateralized loans, surety bonds, reserve funds. Wayne Griswold personally oversees every deal.</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-gold/90 mb-2">� Strategic Advantages</h4>
+                                            <p className="text-sm">Short-term deployment model allows rapid capital reallocation. Privacy-premium niches generate superior yields. Agile response to market opportunities.</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-gold/90 mb-2">💰 Tax Optimization</h4>
+                                            <p className="text-sm">Self-directed retirement strategies: direct 401(k)/IRA funds into high-yield investments. Tax repositioning: transform tax payments into yield-generating assets.</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-gold/90 mb-2">📈 Predictable Performance</h4>
+                                            <p className="text-sm">Fixed returns independent of market volatility. Consistent 11-15% annual yields. No correlation to stock market ups and downs.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Compliance Notes */}
+                                <div className="bg-red-900/20 rounded-lg p-4 border border-red-500/30">
+                                    <h4 className="font-semibold text-red-400 mb-2">⚠️ Compliance Reminders</h4>
+                                    <div className="text-red-300/80 text-sm space-y-1">
+                                        <p>• Verify accredited investor status before discussing specific opportunities</p>
+                                        <p>• Provide all required risk disclosures and disclaimers</p>
+                                        <p>• Past performance does not guarantee future results</p>
+                                        <p>• All investments involve risk of loss</p>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
-                )}
 
-                {error && (
-                    <div className="mt-4 p-3 rounded bg-red-500/20 border border-red-500/30 text-red-400 text-sm">
-                        ⚠️ {error}
-                    </div>
-                )}
-
-                <div className="text-xs text-white/40 mt-8 border-t border-gold/10 pt-4 text-center">
-                    🛡️ This data room is private and confidential. All access is logged. Please do not forward links without authorization.
-                </div>
-            </div>
-
-            {/* Enhanced Document Viewer Popup */}
-            {viewingFile && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-black/90 rounded-xl shadow-2xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col border border-gold/30">
-                        <div className="flex items-center justify-between p-4 border-b border-gold/20">
-                            <div className="flex items-center gap-3">
-                                <div className="relative">
-                                    <div className="text-3xl">
-                                        {getFileIcon(viewingFile.name)}
-                                    </div>
-                                    <div className="absolute -top-1 -right-1 bg-gold/90 text-black text-xs px-1.5 py-0.5 rounded-full font-medium">
-                                        {extractVersion(viewingFile.name)}
-                                    </div>
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold text-white">
-                                        {viewingFile.name.replace(/^\d+_/, '').replace(/v\d+\.?\d*/i, '').replace(/_{2,}/g, '_').replace(/^_|_$/g, '')}
-                                    </h3>
-                                    <div className="text-sm text-white/60 flex items-center gap-3">
-                                        <span>📅 {new Date(viewingFile.updated_at || viewingFile.created_at).toLocaleDateString()}</span>
-                                        <span>🔄 {new Date(viewingFile.updated_at || viewingFile.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                        <span className="text-gold">✨ {extractVersion(viewingFile.name)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <a
-                                    href={supabase.storage.from(BUCKET).getPublicUrl(viewingFile.name).data.publicUrl}
-                                    download
-                                    className="px-4 py-2 text-sm rounded-lg bg-gold/20 text-gold hover:bg-gold/30 transition flex items-center gap-1"
-                                >
-                                    ⬇️ Download
-                                </a>
-                                <button
-                                    onClick={closeFileViewer}
-                                    className="px-4 py-2 text-sm rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition flex items-center gap-1"
-                                >
-                                    ✕ Close
-                                </button>
-                            </div>
-                        </div>
-                        <div className="flex-1 overflow-hidden">
-                            <iframe
-                                src={supabase.storage.from(BUCKET).getPublicUrl(viewingFile.name).data.publicUrl}
-                                className="w-full h-full border-0"
-                                title={viewingFile.name}
-                            />
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Upload Folder Selection Dialog */}
-            {showUploadDialog && pendingFile && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-black/90 rounded-xl shadow-2xl max-w-md w-full border border-gold/30">
-                        <div className="p-6">
-                            <h3 className="text-xl font-semibold text-gold mb-4 flex items-center gap-2">
-                                📁 Choose Upload Destination
+                    {currentPage === 'documents' && (
+                        <div className="bg-black/50 rounded-lg p-6 border border-gold/20 mt-6">
+                            <h3 className="font-semibold text-gold mb-3 flex items-center gap-2">
+                                💬 Document Requests & Inquiries
                             </h3>
-                            <p className="text-white/80 mb-4">
-                                Uploading: <span className="text-gold font-medium">{pendingFile.name}</span>
-                            </p>
-
-                            {/* Folder Selection */}
-                            <div className="space-y-2 mb-6">
-                                {folders.filter(f => f.id !== 'all').map(folder => (
-                                    <button
-                                        key={folder.id}
-                                        onClick={() => setUploadTargetFolder(folder.id)}
-                                        className={`w-full text-left px-4 py-3 rounded-lg border transition flex items-center gap-3 ${uploadTargetFolder === folder.id
-                                            ? 'bg-gold/20 border-gold/40 text-gold'
-                                            : 'bg-gray-800/50 border-gray-700 text-white/70 hover:bg-gray-700/50'
-                                            }`}
-                                    >
-                                        <span className="text-xl">{folder.icon}</span>
-                                        <div>
-                                            <div className="font-medium">{folder.name}</div>
-                                            <div className="text-xs opacity-60">
-                                                {folder.id === 'prospecting' && 'First impression materials'}
-                                                {folder.id === 'presentation' && 'For interested prospects'}
-                                                {folder.id === 'closing' && 'Legal paperwork for commitments'}
-                                                {folder.id === 'training' && 'Sales training & compliance'}
-                                            </div>
-                                        </div>
-                                    </button>
-                                ))}
-
-                                {/* Custom Folder Option */}
-                                <div>
-                                    <button
-                                        onClick={() => setUploadTargetFolder('custom')}
-                                        className={`w-full text-left px-4 py-3 rounded-lg border transition flex items-center gap-3 ${uploadTargetFolder === 'custom'
-                                            ? 'bg-gold/20 border-gold/40 text-gold'
-                                            : 'bg-gray-800/50 border-gray-700 text-white/70 hover:bg-gray-700/50'
-                                            }`}
-                                    >
-                                        <span className="text-xl">✨</span>
-                                        <div className="font-medium">Custom Folder</div>
-                                    </button>
-
-                                    {uploadTargetFolder === 'custom' && (
-                                        <input
-                                            type="text"
-                                            placeholder="Enter folder name (e.g., 'legal', 'marketing')"
-                                            className="w-full mt-2 p-3 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 transition"
-                                            onChange={(e) => setUploadTargetFolder(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''))}
-                                        />
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => {
-                                        setShowUploadDialog(false);
-                                        setPendingFile(null);
-                                        setUploadTargetFolder('');
-                                    }}
-                                    className="flex-1 px-4 py-2 rounded-lg bg-gray-600/20 text-gray-400 hover:bg-gray-600/30 transition"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (pendingFile && uploadTargetFolder) {
-                                            uploadFile(pendingFile, uploadTargetFolder, false);
-                                        }
-                                    }}
-                                    disabled={!uploadTargetFolder}
-                                    className="flex-1 px-4 py-2 rounded-lg bg-gold/90 text-black font-semibold hover:bg-yellow-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Upload File
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Replace File / New Version Dialog */}
-            {showReplaceDialog && replaceTargetFile && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-black/90 rounded-xl shadow-2xl max-w-md w-full border border-gold/30">
-                        <div className="p-6">
-                            <h3 className="text-xl font-semibold text-gold mb-4 flex items-center gap-2">
-                                🔄 Create New Version
-                            </h3>
-                            <p className="text-white/80 mb-4">
-                                Creating new version of: <br />
-                                <span className="text-gold font-medium">
-                                    {replaceTargetFile.name.replace(/^\d+_/, '').replace(/v\d+\.?\d*/i, '').replace(/_{2,}/g, '_').replace(/^_|_$/g, '')}
-                                </span>
-                            </p>
-                            <div className="bg-gray-800/50 rounded-lg p-3 mb-4">
-                                <div className="text-sm text-white/70">Current Version: <span className="text-gold">{extractVersion(replaceTargetFile.name)}</span></div>
-                                <div className="text-sm text-white/70">New Version: <span className="text-green-400">{incrementVersion(extractVersion(replaceTargetFile.name))}</span></div>
-                            </div>
-
-                            {/* Upload New Version */}
-                            <div className="mb-6">
-                                <input
-                                    type="file"
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                            // Extract folder from existing file name
-                                            const folderMatch = replaceTargetFile.name.match(/^\d+_([^_]+)_/);
-                                            const existingFolder = folderMatch ? folderMatch[1] : '';
-                                            uploadFile(file, existingFolder, true, replaceTargetFile);
-                                        }
-                                    }}
-                                    className="w-full p-3 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold transition"
+                            <form onSubmit={handleRequestSubmit}>
+                                <textarea
+                                    className="w-full p-4 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 mb-4 transition"
+                                    placeholder="Request specific documents, ask questions about existing materials, or suggest additional content for this data room..."
+                                    value={requestText}
+                                    onChange={e => setRequestText(e.target.value)}
+                                    rows={4}
+                                    required
                                 />
-                                <p className="text-xs text-white/60 mt-2">
-                                    💡 Select the updated file to create version {incrementVersion(extractVersion(replaceTargetFile.name))}
-                                </p>
-                            </div>
+                                <div className="flex justify-between items-center">
+                                    <div className="text-xs text-white/50">
+                                        All requests are logged and reviewed by authorized personnel
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        className="px-6 py-2 rounded-lg bg-gold/90 text-black font-semibold hover:bg-yellow-500 transition shadow-lg"
+                                    >
+                                        Submit Request
+                                    </button>
+                                </div>
+                            </form>
+                            {requestSuccess && (
+                                <div className="mt-3 p-3 rounded bg-green-500/20 border border-green-500/30 text-green-400 text-sm">
+                                    ✅ Request submitted successfully and will be reviewed promptly.
+                                </div>
+                            )}
+                        </div>
+                    )}
 
-                            {/* Action Buttons */}
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => {
-                                        setShowReplaceDialog(false);
-                                        setReplaceTargetFile(null);
-                                    }}
-                                    className="flex-1 px-4 py-2 rounded-lg bg-gray-600/20 text-gray-400 hover:bg-gray-600/30 transition"
-                                >
-                                    Cancel
-                                </button>
+                    {error && (
+                        <div className="mt-4 p-3 rounded bg-red-500/20 border border-red-500/30 text-red-400 text-sm">
+                            ⚠️ {error}
+                        </div>
+                    )}
+
+                    <div className="text-xs text-white/40 mt-8 border-t border-gold/10 pt-4 text-center">
+                        🛡️ This data room is private and confidential. All access is logged. Please do not forward links without authorization.
+                    </div>
+                </div>
+
+                {/* Enhanced Document Viewer Popup */}
+                {viewingFile && (
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-black/90 rounded-xl shadow-2xl w-full max-w-6xl h-full max-h-[90vh] flex flex-col border border-gold/30">
+                            <div className="flex items-center justify-between p-4 border-b border-gold/20">
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <div className="text-3xl">
+                                            {getFileIcon(viewingFile.name)}
+                                        </div>
+                                        <div className="absolute -top-1 -right-1 bg-gold/90 text-black text-xs px-1.5 py-0.5 rounded-full font-medium">
+                                            {extractVersion(viewingFile.name)}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-white">
+                                            {viewingFile.name.replace(/^\d+_/, '').replace(/v\d+\.?\d*/i, '').replace(/_{2,}/g, '_').replace(/^_|_$/g, '')}
+                                        </h3>
+                                        <div className="text-sm text-white/60 flex items-center gap-3">
+                                            <span>📅 {new Date(viewingFile.updated_at || viewingFile.created_at).toLocaleDateString()}</span>
+                                            <span>🔄 {new Date(viewingFile.updated_at || viewingFile.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            <span className="text-gold">✨ {extractVersion(viewingFile.name)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <a
+                                        href={supabase.storage.from(BUCKET).getPublicUrl(viewingFile.name).data.publicUrl}
+                                        download
+                                        className="px-4 py-2 text-sm rounded-lg bg-gold/20 text-gold hover:bg-gold/30 transition flex items-center gap-1"
+                                    >
+                                        ⬇️ Download
+                                    </a>
+                                    <button
+                                        onClick={closeFileViewer}
+                                        className="px-4 py-2 text-sm rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition flex items-center gap-1"
+                                    >
+                                        ✕ Close
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="flex-1 overflow-hidden">
+                                <iframe
+                                    src={supabase.storage.from(BUCKET).getPublicUrl(viewingFile.name).data.publicUrl}
+                                    className="w-full h-full border-0"
+                                    title={viewingFile.name}
+                                />
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+
+                {/* Upload Folder Selection Dialog */}
+                {showUploadDialog && pendingFile && (
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-black/90 rounded-xl shadow-2xl max-w-md w-full border border-gold/30">
+                            <div className="p-6">
+                                <h3 className="text-xl font-semibold text-gold mb-4 flex items-center gap-2">
+                                    📁 Choose Upload Destination
+                                </h3>
+                                <p className="text-white/80 mb-4">
+                                    Uploading: <span className="text-gold font-medium">{pendingFile.name}</span>
+                                </p>
+
+                                {/* Folder Selection */}
+                                <div className="space-y-2 mb-6">
+                                    {folders.filter(f => f.id !== 'all').map(folder => (
+                                        <button
+                                            key={folder.id}
+                                            onClick={() => setUploadTargetFolder(folder.id)}
+                                            className={`w-full text-left px-4 py-3 rounded-lg border transition flex items-center gap-3 ${uploadTargetFolder === folder.id
+                                                ? 'bg-gold/20 border-gold/40 text-gold'
+                                                : 'bg-gray-800/50 border-gray-700 text-white/70 hover:bg-gray-700/50'
+                                                }`}
+                                        >
+                                            <span className="text-xl">{folder.icon}</span>
+                                            <div>
+                                                <div className="font-medium">{folder.name}</div>
+                                                <div className="text-xs opacity-60">
+                                                    {folder.id === 'prospecting' && 'First impression materials'}
+                                                    {folder.id === 'presentation' && 'For interested prospects'}
+                                                    {folder.id === 'closing' && 'Legal paperwork for commitments'}
+                                                    {folder.id === 'training' && 'Sales training & compliance'}
+                                                </div>
+                                            </div>
+                                        </button>
+                                    ))}
+
+                                    {/* Custom Folder Option */}
+                                    <div>
+                                        <button
+                                            onClick={() => setUploadTargetFolder('custom')}
+                                            className={`w-full text-left px-4 py-3 rounded-lg border transition flex items-center gap-3 ${uploadTargetFolder === 'custom'
+                                                ? 'bg-gold/20 border-gold/40 text-gold'
+                                                : 'bg-gray-800/50 border-gray-700 text-white/70 hover:bg-gray-700/50'
+                                                }`}
+                                        >
+                                            <span className="text-xl">✨</span>
+                                            <div className="font-medium">Custom Folder</div>
+                                        </button>
+
+                                        {uploadTargetFolder === 'custom' && (
+                                            <input
+                                                type="text"
+                                                placeholder="Enter folder name (e.g., 'legal', 'marketing')"
+                                                className="w-full mt-2 p-3 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 transition"
+                                                onChange={(e) => setUploadTargetFolder(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''))}
+                                            />
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => {
+                                            setShowUploadDialog(false);
+                                            setPendingFile(null);
+                                            setUploadTargetFolder('');
+                                        }}
+                                        className="flex-1 px-4 py-2 rounded-lg bg-gray-600/20 text-gray-400 hover:bg-gray-600/30 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (pendingFile && uploadTargetFolder) {
+                                                uploadFile(pendingFile, uploadTargetFolder, false);
+                                            }
+                                        }}
+                                        disabled={!uploadTargetFolder}
+                                        className="flex-1 px-4 py-2 rounded-lg bg-gold/90 text-black font-semibold hover:bg-yellow-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Upload File
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Replace File / New Version Dialog */}
+                {showReplaceDialog && replaceTargetFile && (
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-black/90 rounded-xl shadow-2xl max-w-md w-full border border-gold/30">
+                            <div className="p-6">
+                                <h3 className="text-xl font-semibold text-gold mb-4 flex items-center gap-2">
+                                    🔄 Create New Version
+                                </h3>
+                                <p className="text-white/80 mb-4">
+                                    Creating new version of: <br />
+                                    <span className="text-gold font-medium">
+                                        {replaceTargetFile.name.replace(/^\d+_/, '').replace(/v\d+\.?\d*/i, '').replace(/_{2,}/g, '_').replace(/^_|_$/g, '')}
+                                    </span>
+                                </p>
+                                <div className="bg-gray-800/50 rounded-lg p-3 mb-4">
+                                    <div className="text-sm text-white/70">Current Version: <span className="text-gold">{extractVersion(replaceTargetFile.name)}</span></div>
+                                    <div className="text-sm text-white/70">New Version: <span className="text-green-400">{incrementVersion(extractVersion(replaceTargetFile.name))}</span></div>
+                                </div>
+
+                                {/* Upload New Version */}
+                                <div className="mb-6">
+                                    <input
+                                        type="file"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                // Extract folder from existing file name
+                                                const folderMatch = replaceTargetFile.name.match(/^\d+_([^_]+)_/);
+                                                const existingFolder = folderMatch ? folderMatch[1] : '';
+                                                uploadFile(file, existingFolder, true, replaceTargetFile);
+                                            }
+                                        }}
+                                        className="w-full p-3 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold transition"
+                                    />
+                                    <p className="text-xs text-white/60 mt-2">
+                                        💡 Select the updated file to create version {incrementVersion(extractVersion(replaceTargetFile.name))}
+                                    </p>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => {
+                                            setShowReplaceDialog(false);
+                                            setReplaceTargetFile(null);
+                                        }}
+                                        className="flex-1 px-4 py-2 rounded-lg bg-gray-600/20 text-gray-400 hover:bg-gray-600/30 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
