@@ -650,15 +650,7 @@ export default function DataRoom() {
     return (
         <div className="min-h-screen bg-black">
             {/* Premium Hero Section */}
-            <div className="relative min-h-screen flex items-center justify-center hero-grid overflow-hidden">
-                {/* Simplified Connection Lines */}
-                <div className="connection-line"></div>
-                <div className="connection-line"></div>
-
-                {/* Minimal Data Nodes */}
-                <div className="data-node" style={{ top: '25%', right: '30%' }}></div>
-                <div className="data-node" style={{ top: '75%', left: '25%' }}></div>
-
+            <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
                 {/* Hero Content */}
                 <div className="text-center z-10 max-w-4xl mx-auto px-8">
                     <div className="animate-fadeIn">
