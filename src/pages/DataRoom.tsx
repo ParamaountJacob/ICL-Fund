@@ -478,37 +478,47 @@ export default function DataRoom() {
     function renderFAQPage() {
         return (
             <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-gold mb-6">Sales Team FAQ</h2>
+                <h2 className="text-2xl font-bold text-gold mb-6">Investor FAQ</h2>
 
                 <div className="space-y-4">
                     <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
-                        <h3 className="font-semibold text-gold mb-2">What is Inner Circle Lending Fund #1?</h3>
-                        <p className="text-white/80 text-sm">Inner Circle Lending is a private capital fund focused on providing alternative lending solutions. As Fund #1, we're establishing our track record in the private lending space with carefully selected investment opportunities.</p>
+                        <h3 className="font-semibold text-gold mb-2">What is Inner Circle Lending?</h3>
+                        <p className="text-white/80 text-sm">Inner Circle Lending is a family-run 506(c) private lending firm that provides 11-15% fixed annual returns through secured business loans. We serve borrowers who value certainty, speed, and discretion over the lowest rate, creating premium yield opportunities for our investors.</p>
                     </div>
 
                     <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
-                        <h3 className="font-semibold text-gold mb-2">What are the minimum investment amounts?</h3>
-                        <p className="text-white/80 text-sm">Minimum investments typically start at $25,000 for qualified investors. Specific terms are outlined in the subscription agreement and vary based on the investment structure.</p>
+                        <h3 className="font-semibold text-gold mb-2">What are the minimum investment requirements?</h3>
+                        <p className="text-white/80 text-sm">Our minimum investment is $200,000. We offer tiered returns: Tier 1 ($200K-$349K) = 11-12%, Tier 2 ($350K-$499K) = 12-13%, Tier 3 ($500K-$999K) = 13-14%, Tier 4 ($1M+) = 14-15%. Two-year terms receive an additional 1% bonus.</p>
                     </div>
 
                     <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
-                        <h3 className="font-semibold text-gold mb-2">Who can invest in the fund?</h3>
-                        <p className="text-white/80 text-sm">We work with accredited investors and qualified purchasers. All investors must complete KYC/AML verification and meet suitability requirements outlined in our investor documentation.</p>
+                        <h3 className="font-semibold text-gold mb-2">Who can invest with Inner Circle Lending?</h3>
+                        <p className="text-white/80 text-sm">We work exclusively with accredited investors who meet SEC qualification requirements. Our selective approach ensures we maintain high-quality relationships with sophisticated investors who understand private lending opportunities.</p>
                     </div>
 
                     <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
-                        <h3 className="font-semibold text-gold mb-2">What documents do investors need to sign?</h3>
-                        <p className="text-white/80 text-sm">Primary documents include the subscription agreement and promissory note. Additional KYC/AML forms and disclosures may be required based on investment structure.</p>
+                        <h3 className="font-semibold text-gold mb-2">How are returns structured and paid?</h3>
+                        <p className="text-white/80 text-sm">We offer fixed annual returns of 11-15% based on your investment tier. You can choose monthly, quarterly, or annual payment schedules. Returns are contractually guaranteed through promissory notes - simple, transparent, and secure.</p>
                     </div>
 
                     <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
-                        <h3 className="font-semibold text-gold mb-2">How long is the investment commitment?</h3>
-                        <p className="text-white/80 text-sm">Investment terms vary by opportunity. Typical commitments range from 12-36 months with specific terms outlined in the promissory note and investment documentation.</p>
+                        <h3 className="font-semibold text-gold mb-2">What investment terms are available?</h3>
+                        <p className="text-white/80 text-sm">We offer 12-month and 24-month investment terms. Two-year commitments receive a 1% bonus on returns. Our short-term deployment model (typically 6 months or less) allows for rapid capital reallocation and real-time optimization.</p>
                     </div>
 
                     <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
-                        <h3 className="font-semibold text-gold mb-2">What compliance requirements should I know?</h3>
-                        <p className="text-white/80 text-sm">Always verify accreditation status before discussing specific investment opportunities. Ensure all required disclosures are provided and never guarantee returns or make performance promises.</p>
+                        <h3 className="font-semibold text-gold mb-2">How are investments protected?</h3>
+                        <p className="text-white/80 text-sm">Your investment is secured through collateralized loans, surety bonds, and reserve funds. Wayne Griswold personally oversees every deal. Our rigorous due diligence process and focus on privacy-premium borrowers provides multiple layers of protection.</p>
+                    </div>
+
+                    <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
+                        <h3 className="font-semibold text-gold mb-2">What makes Inner Circle Lending different?</h3>
+                        <p className="text-white/80 text-sm">We're not a startup fund. We're a family-run business with decades of experience, focusing on privacy-premium niches where discretion commands higher yields. Our agile approach with short-term loans allows us to pivot quickly and maintain consistent performance.</p>
+                    </div>
+
+                    <div className="bg-black/50 rounded-lg p-4 border border-gold/20">
+                        <h3 className="font-semibold text-gold mb-2">Can I use retirement funds or tax strategies?</h3>
+                        <p className="text-white/80 text-sm">Yes! We help investors redirect dormant 401(k)s, tax payments, or crypto holdings into our secured lending platform. Our tax repositioning strategies can transform tax liabilities into yield-generating assets while maintaining IRS compliance.</p>
                     </div>
                 </div>
             </div>
@@ -559,9 +569,9 @@ export default function DataRoom() {
             <div className="max-w-4xl mx-auto bg-black/70 backdrop-blur-sm rounded-xl shadow-2xl p-8 mt-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gold mb-2">Sales Resource Center</h1>
+                        <h1 className="text-3xl font-bold text-gold mb-2">Data Room</h1>
                         <p className="text-white/80">
-                            Secure repository for raising capital for Inner Circle Lending Fund #1.
+                            Secure repository for Inner Circle Lending investment materials and documentation.
                         </p>
                     </div>
                     <div className="text-right">
@@ -612,24 +622,86 @@ export default function DataRoom() {
                 {currentPage === 'documents' && renderDocumentsPage()}
                 {currentPage === 'faq' && renderFAQPage()}
                 {currentPage === 'guide' && (
-                    <div className="bg-black/50 rounded-lg p-6 border border-gold/20">
-                        <h2 className="text-xl font-semibold text-gold mb-4">Sales Process Guide</h2>
-                        <div className="space-y-4 text-white/80">
-                            <div>
-                                <h3 className="font-semibold text-gold/90 mb-2">🎯 Step 1: Prospecting</h3>
-                                <p className="text-sm">Use pitch deck and one-pagers for initial meetings. Focus on qualifying accreditation status early.</p>
+                    <div className="space-y-6">
+                        <h2 className="text-xl font-semibold text-gold mb-4">Investment Guide</h2>
+
+                        {/* Investment Tiers */}
+                        <div className="bg-black/50 rounded-lg p-6 border border-gold/20">
+                            <h3 className="font-semibold text-gold mb-4">📊 Investment Tiers & Returns</h3>
+                            <div className="grid md:grid-cols-2 gap-4 text-white/80">
+                                <div className="bg-gray-800/50 rounded-lg p-4">
+                                    <h4 className="font-semibold text-gold/90 mb-2">Tier 1: $200K - $349K</h4>
+                                    <p className="text-sm">11% (1-year) | 12% (2-year)</p>
+                                </div>
+                                <div className="bg-gray-800/50 rounded-lg p-4">
+                                    <h4 className="font-semibold text-gold/90 mb-2">Tier 2: $350K - $499K</h4>
+                                    <p className="text-sm">12% (1-year) | 13% (2-year)</p>
+                                </div>
+                                <div className="bg-gray-800/50 rounded-lg p-4">
+                                    <h4 className="font-semibold text-gold/90 mb-2">Tier 3: $500K - $999K</h4>
+                                    <p className="text-sm">13% (1-year) | 14% (2-year)</p>
+                                </div>
+                                <div className="bg-gray-800/50 rounded-lg p-4">
+                                    <h4 className="font-semibold text-gold/90 mb-2">Tier 4: $1M+</h4>
+                                    <p className="text-sm">14% (1-year) | 15% (2-year)</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-semibold text-gold/90 mb-2">💼 Step 2: Presentation</h3>
-                                <p className="text-sm">Share detailed terms sheet and FAQ responses. Address risk questions thoroughly with provided materials.</p>
+                        </div>
+
+                        {/* Investment Process */}
+                        <div className="bg-black/50 rounded-lg p-6 border border-gold/20">
+                            <h3 className="font-semibold text-gold mb-4">🎯 Investment Process</h3>
+                            <div className="space-y-4 text-white/80">
+                                <div>
+                                    <h4 className="font-semibold text-gold/90 mb-2">Step 1: Qualification & Selection</h4>
+                                    <p className="text-sm">Verify accredited investor status. Choose investment amount ($200K minimum) and term (12 or 24 months). Two-year terms receive +1% bonus rate.</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-gold/90 mb-2">Step 2: Documentation</h4>
+                                    <p className="text-sm">Receive promissory note with contractually fixed annual yield. Simple, transparent structure with no complex equity arrangements.</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-gold/90 mb-2">Step 3: Capital Deployment</h4>
+                                    <p className="text-sm">Funds deployed across short-term (1-6 month) secured business loans to privacy-focused borrowers who value discretion over lowest rates.</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-gold/90 mb-2">Step 4: Returns</h4>
+                                    <p className="text-sm">Receive consistent, fixed payouts on your preferred schedule: monthly, quarterly, or annually. No surprises, no market volatility.</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-semibold text-gold/90 mb-2">📋 Step 3: Closing</h3>
-                                <p className="text-sm">Provide subscription agreement and promissory note. Ensure all required disclosures are completed.</p>
+                        </div>
+
+                        {/* Key Value Propositions */}
+                        <div className="bg-black/50 rounded-lg p-6 border border-gold/20">
+                            <h3 className="font-semibold text-gold mb-4">💡 Key Selling Points</h3>
+                            <div className="space-y-4 text-white/80">
+                                <div>
+                                    <h4 className="font-semibold text-gold/90 mb-2">🛡️ Security & Protection</h4>
+                                    <p className="text-sm">Family-run 506(c) firm with decades of experience. Collateralized loans, surety bonds, reserve funds. Wayne Griswold personally oversees every deal.</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-gold/90 mb-2">� Strategic Advantages</h4>
+                                    <p className="text-sm">Short-term deployment model allows rapid capital reallocation. Privacy-premium niches generate superior yields. Agile response to market opportunities.</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-gold/90 mb-2">💰 Tax Optimization</h4>
+                                    <p className="text-sm">Self-directed retirement strategies: direct 401(k)/IRA funds into high-yield investments. Tax repositioning: transform tax payments into yield-generating assets.</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-gold/90 mb-2">📈 Predictable Performance</h4>
+                                    <p className="text-sm">Fixed returns independent of market volatility. Consistent 11-15% annual yields. No correlation to stock market ups and downs.</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-semibold text-gold/90 mb-2">⚠️ Compliance Reminders</h3>
-                                <p className="text-sm">Never guarantee returns. Always verify accreditation. Provide all required risk disclosures.</p>
+                        </div>
+
+                        {/* Compliance Notes */}
+                        <div className="bg-red-900/20 rounded-lg p-4 border border-red-500/30">
+                            <h4 className="font-semibold text-red-400 mb-2">⚠️ Compliance Reminders</h4>
+                            <div className="text-red-300/80 text-sm space-y-1">
+                                <p>• Verify accredited investor status before discussing specific opportunities</p>
+                                <p>• Provide all required risk disclosures and disclaimers</p>
+                                <p>• Past performance does not guarantee future results</p>
+                                <p>• All investments involve risk of loss</p>
                             </div>
                         </div>
                     </div>
@@ -751,8 +823,8 @@ export default function DataRoom() {
                                         key={folder.id}
                                         onClick={() => setUploadTargetFolder(folder.id)}
                                         className={`w-full text-left px-4 py-3 rounded-lg border transition flex items-center gap-3 ${uploadTargetFolder === folder.id
-                                                ? 'bg-gold/20 border-gold/40 text-gold'
-                                                : 'bg-gray-800/50 border-gray-700 text-white/70 hover:bg-gray-700/50'
+                                            ? 'bg-gold/20 border-gold/40 text-gold'
+                                            : 'bg-gray-800/50 border-gray-700 text-white/70 hover:bg-gray-700/50'
                                             }`}
                                     >
                                         <span className="text-xl">{folder.icon}</span>
@@ -773,8 +845,8 @@ export default function DataRoom() {
                                     <button
                                         onClick={() => setUploadTargetFolder('custom')}
                                         className={`w-full text-left px-4 py-3 rounded-lg border transition flex items-center gap-3 ${uploadTargetFolder === 'custom'
-                                                ? 'bg-gold/20 border-gold/40 text-gold'
-                                                : 'bg-gray-800/50 border-gray-700 text-white/70 hover:bg-gray-700/50'
+                                            ? 'bg-gold/20 border-gold/40 text-gold'
+                                            : 'bg-gray-800/50 border-gray-700 text-white/70 hover:bg-gray-700/50'
                                             }`}
                                     >
                                         <span className="text-xl">✨</span>
