@@ -27,6 +27,7 @@ const Hero: React.FC = () => {
           muted
           loop
           playsInline
+          poster="https://res.cloudinary.com/digjsdron/video/upload/so_0/v1752590378/Homescreen_q1odxc.jpg"
           className="w-full h-full object-cover"
           style={{ minHeight: '100vh', minWidth: '100vw', maxWidth: '100vw' }}
         >
