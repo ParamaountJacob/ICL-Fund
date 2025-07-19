@@ -33,23 +33,35 @@ export default function DataRoom() {
     }
 
     function sanitizeFileName(name: string): string {
-        // Remove or replace problematic characters
+        // More aggressive sanitization for Supabase storage
         return name
-            .replace(/[^\w\s.-]/g, '') // Remove special chars except spaces, dots, hyphens
-            .replace(/\s+/g, '_') // Replace spaces with underscores
-            .replace(/_{2,}/g, '_') // Replace multiple underscores with single
-            .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+            .normalize('NFD') // Normalize unicode
+            .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+            .replace(/[^\w.-]/g, '_') // Replace any non-alphanumeric (except dots/hyphens) with underscore
+            .replace(/_+/g, '_') // Replace multiple underscores with single
+            .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+            .toLowerCase(); // Convert to lowercase for consistency
     }
 
     async function uploadFile(file: File) {
         setUploading(true);
         setError('');
+
         const sanitizedName = sanitizeFileName(file.name);
         const fileName = `${Date.now()}_${sanitizedName}`;
+
+        console.log('Original filename:', file.name);
+        console.log('Sanitized filename:', sanitizedName);
+        console.log('Final filename:', fileName);
+
         const { error } = await supabase.storage.from(BUCKET).upload(fileName, file, { upsert: true });
         setUploading(false);
-        if (error) setError(error.message);
-        else fetchFiles();
+        if (error) {
+            console.error('Upload error:', error);
+            setError(error.message);
+        } else {
+            fetchFiles();
+        }
     }
 
     async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
