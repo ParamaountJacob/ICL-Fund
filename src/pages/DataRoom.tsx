@@ -174,9 +174,9 @@ export default function DataRoom() {
             <div className="max-w-4xl mx-auto bg-black/70 backdrop-blur-sm rounded-xl shadow-2xl p-8 mt-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gold mb-2">Virtual Data Room</h1>
+                        <h1 className="text-3xl font-bold text-gold mb-2">Sales Resource Center</h1>
                         <p className="text-white/80">
-                            Secure document repository containing essential business documents, financial statements, legal agreements, and due diligence materials.
+                            Secure repository containing all approved materials, documents, and resources for raising capital for Inner Circle Lending Fund #1.
                         </p>
                     </div>
                     <div className="text-right">
@@ -191,56 +191,56 @@ export default function DataRoom() {
                 </div>
 
                 <div className="mb-8 bg-black/50 rounded-lg p-6 border border-gold/20">
-                    <h2 className="text-xl font-semibold text-gold mb-4">What Goes in a Data Room?</h2>
-                    <p className="text-white/70 mb-4">A virtual data room contains ALL the documents investors/partners need for due diligence. Think of it as your complete business file cabinet that proves everything you claim about your company.</p>
+                    <h2 className="text-xl font-semibold text-gold mb-4">Sales Team Resource Center</h2>
+                    <p className="text-white/70 mb-4">Everything you need to effectively raise capital for Inner Circle Lending Fund #1. Organized by sales workflow stages.</p>
                     <div className="grid md:grid-cols-2 gap-6 text-white/80">
                         <div>
-                            <h3 className="font-semibold text-gold/90 mb-2">📊 Financial Proof</h3>
-                            <p className="text-sm mb-2">Show them the money is real:</p>
+                            <h3 className="font-semibold text-gold/90 mb-2">🎯 Prospecting Tools</h3>
+                            <p className="text-sm mb-2">First impression materials:</p>
                             <ul className="text-xs text-white/60 space-y-1">
-                                <li>• Bank statements (last 12 months)</li>
-                                <li>• Tax returns (last 3 years)</li>
-                                <li>• Profit & loss statements</li>
-                                <li>• Cash flow projections</li>
-                                <li>• Audited financials (if you have them)</li>
+                                <li>• Pitch deck (PDF for presentations)</li>
+                                <li>• One-page fund summary</li>
+                                <li>• Executive summary</li>
+                                <li>• Key talking points</li>
+                                <li>• Elevator pitch scripts</li>
                             </ul>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gold/90 mb-2">⚖️ Legal Stuff</h3>
-                            <p className="text-sm mb-2">Prove you're legitimate:</p>
+                            <h3 className="font-semibold text-gold/90 mb-2">💼 Presentation Materials</h3>
+                            <p className="text-sm mb-2">For interested prospects:</p>
                             <ul className="text-xs text-white/60 space-y-1">
-                                <li>• Articles of incorporation</li>
-                                <li>• Operating agreements</li>
-                                <li>• Any major contracts</li>
-                                <li>• Insurance policies</li>
-                                <li>• Regulatory licenses</li>
+                                <li>• Detailed fund terms sheet</li>
+                                <li>• Investment minimums & timeline</li>
+                                <li>• Returns & risk explanations</li>
+                                <li>• FAQ responses</li>
+                                <li>• Market analysis data</li>
                             </ul>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gold/90 mb-2">🏢 Business Operations</h3>
-                            <p className="text-sm mb-2">Show how you make money:</p>
+                            <h3 className="font-semibold text-gold/90 mb-2">📋 Closing Documents</h3>
+                            <p className="text-sm mb-2">Legal paperwork for commitments:</p>
                             <ul className="text-xs text-white/60 space-y-1">
-                                <li>• Your detailed business plan</li>
-                                <li>• Market analysis/research</li>
-                                <li>• Customer lists (if allowed)</li>
-                                <li>• Key employee contracts</li>
-                                <li>• Operational procedures</li>
+                                <li>• Subscription agreement template</li>
+                                <li>• Promissory note template</li>
+                                <li>• Required disclosures</li>
+                                <li>• KYC/AML forms</li>
+                                <li>• Wire transfer instructions</li>
                             </ul>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gold/90 mb-2">📈 The Sales Pitch</h3>
-                            <p className="text-sm mb-2">Get them excited:</p>
+                            <h3 className="font-semibold text-gold/90 mb-2">🎓 Training & Support</h3>
+                            <p className="text-sm mb-2">How to sell effectively & compliantly:</p>
                             <ul className="text-xs text-white/60 space-y-1">
-                                <li>• Your best pitch deck</li>
-                                <li>• Investment memorandum</li>
-                                <li>• Market opportunity analysis</li>
-                                <li>• Growth projections</li>
-                                <li>• Competition analysis</li>
+                                <li>• Sales process flowchart</li>
+                                <li>• Compliance do's and don'ts</li>
+                                <li>• Objection handling guide</li>
+                                <li>• Contact list (legal, ops, support)</li>
+                                <li>• Commission structure</li>
                             </ul>
                         </div>
                     </div>
                     <div className="mt-4 p-3 bg-gold/10 rounded border border-gold/30">
-                        <p className="text-white/80 text-sm"><strong>💡 Pro Tip:</strong> Don't put everything at once. Start with your pitch deck and financials. Add more as investors request specific documents. This lets you control the narrative and see what they're most interested in.</p>
+                        <p className="text-white/80 text-sm"><strong>💡 Sales Tip:</strong> Start with Prospecting Tools for initial meetings, move to Presentation Materials when they show interest, use Closing Documents when they're ready to commit. Everything here is pre-approved for external use.</p>
                     </div>
                 </div>
 
