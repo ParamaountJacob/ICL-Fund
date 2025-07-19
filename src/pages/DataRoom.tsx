@@ -74,6 +74,8 @@ export default function DataRoom() {
     const [uploadTargetFolder, setUploadTargetFolder] = useState('');
     const [showReplaceDialog, setShowReplaceDialog] = useState(false);
     const [replaceTargetFile, setReplaceTargetFile] = useState<any>(null);
+    const [showDocumentActions, setShowDocumentActions] = useState(false);
+    const [selectedDocumentForActions, setSelectedDocumentForActions] = useState<any>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -453,10 +455,14 @@ export default function DataRoom() {
                         {filteredFiles.map((f) => (
                             <div
                                 key={f.name}
-                                className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 sm:py-5 rounded-lg hover:bg-gold/10 text-white/90 border border-gold/10 hover:border-gold/40 transition-all group"
+                                className="flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 sm:py-5 rounded-lg hover:bg-gold/10 text-white/90 border border-gold/10 hover:border-gold/40 transition-all cursor-pointer group"
+                                onClick={() => {
+                                    setSelectedDocumentForActions(f);
+                                    setShowDocumentActions(true);
+                                }}
                             >
                                 {/* Enhanced File Icon with Preview Thumbnail */}
-                                <div className="relative flex-shrink-0 self-start sm:self-center">
+                                <div className="relative flex-shrink-0">
                                     <div className="text-3xl sm:text-4xl">
                                         {getFileIcon(f.name)}
                                     </div>
@@ -467,51 +473,24 @@ export default function DataRoom() {
                                 </div>
 
                                 {/* File Details */}
-                                <div className="flex-1 cursor-pointer min-w-0"
-                                    onClick={() => openFileViewer(f)}>
+                                <div className="flex-1 min-w-0">
                                     <div className="font-medium hover:text-gold transition text-base sm:text-lg mb-1">
                                         {f.name.replace(/^\d+_/, '').replace(/v\d+\.?\d*/i, '').replace(/_{2,}/g, '_').replace(/^_|_$/g, '')}
                                     </div>
                                     <div className="text-sm text-white/60 flex flex-wrap gap-2 sm:gap-3">
                                         <span className="flex items-center gap-1">📅 {new Date(f.updated_at || f.created_at).toLocaleDateString()}</span>
                                         <span className="flex items-center gap-1">🔄 {new Date(f.updated_at || f.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                        <span className="flex items-center gap-1">👁️ Click to view</span>
                                         {f.metadata?.size && (
                                             <span className="flex items-center gap-1">📊 {(f.metadata.size / 1024 / 1024).toFixed(1)}MB</span>
                                         )}
                                     </div>
                                 </div>
 
-                                {/* Action Buttons */}
-                                <div className="flex flex-wrap gap-2 mt-2 sm:mt-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                                    <button
-                                        onClick={() => openFileViewer(f)}
-                                        className="px-3 py-2 text-sm rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition flex items-center gap-1 flex-shrink-0"
-                                    >
-                                        👁️ View
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setReplaceTargetFile(f);
-                                            setShowReplaceDialog(true);
-                                        }}
-                                        className="px-3 py-2 text-sm rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition flex items-center gap-1 flex-shrink-0"
-                                    >
-                                        🔄 New Version
-                                    </button>
-                                    <a
-                                        href={supabase.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl}
-                                        download
-                                        className="px-3 py-2 text-sm rounded-lg bg-gold/20 text-gold hover:bg-gold/30 transition flex items-center gap-1 flex-shrink-0"
-                                    >
-                                        ⬇️ Download
-                                    </a>
-                                    <button
-                                        className="px-3 py-2 text-sm rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition flex items-center gap-1 flex-shrink-0"
-                                        onClick={() => handleDelete(f.name)}
-                                    >
-                                        🗑️ Delete
-                                    </button>
+                                {/* Click indicator */}
+                                <div className="text-white/40 group-hover:text-gold transition-colors">
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
                                 </div>
                             </div>
                         ))}
@@ -685,30 +664,30 @@ export default function DataRoom() {
 
                     {/* Navigation */}
                     <div className="mb-6 sm:mb-8 border-b border-gold/20">
-                        <div className="flex gap-2 sm:gap-4 lg:gap-6 overflow-x-auto pb-1">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-0 sm:flex">
                             <button
                                 onClick={() => setCurrentPage('documents')}
-                                className={`pb-3 sm:pb-4 px-3 sm:px-4 text-base sm:text-lg font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${currentPage === 'documents'
-                                    ? 'text-gold border-b-2 border-gold'
-                                    : 'text-white/60 hover:text-white/90'
+                                className={`pb-3 sm:pb-4 px-4 py-2 sm:py-0 text-base sm:text-lg font-medium transition-all duration-300 rounded-lg sm:rounded-none ${currentPage === 'documents'
+                                    ? 'text-gold border-2 border-gold sm:border-0 sm:border-b-2 bg-gold/10 sm:bg-transparent'
+                                    : 'text-white/60 hover:text-white/90 border-2 border-transparent hover:border-white/20 sm:border-0'
                                     }`}
                             >
                                 📁 Documents
                             </button>
                             <button
                                 onClick={() => setCurrentPage('faq')}
-                                className={`pb-3 sm:pb-4 px-3 sm:px-4 text-base sm:text-lg font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${currentPage === 'faq'
-                                    ? 'text-gold border-b-2 border-gold'
-                                    : 'text-white/60 hover:text-white/90'
+                                className={`pb-3 sm:pb-4 px-4 py-2 sm:py-0 text-base sm:text-lg font-medium transition-all duration-300 rounded-lg sm:rounded-none ${currentPage === 'faq'
+                                    ? 'text-gold border-2 border-gold sm:border-0 sm:border-b-2 bg-gold/10 sm:bg-transparent'
+                                    : 'text-white/60 hover:text-white/90 border-2 border-transparent hover:border-white/20 sm:border-0'
                                     }`}
                             >
                                 ❓ FAQ
                             </button>
                             <button
                                 onClick={() => setCurrentPage('guide')}
-                                className={`pb-3 sm:pb-4 px-3 sm:px-4 text-base sm:text-lg font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${currentPage === 'guide'
-                                    ? 'text-gold border-b-2 border-gold'
-                                    : 'text-white/60 hover:text-white/90'
+                                className={`pb-3 sm:pb-4 px-4 py-2 sm:py-0 text-base sm:text-lg font-medium transition-all duration-300 rounded-lg sm:rounded-none ${currentPage === 'guide'
+                                    ? 'text-gold border-2 border-gold sm:border-0 sm:border-b-2 bg-gold/10 sm:bg-transparent'
+                                    : 'text-white/60 hover:text-white/90 border-2 border-transparent hover:border-white/20 sm:border-0'
                                     }`}
                             >
                                 📖 Investment Guide
@@ -1046,6 +1025,117 @@ export default function DataRoom() {
                                             setReplaceTargetFile(null);
                                         }}
                                         className="flex-1 px-4 py-2 rounded-lg bg-gray-600/20 text-gray-400 hover:bg-gray-600/30 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Document Actions Modal */}
+                {showDocumentActions && selectedDocumentForActions && (
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-black/95 rounded-xl shadow-2xl max-w-md w-full border border-gold/30">
+                            <div className="p-6">
+                                {/* Document Info Header */}
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="relative">
+                                        <div className="text-4xl">
+                                            {getFileIcon(selectedDocumentForActions.name)}
+                                        </div>
+                                        <div className="absolute -top-1 -right-1 bg-gold/90 text-black text-xs px-1.5 py-0.5 rounded-full font-medium">
+                                            {extractVersion(selectedDocumentForActions.name)}
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="text-lg font-semibold text-gold mb-1 truncate">
+                                            {selectedDocumentForActions.name.replace(/^\d+_/, '').replace(/v\d+\.?\d*/i, '').replace(/_{2,}/g, '_').replace(/^_|_$/g, '')}
+                                        </h3>
+                                        <div className="text-sm text-white/60 space-y-1">
+                                            <div>📅 {new Date(selectedDocumentForActions.updated_at || selectedDocumentForActions.created_at).toLocaleDateString()}</div>
+                                            <div>🔄 {new Date(selectedDocumentForActions.updated_at || selectedDocumentForActions.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                            {selectedDocumentForActions.metadata?.size && (
+                                                <div>📊 {(selectedDocumentForActions.metadata.size / 1024 / 1024).toFixed(1)}MB</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="space-y-3">
+                                    <button
+                                        onClick={() => {
+                                            openFileViewer(selectedDocumentForActions);
+                                            setShowDocumentActions(false);
+                                            setSelectedDocumentForActions(null);
+                                        }}
+                                        className="w-full px-4 py-3 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition flex items-center gap-3 text-left"
+                                    >
+                                        <span className="text-xl">👁️</span>
+                                        <div>
+                                            <div className="font-medium">View Document</div>
+                                            <div className="text-xs opacity-70">Open in full-screen viewer</div>
+                                        </div>
+                                    </button>
+
+                                    <button
+                                        onClick={() => {
+                                            setReplaceTargetFile(selectedDocumentForActions);
+                                            setShowReplaceDialog(true);
+                                            setShowDocumentActions(false);
+                                            setSelectedDocumentForActions(null);
+                                        }}
+                                        className="w-full px-4 py-3 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition flex items-center gap-3 text-left"
+                                    >
+                                        <span className="text-xl">🔄</span>
+                                        <div>
+                                            <div className="font-medium">Upload New Version</div>
+                                            <div className="text-xs opacity-70">Create version {incrementVersion(extractVersion(selectedDocumentForActions.name))}</div>
+                                        </div>
+                                    </button>
+
+                                    <a
+                                        href={supabase.storage.from(BUCKET).getPublicUrl(selectedDocumentForActions.name).data.publicUrl}
+                                        download
+                                        onClick={() => {
+                                            setShowDocumentActions(false);
+                                            setSelectedDocumentForActions(null);
+                                        }}
+                                        className="w-full px-4 py-3 rounded-lg bg-gold/20 text-gold hover:bg-gold/30 transition flex items-center gap-3 text-left"
+                                    >
+                                        <span className="text-xl">⬇️</span>
+                                        <div>
+                                            <div className="font-medium">Download</div>
+                                            <div className="text-xs opacity-70">Save to device</div>
+                                        </div>
+                                    </a>
+
+                                    <button
+                                        onClick={() => {
+                                            handleDelete(selectedDocumentForActions.name);
+                                            setShowDocumentActions(false);
+                                            setSelectedDocumentForActions(null);
+                                        }}
+                                        className="w-full px-4 py-3 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition flex items-center gap-3 text-left"
+                                    >
+                                        <span className="text-xl">🗑️</span>
+                                        <div>
+                                            <div className="font-medium">Delete Document</div>
+                                            <div className="text-xs opacity-70">Remove permanently</div>
+                                        </div>
+                                    </button>
+                                </div>
+
+                                {/* Cancel Button */}
+                                <div className="mt-6 pt-4 border-t border-gold/20">
+                                    <button
+                                        onClick={() => {
+                                            setShowDocumentActions(false);
+                                            setSelectedDocumentForActions(null);
+                                        }}
+                                        className="w-full px-4 py-2 rounded-lg bg-gray-600/20 text-gray-400 hover:bg-gray-600/30 transition"
                                     >
                                         Cancel
                                     </button>
