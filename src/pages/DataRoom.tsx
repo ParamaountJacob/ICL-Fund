@@ -53,8 +53,8 @@ const supabase = createClient(
 );
 
 const BUCKET = 'tim-data-room';
-const USERNAME = 'Admin';
-const PASSWORD = '000';
+const USERNAME = 'admin'; // Changed to lowercase for consistency
+const PASSWORD = '123456'; // Updated to match what user mentioned
 
 export default function DataRoom() {
     const { user: authUser } = useAuth(); // Get authenticated user from context
@@ -82,7 +82,9 @@ export default function DataRoom() {
 
     // Check if user is authenticated via AuthContext (admin) or simple login
     useEffect(() => {
+        console.log('DataRoom: Checking auth user:', authUser);
         if (authUser && (authUser.role === 'admin' || authUser.role === 'sub_admin')) {
+            console.log('DataRoom: Auto-authenticating admin user');
             setAuthenticated(true);
         }
     }, [authUser]);
@@ -229,11 +231,15 @@ export default function DataRoom() {
 
     function handlePasswordSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if (username === USERNAME && password === PASSWORD) {
+        // Make login case-insensitive and more flexible
+        const inputUsername = username.toLowerCase().trim();
+        const inputPassword = password.trim();
+
+        if (inputUsername === USERNAME.toLowerCase() && inputPassword === PASSWORD) {
             setAuthenticated(true);
             setError('');
         } else {
-            setError('Invalid username or password');
+            setError('Invalid username or password. Try: admin / 123456');
         }
     }
 
@@ -303,10 +309,12 @@ export default function DataRoom() {
     const folders = [
         { id: 'all', name: 'All Files', icon: '📁' },
         { id: 'recent', name: 'Recently Updated', icon: '⚡' },
-        { id: 'prospecting', name: 'Prospecting', icon: '🎯' },
-        { id: 'presentation', name: 'Presentation', icon: '💼' },
-        { id: 'closing', name: 'Closing Docs', icon: '📋' },
-        { id: 'training', name: 'Training', icon: '🎓' }
+        { id: 'company', name: 'Company Docs', icon: '�' },
+        { id: 'financial', name: 'Financial', icon: '�' },
+        { id: 'legal', name: 'Legal', icon: '⚖️' },
+        { id: 'marketing', name: 'Marketing', icon: '�' },
+        { id: 'investor', name: 'Investor Relations', icon: '🤝' },
+        { id: 'compliance', name: 'Compliance', icon: '📋' }
     ];
 
     const filteredFiles = getFilteredFiles();
@@ -367,10 +375,13 @@ export default function DataRoom() {
                             }
                         </div>
                         <div className="text-sm text-white/60 space-y-1">
-                            <div>💡 Pro tips for better organization:</div>
-                            <div>• Include folder name: "prospecting_pitchdeck.pdf"</div>
-                            <div>• Add version numbers: "pitchdeck_v2.1.pdf"</div>
-                            <div>• Use descriptive names: "closing_subscription_agreement_v1.0.pdf"</div>
+                            <div>💡 Recommended data room contents by folder:</div>
+                            <div>• Company: Articles, bylaws, licenses, org chart</div>
+                            <div>• Financial: Statements, tax returns, audits, projections</div>
+                            <div>• Legal: Fund docs, agreements, SEC filings</div>
+                            <div>• Marketing: Pitch decks, brochures, presentations</div>
+                            <div>• Investor: Subscription agreements, performance reports</div>
+                            <div>• Compliance: Policies, certifications, procedures</div>
                         </div>
                         <input
                             type="file"
@@ -533,6 +544,9 @@ export default function DataRoom() {
                         <div className="text-4xl mb-4">🔒</div>
                         <h1 className="text-2xl font-bold text-gold mb-2 tracking-wide">Secure Access</h1>
                         <p className="text-white/50 text-sm">Data Room Authentication</p>
+                        <div className="mt-2 text-xs text-white/40">
+                            Try: admin / 123456
+                        </div>
                         {authUser && (authUser.role === 'admin' || authUser.role === 'sub_admin') && (
                             <div className="mt-3 p-2 bg-green-500/10 rounded-lg border border-green-500/20">
                                 <p className="text-green-400 text-xs">
@@ -540,6 +554,22 @@ export default function DataRoom() {
                                 </p>
                                 <p className="text-green-300/60 text-xs mt-1">
                                     You already have admin access through the main system
+                                </p>
+                                <button
+                                    onClick={() => setAuthenticated(true)}
+                                    className="mt-2 px-3 py-1 text-xs bg-green-500/20 text-green-400 rounded border border-green-500/40 hover:bg-green-500/30 transition"
+                                >
+                                    Click here to enter directly
+                                </button>
+                            </div>
+                        )}
+                        {authUser && !(authUser.role === 'admin' || authUser.role === 'sub_admin') && (
+                            <div className="mt-3 p-2 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                                <p className="text-yellow-400 text-xs">
+                                    ⚠️ Logged in as: {authUser.email} (Role: {authUser.role})
+                                </p>
+                                <p className="text-yellow-300/60 text-xs mt-1">
+                                    Data room requires admin access. Use simple login below.
                                 </p>
                             </div>
                         )}
@@ -628,6 +658,15 @@ export default function DataRoom() {
                                 ❓ FAQ
                             </button>
                             <button
+                                onClick={() => setCurrentPage('whattoinclude')}
+                                className={`pb-3 sm:pb-4 px-4 py-2 sm:py-0 text-base sm:text-lg font-medium transition-all duration-300 rounded-lg sm:rounded-none ${currentPage === 'whattoinclude'
+                                    ? 'text-gold border-2 border-gold sm:border-0 sm:border-b-2 bg-gold/10 sm:bg-transparent'
+                                    : 'text-white/60 hover:text-white/90 border-2 border-transparent hover:border-white/20 sm:border-0'
+                                    }`}
+                            >
+                                📋 What to Include
+                            </button>
+                            <button
                                 onClick={() => setCurrentPage('guide')}
                                 className={`pb-3 sm:pb-4 px-4 py-2 sm:py-0 text-base sm:text-lg font-medium transition-all duration-300 rounded-lg sm:rounded-none ${currentPage === 'guide'
                                     ? 'text-gold border-2 border-gold sm:border-0 sm:border-b-2 bg-gold/10 sm:bg-transparent'
@@ -644,6 +683,187 @@ export default function DataRoom() {
                         {currentPage === 'documents' && (
                             <div className="animate-fadeIn">
                                 {renderDocumentsPage()}
+                            </div>
+                        )}
+                        {currentPage === 'whattoinclude' && (
+                            <div className="animate-fadeIn space-y-8">
+                                <h2 className="text-3xl font-bold text-gold mb-8">📋 Data Room Contents Guide</h2>
+                                <p className="text-white/80 text-lg mb-8">Here's exactly what you should include in each folder of your data room:</p>
+
+                                {/* Company Documents */}
+                                <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-gold/10">
+                                    <h3 className="font-semibold text-gold mb-4 text-xl flex items-center gap-2">
+                                        🏢 Company Documents
+                                    </h3>
+                                    <div className="grid md:grid-cols-2 gap-4 text-white/80">
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Formation Documents</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>Articles of Incorporation</li>
+                                                <li>Operating Agreement/Bylaws</li>
+                                                <li>Certificate of Good Standing</li>
+                                                <li>Corporate Resolutions</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Business Structure</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>Organizational Chart</li>
+                                                <li>Business Licenses & Permits</li>
+                                                <li>Company Overview/Profile</li>
+                                                <li>Management Bios</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Financial Documents */}
+                                <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-gold/10">
+                                    <h3 className="font-semibold text-gold mb-4 text-xl flex items-center gap-2">
+                                        💰 Financial Documents
+                                    </h3>
+                                    <div className="grid md:grid-cols-2 gap-4 text-white/80">
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Financial Statements</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>Balance Sheets (3 years)</li>
+                                                <li>Income Statements (3 years)</li>
+                                                <li>Cash Flow Statements</li>
+                                                <li>Audited Financials</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Performance & Projections</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>Tax Returns (2-3 years)</li>
+                                                <li>Portfolio Performance Reports</li>
+                                                <li>Financial Projections</li>
+                                                <li>Budget & Forecasts</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Legal Documents */}
+                                <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-gold/10">
+                                    <h3 className="font-semibold text-gold mb-4 text-xl flex items-center gap-2">
+                                        ⚖️ Legal Documents
+                                    </h3>
+                                    <div className="grid md:grid-cols-2 gap-4 text-white/80">
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Fund Documentation</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>Private Placement Memorandum</li>
+                                                <li>Fund Operating Agreement</li>
+                                                <li>Subscription Agreement Template</li>
+                                                <li>Promissory Note Templates</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Regulatory & Compliance</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>SEC Form D Filings</li>
+                                                <li>State Securities Filings</li>
+                                                <li>Legal Opinions</li>
+                                                <li>Material Contracts</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Marketing Materials */}
+                                <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-gold/10">
+                                    <h3 className="font-semibold text-gold mb-4 text-xl flex items-center gap-2">
+                                        📈 Marketing Materials
+                                    </h3>
+                                    <div className="grid md:grid-cols-2 gap-4 text-white/80">
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Presentations</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>Investment Pitch Deck</li>
+                                                <li>Company Presentation</li>
+                                                <li>Performance Track Record</li>
+                                                <li>Investment Strategy Overview</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Marketing Collateral</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>Investment Brochures</li>
+                                                <li>Fact Sheets</li>
+                                                <li>Case Studies</li>
+                                                <li>Testimonials</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Investor Relations */}
+                                <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-gold/10">
+                                    <h3 className="font-semibold text-gold mb-4 text-xl flex items-center gap-2">
+                                        🤝 Investor Relations
+                                    </h3>
+                                    <div className="grid md:grid-cols-2 gap-4 text-white/80">
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Investor Communication</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>Quarterly Reports</li>
+                                                <li>Annual Reports</li>
+                                                <li>Investor Letters</li>
+                                                <li>Meeting Minutes</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Documentation</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>Investor Agreements</li>
+                                                <li>Capital Call Notices</li>
+                                                <li>Distribution Notices</li>
+                                                <li>Tax Information (K-1s)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Compliance */}
+                                <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-gold/10">
+                                    <h3 className="font-semibold text-gold mb-4 text-xl flex items-center gap-2">
+                                        📋 Compliance Documents
+                                    </h3>
+                                    <div className="grid md:grid-cols-2 gap-4 text-white/80">
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Policies & Procedures</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>Investment Policy</li>
+                                                <li>Risk Management Policy</li>
+                                                <li>Anti-Money Laundering Policy</li>
+                                                <li>Privacy Policy</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-gold/90 mb-2">Certifications</h4>
+                                            <ul className="text-sm space-y-1 list-disc list-inside">
+                                                <li>Insurance Certificates</li>
+                                                <li>Compliance Certifications</li>
+                                                <li>Third-Party Audits</li>
+                                                <li>Background Check Reports</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Pro Tips */}
+                                <div className="bg-blue-900/20 rounded-lg p-6 border border-blue-500/30">
+                                    <h4 className="font-semibold text-blue-400 mb-4">💡 Pro Tips for Data Room Organization</h4>
+                                    <div className="text-blue-300/80 text-sm space-y-2">
+                                        <p>• <strong>File Naming:</strong> Use consistent naming: "folder_document_version.pdf"</p>
+                                        <p>• <strong>Version Control:</strong> Always include version numbers (v1.0, v2.1, etc.)</p>
+                                        <p>• <strong>Date Stamps:</strong> Include "as of" dates for financial documents</p>
+                                        <p>• <strong>Redaction:</strong> Remove sensitive info not needed for due diligence</p>
+                                        <p>• <strong>Organization:</strong> Keep related documents together in logical folders</p>
+                                        <p>• <strong>Updates:</strong> Regularly update with new quarterly reports and financials</p>
+                                    </div>
+                                </div>
                             </div>
                         )}
                         {currentPage === 'faq' && (
@@ -821,10 +1041,12 @@ export default function DataRoom() {
                                             <div>
                                                 <div className="font-medium">{folder.name}</div>
                                                 <div className="text-xs opacity-60">
-                                                    {folder.id === 'prospecting' && 'First impression materials'}
-                                                    {folder.id === 'presentation' && 'For interested prospects'}
-                                                    {folder.id === 'closing' && 'Legal paperwork for commitments'}
-                                                    {folder.id === 'training' && 'Sales training & compliance'}
+                                                    {folder.id === 'company' && 'Corporate documents & structure'}
+                                                    {folder.id === 'financial' && 'Financial statements & reports'}
+                                                    {folder.id === 'legal' && 'Legal agreements & filings'}
+                                                    {folder.id === 'marketing' && 'Marketing materials & presentations'}
+                                                    {folder.id === 'investor' && 'Investor communications & agreements'}
+                                                    {folder.id === 'compliance' && 'Compliance documents & policies'}
                                                 </div>
                                             </div>
                                         </button>
