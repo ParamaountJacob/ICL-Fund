@@ -165,9 +165,9 @@ export default function DataRoom() {
             <div className="max-w-4xl mx-auto bg-black/70 backdrop-blur-sm rounded-xl shadow-2xl p-8 mt-8">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gold mb-2">Tim's Capital Access Room</h1>
+                        <h1 className="text-3xl font-bold text-gold mb-2">Virtual Data Room</h1>
                         <p className="text-white/80">
-                            <strong>Welcome, Tim.</strong> This room contains all core documents, pitch assets, and reference materials for capital partner outreach, webinars, and investor calls.
+                            Secure document repository containing essential business documents, financial statements, legal agreements, and due diligence materials.
                         </p>
                     </div>
                     <div className="text-right">
@@ -176,8 +176,30 @@ export default function DataRoom() {
                             onClick={() => setAuthenticated(false)}
                             className="text-xs text-red-400 hover:text-red-600 mt-1"
                         >
-                            Lock Room
+                            Exit Room
                         </button>
+                    </div>
+                </div>
+
+                <div className="mb-8 bg-black/50 rounded-lg p-6 border border-gold/20">
+                    <h2 className="text-xl font-semibold text-gold mb-4">About This Data Room</h2>
+                    <div className="grid md:grid-cols-2 gap-6 text-white/80">
+                        <div>
+                            <h3 className="font-semibold text-gold/90 mb-2">📊 Financial Documents</h3>
+                            <p className="text-sm">Audited financial statements, tax returns, cash flow projections, and budget analyses.</p>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-gold/90 mb-2">⚖️ Legal & Compliance</h3>
+                            <p className="text-sm">Corporate governance documents, regulatory filings, contracts, and legal opinions.</p>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-gold/90 mb-2">🏢 Business Operations</h3>
+                            <p className="text-sm">Business plans, market analysis, operational procedures, and strategic documents.</p>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-gold/90 mb-2">📈 Investment Materials</h3>
+                            <p className="text-sm">Pitch decks, investment memorandums, subscription agreements, and offering documents.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -249,17 +271,23 @@ export default function DataRoom() {
                                                 f.name.includes('.ppt') ? '📈' :
                                                     f.name.includes('.zip') ? '📦' : '📄'}
                                 </div>
-                                <div className="flex-1">
-                                    <div className="font-medium">{f.name.replace(/^\d+_/, '')}</div>
+                                <div className="flex-1 cursor-pointer"
+                                    onClick={() => window.open(supabase.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl, '_blank')}>
+                                    <div className="font-medium hover:text-gold transition">{f.name.replace(/^\d+_/, '')}</div>
                                     <div className="text-xs text-white/50">
-                                        {new Date(f.updated_at || f.created_at).toLocaleDateString()}
+                                        {new Date(f.updated_at || f.created_at).toLocaleDateString()} • Click to view
                                     </div>
                                 </div>
                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={() => window.open(supabase.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl, '_blank')}
+                                        className="px-3 py-1 text-xs rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition"
+                                    >
+                                        View
+                                    </button>
                                     <a
                                         href={supabase.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                        download
                                         className="px-3 py-1 text-xs rounded bg-gold/20 text-gold hover:bg-gold/30 transition"
                                     >
                                         Download
@@ -278,12 +306,12 @@ export default function DataRoom() {
 
                 <div className="bg-black/50 rounded-lg p-6 border border-gold/20">
                     <h3 className="font-semibold text-gold mb-3 flex items-center gap-2">
-                        💡 Request Documents or Suggest Improvements
+                        � Document Requests & Inquiries
                     </h3>
                     <form onSubmit={handleRequestSubmit}>
                         <textarea
                             className="w-full p-4 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 mb-4 transition"
-                            placeholder="What documents do you need? Any suggestions for improving this data room?"
+                            placeholder="Request specific documents, ask questions about existing materials, or suggest additional content for this data room..."
                             value={requestText}
                             onChange={e => setRequestText(e.target.value)}
                             rows={4}
@@ -291,7 +319,7 @@ export default function DataRoom() {
                         />
                         <div className="flex justify-between items-center">
                             <div className="text-xs text-white/50">
-                                Requests are tracked and will be reviewed promptly
+                                All requests are logged and reviewed by authorized personnel
                             </div>
                             <button
                                 type="submit"
@@ -303,7 +331,7 @@ export default function DataRoom() {
                     </form>
                     {requestSuccess && (
                         <div className="mt-3 p-3 rounded bg-green-500/20 border border-green-500/30 text-green-400 text-sm">
-                            ✅ Request submitted successfully! We'll review it promptly.
+                            ✅ Request submitted successfully and will be reviewed promptly.
                         </div>
                     )}
                 </div>
