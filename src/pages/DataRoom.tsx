@@ -618,7 +618,7 @@ export default function DataRoom() {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 placeholder="Username"
-                                className="w-full p-3 rounded-xl bg-gray-800/40 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder-white/70"
+                                className="w-full p-3 rounded-xl bg-gray-800/60 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder:text-gray-300"
                                 required
                             />
                             <input
@@ -626,7 +626,7 @@ export default function DataRoom() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Password"
-                                className="w-full p-3 rounded-xl bg-gray-800/40 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder-white/70"
+                                className="w-full p-3 rounded-xl bg-gray-800/60 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder:text-gray-300"
                                 required
                             />
                         </div>
