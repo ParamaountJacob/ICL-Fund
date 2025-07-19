@@ -713,7 +713,7 @@ export default function DataRoom() {
 
                 {/* Enhanced Document Viewer Popup */}
                 {viewingFile && (
-                    <div className="fixed inset-0 bg-black z-50 flex flex-col" style={{ height: '100vh', width: '100vw' }}>
+                    <div className="fixed inset-0 bg-black z-[9999]" style={{ height: '100vh', width: '100vw' }}>
                         <div className="bg-black w-full h-full flex flex-col">
                             <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gold/20 bg-black flex-shrink-0">
                                 <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
@@ -762,7 +762,7 @@ export default function DataRoom() {
                     </div>
                 )}                {/* Upload Folder Selection Dialog */}
                 {showUploadDialog && pendingFile && (
-                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9997] flex items-center justify-center p-4">
                         <div className="bg-black/90 rounded-xl shadow-2xl max-w-md w-full border border-gold/30">
                             <div className="p-6">
                                 <h3 className="text-xl font-semibold text-gold mb-4 flex items-center gap-2">
@@ -851,7 +851,7 @@ export default function DataRoom() {
 
                 {/* Replace File / New Version Dialog */}
                 {showReplaceDialog && replaceTargetFile && (
-                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9996] flex items-center justify-center p-4">
                         <div className="bg-black/90 rounded-xl shadow-2xl max-w-md w-full border border-gold/30">
                             <div className="p-6">
                                 <h3 className="text-xl font-semibold text-gold mb-4 flex items-center gap-2">
@@ -907,7 +907,7 @@ export default function DataRoom() {
 
                 {/* Document Actions Modal */}
                 {showDocumentActions && selectedDocumentForActions && (
-                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998] flex items-center justify-center p-4">
                         <div className="bg-black/95 rounded-xl shadow-2xl max-w-md w-full border border-gold/30">
                             <div className="p-6">
                                 {/* Document Info Header */}
