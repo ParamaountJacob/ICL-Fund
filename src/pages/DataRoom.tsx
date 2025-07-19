@@ -609,7 +609,7 @@ export default function DataRoom() {
             <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4">
                 <div className="bg-black/50 backdrop-blur-lg rounded-3xl shadow-2xl p-8 max-w-md w-full border border-gold/30 transform transition-all duration-700 hover:scale-[1.02]">
                     <div className="text-center mb-8">
-                        <div className="text-4xl mb-4 animate-pulse">�</div>
+                        <div className="text-4xl mb-4 animate-pulse">🔒</div>
                         <h1 className="text-2xl font-bold text-gold mb-2 tracking-wide">Secure Access</h1>
                         <p className="text-white/50 text-sm">Data Room Authentication</p>
                     </div>
@@ -620,7 +620,7 @@ export default function DataRoom() {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 placeholder="Username"
-                                className="w-full p-3 rounded-xl bg-gray-800/40 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder-white/30"
+                                className="w-full p-3 rounded-xl bg-gray-800/40 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder-white/70"
                                 required
                             />
                             <input
@@ -628,7 +628,7 @@ export default function DataRoom() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Password"
-                                className="w-full p-3 rounded-xl bg-gray-800/40 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder-white/30"
+                                className="w-full p-3 rounded-xl bg-gray-800/40 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder-white/70"
                                 required
                             />
                         </div>
