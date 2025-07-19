@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { useAuth } from '../contexts/AuthContext';
 
 // Enhanced styles for premium hero section and animations
 const styles = `
@@ -56,6 +57,7 @@ const USERNAME = 'Admin';
 const PASSWORD = '000';
 
 export default function DataRoom() {
+    const { user: authUser } = useAuth(); // Get authenticated user from context
     const [authenticated, setAuthenticated] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -77,6 +79,13 @@ export default function DataRoom() {
     const [showDocumentActions, setShowDocumentActions] = useState(false);
     const [selectedDocumentForActions, setSelectedDocumentForActions] = useState<any>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Check if user is authenticated via AuthContext (admin) or simple login
+    useEffect(() => {
+        if (authUser && (authUser.role === 'admin' || authUser.role === 'sub_admin')) {
+            setAuthenticated(true);
+        }
+    }, [authUser]);
 
     useEffect(() => {
         if (authenticated) fetchFiles();
@@ -226,6 +235,14 @@ export default function DataRoom() {
         } else {
             setError('Invalid username or password');
         }
+    }
+
+    function handleLogout() {
+        setAuthenticated(false);
+        setUsername('');
+        setPassword('');
+        // Note: We don't sign out from AuthContext here since this is just data room access
+        // If user wants to fully log out, they should use the main site logout
     }
 
     function openFileViewer(file: any) {
@@ -513,9 +530,19 @@ export default function DataRoom() {
             <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4">
                 <div className="bg-black/50 backdrop-blur-lg rounded-3xl shadow-2xl p-8 max-w-md w-full border border-gold/30 transform transition-all duration-700 hover:scale-[1.02]">
                     <div className="text-center mb-8">
-                        <div className="text-4xl mb-4 animate-pulse">🔒</div>
+                        <div className="text-4xl mb-4">🔒</div>
                         <h1 className="text-2xl font-bold text-gold mb-2 tracking-wide">Secure Access</h1>
                         <p className="text-white/50 text-sm">Data Room Authentication</p>
+                        {authUser && (authUser.role === 'admin' || authUser.role === 'sub_admin') && (
+                            <div className="mt-3 p-2 bg-green-500/10 rounded-lg border border-green-500/20">
+                                <p className="text-green-400 text-xs">
+                                    ✅ Authenticated as admin: {authUser.email}
+                                </p>
+                                <p className="text-green-300/60 text-xs mt-1">
+                                    You already have admin access through the main system
+                                </p>
+                            </div>
+                        )}
                     </div>
                     <form onSubmit={handlePasswordSubmit} className="space-y-4">
                         <div className="space-y-3">
@@ -543,6 +570,13 @@ export default function DataRoom() {
                             Enter Data Room
                         </button>
                     </form>
+                    {authUser && (authUser.role === 'admin' || authUser.role === 'sub_admin') && (
+                        <div className="mt-4 text-center">
+                            <p className="text-white/60 text-xs">
+                                As an authenticated admin, you can also access the data room directly
+                            </p>
+                        </div>
+                    )}
                     {error && (
                         <div className="text-red-400 text-center mt-4 p-2 bg-red-500/10 rounded-lg border border-red-500/20 text-xs">
                             {error}
@@ -565,7 +599,7 @@ export default function DataRoom() {
                             <p className="text-white/60 text-sm sm:text-base">Secure Repository</p>
                         </div>
                         <button
-                            onClick={() => setAuthenticated(false)}
+                            onClick={handleLogout}
                             className="text-red-400/60 hover:text-red-400 transition-colors duration-200 text-sm flex items-center gap-2 bg-black/30 backdrop-blur-sm px-3 py-2 rounded-lg border border-red-400/20 hover:border-red-400/40"
                         >
                             🚪 Exit
