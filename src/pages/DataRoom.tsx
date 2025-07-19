@@ -301,15 +301,15 @@ export default function DataRoom() {
                             placeholder="Search documents by name or version..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 transition"
+                            className="w-full pl-12 pr-12 py-3 sm:py-4 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 transition text-base"
                         />
-                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold/60">
+                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gold/60 text-lg">
                             🔍
                         </div>
                         {searchQuery && (
                             <button
                                 onClick={() => setSearchQuery('')}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white"
+                                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white text-lg"
                             >
                                 ✕
                             </button>
@@ -320,26 +320,27 @@ export default function DataRoom() {
                 {/* Recently Updated Section */}
                 {recentlyUpdated.length > 0 && !searchQuery && (
                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gold mb-3 flex items-center gap-2">
+                        <h3 className="text-lg sm:text-xl font-semibold text-gold mb-4 flex items-center gap-2">
                             ⚡ Recently Updated
                         </h3>
-                        <div className="grid gap-2">
+                        <div className="grid gap-3">
                             {recentlyUpdated.map((f) => (
                                 <div
                                     key={`recent-${f.name}`}
-                                    className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gold/5 border border-gold/20 hover:bg-gold/10 transition-all group cursor-pointer"
+                                    className="flex items-center gap-3 sm:gap-4 px-4 py-3 sm:py-4 rounded-lg bg-gold/5 border border-gold/20 hover:bg-gold/10 transition-all group cursor-pointer"
                                     onClick={() => openFileViewer(f)}
                                 >
-                                    <div className="text-lg">{getFileIcon(f.name)}</div>
-                                    <div className="flex-1">
-                                        <div className="font-medium text-white/90 text-sm">
+                                    <div className="text-xl sm:text-2xl flex-shrink-0">{getFileIcon(f.name)}</div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="font-medium text-white/90 text-sm sm:text-base truncate">
                                             {f.name.replace(/^\d+_/, '')}
                                         </div>
-                                        <div className="text-xs text-gold/70">
-                                            Updated {new Date(f.updated_at || f.created_at).toLocaleDateString()} • {extractVersion(f.name)}
+                                        <div className="text-xs sm:text-sm text-gold/70 mt-1 flex flex-wrap gap-2">
+                                            <span>Updated {new Date(f.updated_at || f.created_at).toLocaleDateString()}</span>
+                                            <span>• {extractVersion(f.name)}</span>
                                         </div>
                                     </div>
-                                    <div className="text-xs text-white/60 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="text-xs sm:text-sm text-white/60 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block">
                                         Click to view
                                     </div>
                                 </div>
@@ -349,19 +350,19 @@ export default function DataRoom() {
                 )}
 
                 <div className="mb-6">
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex flex-wrap gap-2 sm:gap-3 mb-4">
                         {folders.map(folder => (
                             <button
                                 key={folder.id}
                                 onClick={() => setSelectedFolder(folder.id)}
-                                className={`px-3 py-2 rounded-lg text-sm transition flex items-center gap-2 ${selectedFolder === folder.id
+                                className={`px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base transition flex items-center gap-2 flex-shrink-0 ${selectedFolder === folder.id
                                     ? 'bg-gold/20 text-gold border border-gold/40'
                                     : 'bg-gray-800/50 text-white/70 border border-gray-700 hover:bg-gray-700/50'
                                     }`}
                             >
-                                <span>{folder.icon}</span>
-                                {folder.name}
-                                <span className="text-xs opacity-60">
+                                <span className="text-lg">{folder.icon}</span>
+                                <span className="font-medium">{folder.name}</span>
+                                <span className="text-xs opacity-60 ml-1">
                                     ({folder.id === 'all' ? files.length : files.filter(f => f.name.toLowerCase().includes(folder.id)).length})
                                 </span>
                             </button>
@@ -452,11 +453,11 @@ export default function DataRoom() {
                         {filteredFiles.map((f) => (
                             <div
                                 key={f.name}
-                                className="flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-gold/10 text-white/90 border border-gold/10 hover:border-gold/40 transition-all group"
+                                className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 sm:py-5 rounded-lg hover:bg-gold/10 text-white/90 border border-gold/10 hover:border-gold/40 transition-all group"
                             >
                                 {/* Enhanced File Icon with Preview Thumbnail */}
-                                <div className="relative">
-                                    <div className="text-3xl">
+                                <div className="relative flex-shrink-0 self-start sm:self-center">
+                                    <div className="text-3xl sm:text-4xl">
                                         {getFileIcon(f.name)}
                                     </div>
                                     {/* Version Badge */}
@@ -466,26 +467,26 @@ export default function DataRoom() {
                                 </div>
 
                                 {/* File Details */}
-                                <div className="flex-1 cursor-pointer"
+                                <div className="flex-1 cursor-pointer min-w-0"
                                     onClick={() => openFileViewer(f)}>
-                                    <div className="font-medium hover:text-gold transition text-base">
+                                    <div className="font-medium hover:text-gold transition text-base sm:text-lg mb-1">
                                         {f.name.replace(/^\d+_/, '').replace(/v\d+\.?\d*/i, '').replace(/_{2,}/g, '_').replace(/^_|_$/g, '')}
                                     </div>
-                                    <div className="text-xs text-white/60 mt-1 flex items-center gap-3">
-                                        <span>📅 {new Date(f.updated_at || f.created_at).toLocaleDateString()}</span>
-                                        <span>🔄 {new Date(f.updated_at || f.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                        <span>👁️ Click to view</span>
+                                    <div className="text-sm text-white/60 flex flex-wrap gap-2 sm:gap-3">
+                                        <span className="flex items-center gap-1">📅 {new Date(f.updated_at || f.created_at).toLocaleDateString()}</span>
+                                        <span className="flex items-center gap-1">🔄 {new Date(f.updated_at || f.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                        <span className="flex items-center gap-1">👁️ Click to view</span>
                                         {f.metadata?.size && (
-                                            <span>📊 {(f.metadata.size / 1024 / 1024).toFixed(1)}MB</span>
+                                            <span className="flex items-center gap-1">📊 {(f.metadata.size / 1024 / 1024).toFixed(1)}MB</span>
                                         )}
                                     </div>
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex flex-wrap gap-2 mt-2 sm:mt-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                     <button
                                         onClick={() => openFileViewer(f)}
-                                        className="px-3 py-1.5 text-xs rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition flex items-center gap-1"
+                                        className="px-3 py-2 text-sm rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition flex items-center gap-1 flex-shrink-0"
                                     >
                                         👁️ View
                                     </button>
@@ -494,19 +495,19 @@ export default function DataRoom() {
                                             setReplaceTargetFile(f);
                                             setShowReplaceDialog(true);
                                         }}
-                                        className="px-3 py-1.5 text-xs rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition flex items-center gap-1"
+                                        className="px-3 py-2 text-sm rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition flex items-center gap-1 flex-shrink-0"
                                     >
                                         🔄 New Version
                                     </button>
                                     <a
                                         href={supabase.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl}
                                         download
-                                        className="px-3 py-1.5 text-xs rounded-lg bg-gold/20 text-gold hover:bg-gold/30 transition flex items-center gap-1"
+                                        className="px-3 py-2 text-sm rounded-lg bg-gold/20 text-gold hover:bg-gold/30 transition flex items-center gap-1 flex-shrink-0"
                                     >
                                         ⬇️ Download
                                     </a>
                                     <button
-                                        className="px-3 py-1.5 text-xs rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition flex items-center gap-1"
+                                        className="px-3 py-2 text-sm rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition flex items-center gap-1 flex-shrink-0"
                                         onClick={() => handleDelete(f.name)}
                                     >
                                         🗑️ Delete
@@ -586,7 +587,7 @@ export default function DataRoom() {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 placeholder="Username"
-                                className="w-full p-3 rounded-xl bg-gray-800/60 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder:text-gray-300"
+                                className="w-full p-3 rounded-xl bg-gray-800/60 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder:text-gray-400"
                                 required
                             />
                             <input
@@ -594,7 +595,7 @@ export default function DataRoom() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Password"
-                                className="w-full p-3 rounded-xl bg-gray-800/60 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder:text-gray-300"
+                                className="w-full p-3 rounded-xl bg-gray-800/60 text-white border border-gold/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all duration-300 placeholder:text-gray-400"
                                 required
                             />
                         </div>
@@ -663,25 +664,31 @@ export default function DataRoom() {
             {/* Main Data Room Content */}
             <div className="bg-black">
                 <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
-                        <div>
-                            <h2 className="text-2xl sm:text-3xl font-bold text-gold mb-1 sm:mb-2 tracking-wide">Investment Materials</h2>
-                            <p className="text-white/60 text-base sm:text-lg">
+                    <div className="flex flex-col mb-6 sm:mb-8 gap-4">
+                        <div className="text-center sm:text-left">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-gold mb-2 tracking-wide">Investment Materials</h2>
+                            <p className="text-white/60 text-base sm:text-lg mb-3 sm:mb-0">
                                 Access documentation and resources for qualified investors.
                             </p>
                         </div>
-                        <div className="text-left sm:text-right">
-                            <div className="text-xs sm:text-sm text-white/50 mb-1">Total Files: {files.length}</div>
-                            <div className="text-xs text-gold/70">Last Updated: {new Date().toLocaleDateString()}</div>
+                        <div className="flex flex-wrap justify-center sm:justify-start gap-4 text-center">
+                            <div className="bg-black/30 rounded-lg px-4 py-2 border border-gold/20">
+                                <div className="text-sm sm:text-base text-white/70 mb-1">Total Files</div>
+                                <div className="text-lg sm:text-xl font-semibold text-gold">{files.length}</div>
+                            </div>
+                            <div className="bg-black/30 rounded-lg px-4 py-2 border border-gold/20">
+                                <div className="text-sm sm:text-base text-white/70 mb-1">Last Updated</div>
+                                <div className="text-sm sm:text-base font-medium text-gold/80">{new Date().toLocaleDateString()}</div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Navigation */}
                     <div className="mb-6 sm:mb-8 border-b border-gold/20">
-                        <div className="flex gap-4 sm:gap-6 lg:gap-8 overflow-x-auto">
+                        <div className="flex gap-2 sm:gap-4 lg:gap-6 overflow-x-auto pb-1">
                             <button
                                 onClick={() => setCurrentPage('documents')}
-                                className={`pb-3 sm:pb-4 px-1 sm:px-2 text-sm sm:text-base font-medium transition-all duration-300 whitespace-nowrap ${currentPage === 'documents'
+                                className={`pb-3 sm:pb-4 px-3 sm:px-4 text-base sm:text-lg font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${currentPage === 'documents'
                                     ? 'text-gold border-b-2 border-gold'
                                     : 'text-white/60 hover:text-white/90'
                                     }`}
@@ -690,7 +697,7 @@ export default function DataRoom() {
                             </button>
                             <button
                                 onClick={() => setCurrentPage('faq')}
-                                className={`pb-3 sm:pb-4 px-1 sm:px-2 text-sm sm:text-base font-medium transition-all duration-300 whitespace-nowrap ${currentPage === 'faq'
+                                className={`pb-3 sm:pb-4 px-3 sm:px-4 text-base sm:text-lg font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${currentPage === 'faq'
                                     ? 'text-gold border-b-2 border-gold'
                                     : 'text-white/60 hover:text-white/90'
                                     }`}
@@ -699,7 +706,7 @@ export default function DataRoom() {
                             </button>
                             <button
                                 onClick={() => setCurrentPage('guide')}
-                                className={`pb-3 sm:pb-4 px-1 sm:px-2 text-sm sm:text-base font-medium transition-all duration-300 whitespace-nowrap ${currentPage === 'guide'
+                                className={`pb-3 sm:pb-4 px-3 sm:px-4 text-base sm:text-lg font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${currentPage === 'guide'
                                     ? 'text-gold border-b-2 border-gold'
                                     : 'text-white/60 hover:text-white/90'
                                     }`}
@@ -809,33 +816,33 @@ export default function DataRoom() {
                     </div>
 
                     {currentPage === 'documents' && (
-                        <div className="bg-black/50 rounded-lg p-6 border border-gold/20 mt-6">
-                            <h3 className="font-semibold text-gold mb-3 flex items-center gap-2">
+                        <div className="bg-black/50 rounded-xl p-4 sm:p-6 border border-gold/20 mt-6">
+                            <h3 className="font-semibold text-gold mb-4 flex items-center gap-2 text-lg sm:text-xl">
                                 💬 Document Requests & Inquiries
                             </h3>
-                            <form onSubmit={handleRequestSubmit}>
+                            <form onSubmit={handleRequestSubmit} className="space-y-4">
                                 <textarea
-                                    className="w-full p-4 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 mb-4 transition"
+                                    className="w-full p-4 sm:p-5 rounded-lg bg-gray-800/70 text-white border border-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 transition text-base resize-none"
                                     placeholder="Request specific documents, ask questions about existing materials, or suggest additional content for this data room..."
                                     value={requestText}
                                     onChange={e => setRequestText(e.target.value)}
-                                    rows={4}
+                                    rows={5}
                                     required
                                 />
-                                <div className="flex justify-between items-center">
-                                    <div className="text-xs text-white/50">
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                                    <div className="text-sm text-white/50 order-2 sm:order-1">
                                         All requests are logged and reviewed by authorized personnel
                                     </div>
                                     <button
                                         type="submit"
-                                        className="px-6 py-2 rounded-lg bg-gold/90 text-black font-semibold hover:bg-yellow-500 transition shadow-lg"
+                                        className="px-6 sm:px-8 py-3 sm:py-4 rounded-lg bg-gold/90 text-black font-semibold hover:bg-yellow-500 transition shadow-lg text-base sm:text-lg w-full sm:w-auto order-1 sm:order-2"
                                     >
-                                        Submit Request
+                                        📤 Submit Request
                                     </button>
                                 </div>
                             </form>
                             {requestSuccess && (
-                                <div className="mt-3 p-3 rounded bg-green-500/20 border border-green-500/30 text-green-400 text-sm">
+                                <div className="mt-4 p-4 rounded-lg bg-green-500/20 border border-green-500/30 text-green-400 text-sm sm:text-base">
                                     ✅ Request submitted successfully and will be reviewed promptly.
                                 </div>
                             )}
