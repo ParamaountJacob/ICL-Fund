@@ -91,12 +91,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (newUser) {
                 console.log('User signed in, fetching profile and role...');
+                console.log('User ID:', newUser.id);
+                console.log('User email:', newUser.email);
+
                 // Fetch profile and role when user logs in
                 try {
+                    console.log('Calling getUserProfile()...');
                     const profileData = await getUserProfile();
+                    console.log('getUserProfile() result:', profileData);
                     setProfile(profileData);
 
+                    console.log('Calling checkUserRole()...');
                     const roleData = await checkUserRole();
+                    console.log('checkUserRole() result:', roleData);
                     setUserRole(roleData);
                     console.log('Successfully loaded profile/role:', { roleData, profileData });
                     logger.log('AuthContext - Auth change: Successfully loaded profile/role:', { roleData, profileData });

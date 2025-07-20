@@ -58,6 +58,14 @@ const PASSWORD = '123456'; // Updated to match what user mentioned
 
 export default function DataRoom() {
     const { user: authUser } = useAuth(); // Get authenticated user from context
+
+    // Helper function to check if user is admin (same logic as Profile page)
+    const isUserAdmin = () => {
+        const isAdminByEmail = authUser?.user?.email === 'innercirclelending@gmail.com';
+        const isAdminByRole = authUser && (authUser.userRole === 'admin' || authUser.userRole === 'sub_admin');
+        return isAdminByEmail || isAdminByRole;
+    };
+
     const [authenticated, setAuthenticated] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -85,7 +93,12 @@ export default function DataRoom() {
         console.log('DataRoom: Checking auth user:', authUser);
         console.log('DataRoom: User email:', authUser?.user?.email);
         console.log('DataRoom: User role:', authUser?.userRole);
-        if (authUser && (authUser.userRole === 'admin' || authUser.userRole === 'sub_admin')) {
+        console.log('DataRoom: User object:', authUser?.user);
+
+        const adminStatus = isUserAdmin();
+        console.log('DataRoom: Is admin?', adminStatus);
+
+        if (adminStatus) {
             console.log('DataRoom: Auto-authenticating admin user');
             setAuthenticated(true);
         }
@@ -549,7 +562,7 @@ export default function DataRoom() {
                         <div className="mt-2 text-xs text-white/40">
                             Try: admin / 123456
                         </div>
-                        {authUser && (authUser.userRole === 'admin' || authUser.userRole === 'sub_admin') && (
+                        {authUser && isUserAdmin() && (
                             <div className="mt-3 p-2 bg-green-500/10 rounded-lg border border-green-500/20">
                                 <p className="text-green-400 text-xs">
                                     ✅ Authenticated as admin: {authUser.user?.email}
@@ -565,7 +578,7 @@ export default function DataRoom() {
                                 </button>
                             </div>
                         )}
-                        {authUser && !(authUser.userRole === 'admin' || authUser.userRole === 'sub_admin') && (
+                        {authUser && !isUserAdmin() && (
                             <div className="mt-3 p-2 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
                                 <p className="text-yellow-400 text-xs">
                                     ⚠️ Logged in as: {authUser.user?.email} (Role: {authUser.userRole})
@@ -602,7 +615,7 @@ export default function DataRoom() {
                             Enter Data Room
                         </button>
                     </form>
-                    {authUser && (authUser.userRole === 'admin' || authUser.userRole === 'sub_admin') && (
+                    {authUser && isUserAdmin() && (
                         <div className="mt-4 text-center">
                             <p className="text-white/60 text-xs">
                                 As an authenticated admin, you can also access the data room directly
