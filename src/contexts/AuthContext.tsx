@@ -129,7 +129,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUserRole('user');
                 setLoading(false);
             }
-        }); return () => {
+        });
+
+        return () => {
             subscription.unsubscribe();
         };
     }, []);
