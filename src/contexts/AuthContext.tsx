@@ -80,12 +80,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         initializeAuth();
 
-        // Add a safety timeout to ensure loading doesn't get stuck
-        const safetyTimeout = setTimeout(() => {
-            setLoading(false);
-            logger.log('AuthContext - Safety timeout triggered, clearing loading state');
-        }, 10000); // 10 second timeout
-
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             console.log('Auth state change event:', event);
@@ -119,16 +113,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     }
                     setProfile(null);
                 }
+                // Clear loading state after processing auth change
+                setLoading(false);
             } else {
                 console.log('User signed out, clearing data...');
                 // Clear data when user logs out
                 setProfile(null);
                 setUserRole('user');
+                setLoading(false);
             }
-        });
-
-        return () => {
-            clearTimeout(safetyTimeout);
+        }); return () => {
             subscription.unsubscribe();
         };
     }, []);
