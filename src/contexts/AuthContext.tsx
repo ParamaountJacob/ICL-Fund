@@ -1,7 +1,7 @@
 // CENTRALIZED AUTH CONTEXT - Fixes auth race conditions and excessive calls
 // This replaces scattered auth.getUser() calls throughout the app
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase, getUserProfile, checkUserRole, type UserProfile, type UserRole } from '../lib/supabase';
 import { logger } from '../utils/logger';
@@ -20,8 +20,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider. Make sure your component is wrapped with AuthProvider.');
     }
     return context;
 };
@@ -31,16 +31,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [userRole, setUserRole] = useState<UserRole>('user');
     const [loading, setLoading] = useState(true);
+    const mountedRef = useRef(false);
 
     // Initialize auth state
     useEffect(() => {
+        mountedRef.current = true;
+
         const initializeAuth = async () => {
             try {
+                if (!mountedRef.current) return;
                 setLoading(true);
 
                 // Get initial session
                 const { data: { user: initialUser } } = await supabase.auth.getUser();
                 logger.log('AuthContext - Initial user:', initialUser);
+
+                if (!mountedRef.current) return;
                 setUser(initialUser);
 
                 if (initialUser) {
@@ -51,6 +57,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             setTimeout(() => reject(new Error('Initial getUserProfile timeout')), 5000)
                         );
                         const profileData = await Promise.race([profilePromise, profileTimeout]);
+
+                        if (!mountedRef.current) return;
                         setProfile(profileData);
 
                         const rolePromise = checkUserRole();
@@ -58,31 +66,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             setTimeout(() => reject(new Error('Initial checkUserRole timeout')), 5000)
                         );
                         const roleData = await Promise.race([rolePromise, roleTimeout]);
+
+                        if (!mountedRef.current) return;
                         setUserRole(roleData);
                         logger.log('AuthContext - Successfully loaded profile/role:', { roleData, profileData });
                     } catch (error) {
                         logger.error('Error fetching profile/role:', error);
                         // Fallback: check if user is the admin email
                         if (initialUser.email === 'innercirclelending@gmail.com') {
-                            setUserRole('admin');
+                            if (mountedRef.current) setUserRole('admin');
                             logger.log('AuthContext - Set fallback admin role for innercirclelending@gmail.com');
                         } else {
-                            setUserRole('user');
+                            if (mountedRef.current) setUserRole('user');
                         }
-                        setProfile(null);
+                        if (mountedRef.current) setProfile(null);
                     }
                 } else {
                     // No user logged in, ensure clean state
-                    setProfile(null);
-                    setUserRole('user');
+                    if (mountedRef.current) {
+                        setProfile(null);
+                        setUserRole('user');
+                    }
                 }
             } catch (error) {
                 logger.error('Error initializing auth:', error);
-                setUser(null);
-                setProfile(null);
-                setUserRole('user');
+                if (mountedRef.current) {
+                    setUser(null);
+                    setProfile(null);
+                    setUserRole('user');
+                }
             } finally {
-                setLoading(false);
+                if (mountedRef.current) {
+                    setLoading(false);
+                }
             }
         };
 
@@ -95,6 +111,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             const newUser = session?.user ?? null;
             logger.log('AuthContext - Auth state changed:', event, newUser);
+
+            if (!mountedRef.current) return;
             setUser(newUser);
 
             if (newUser) {
@@ -144,12 +162,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
                 // Clear loading state after processing auth change
                 setLoading(false);
+                setIsInitialized(true);
             } else {
                 console.log('User signed out, clearing data...');
                 // Clear data when user logs out
                 setProfile(null);
                 setUserRole('user');
                 setLoading(false);
+                setIsInitialized(true);
             }
         });
 
@@ -220,6 +240,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         refreshRole
     };
 
+    // Ensure we always provide a context value, even during initialization
+    console.log('AuthProvider providing value:', value);
     return (
         <AuthContext.Provider value={value}>
             {children}
