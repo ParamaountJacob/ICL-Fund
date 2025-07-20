@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase'; // Use shared Supabase client
 import { useAuth } from '../contexts/AuthContext';
 
 // Enhanced styles for premium hero section and animations
@@ -46,11 +46,6 @@ if (typeof document !== 'undefined') {
     styleSheet.innerText = styles;
     document.head.appendChild(styleSheet);
 }
-
-const supabase = createClient(
-    import.meta.env.VITE_SUPABASE_URL!,
-    import.meta.env.VITE_SUPABASE_ANON_KEY!
-);
 
 const BUCKET = 'tim-data-room';
 const USERNAME = 'admin'; // Changed to lowercase for consistency
