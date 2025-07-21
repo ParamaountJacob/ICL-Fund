@@ -9,7 +9,7 @@ export default defineConfig({
   },
   server: {
     // Change default port from 5173 to avoid conflicts
-    port: 3000,
+    port: 5179,
     // Auto-open browser on server start
     open: true,
     // Allow external connections (useful for testing on mobile/other devices)
