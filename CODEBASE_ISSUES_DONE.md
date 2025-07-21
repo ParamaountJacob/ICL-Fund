@@ -9,7 +9,33 @@ This file contains issues that have been successfully resolved and implemented.
 ### 1. Fixed Missing Imports in `useDashboardData.ts`
 **Status**: ✅ COMPLETED  
 **Priority**: Critical  
-**File**: `src/hooks/useDashboar### 16. Cleaned Up Production Debug St*Last Updated: July 21, 2025*ments
+**File**: `src/hooks/useDashboar### 16. Cleaned Up Production Debug St### 18. Improved Development Logger with Configurable Levels
+**Status**: ✅ COMPLETED  
+**Priority**: Medium  
+**Files**: `src/utils/logger.ts`, `src/contexts/AuthContext.tsx`, `ENVIRONMENT_CONFIG.md`
+
+**Issue**: Excessive console logging noise in development, including verbose AuthContext debug messages and third-party Sentry debug logs cluttering the console.
+
+**Solutions Implemented**:
+- Enhanced logger utility with configurable log levels (0-4 scale)
+- Added `VITE_LOG_LEVEL` environment variable support with default level 2 (warnings + errors)
+- Converted verbose AuthContext debug messages from `logger.log` to `logger.debug` (level 4)
+- Added log level prefixes ([DEBUG], [INFO], [WARN], [ERROR]) for better visibility
+- Created comprehensive environment configuration guide
+- Documented third-party Sentry logging issues and browser console filtering solutions
+
+**Log Levels**:
+- Level 0: Silent (production)
+- Level 1: Errors only
+- Level 2: Warnings + Errors (default - good for development)
+- Level 3: Info + Warnings + Errors
+- Level 4: All logs including debug (verbose)
+
+**Impact**: Significantly reduced console noise during development while maintaining essential error logging. Developers can now control verbosity based on their debugging needs.
+
+---
+
+*Last Updated: July 21, 2025*ments
 **Status**: ✅ COMPLETED  
 **Priority**: Medium  
 **Files**: `src/pages/DataRoom.tsx`, `src/contexts/AuthContext.tsx`
@@ -316,7 +342,7 @@ This file contains issues that have been successfully resolved and implemented.
 
 - **Critical Issues Fixed**: 5
 - **High Priority Issues Fixed**: 8
-- **Medium Priority Issues Fixed**: 5
+- **Medium Priority Issues Fixed**: 6
 - **Total Runtime Errors Prevented**: 3
 - **Memory Leaks Fixed**: 2
 - **Performance Improvements**: 1
@@ -326,7 +352,7 @@ This file contains issues that have been successfully resolved and implemented.
 - **Error Handling Improvements**: 2
 - **Security Improvements**: 2
 - **Testing Infrastructure**: 1
-- **Code Quality Improvements**: 2
+- **Code Quality Improvements**: 3
 
 ## 🚀 Next Recommended Actions
 

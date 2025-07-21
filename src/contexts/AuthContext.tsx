@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                 // Get initial session
                 const { data: { user: initialUser } } = await supabase.auth.getUser();
-                logger.log('AuthContext - Initial user:', initialUser);
+                logger.debug('AuthContext - Initial user:', initialUser);
 
                 if (!mountedRef.current) return;
                 setUser(initialUser);
@@ -81,13 +81,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                         if (!mountedRef.current) return;
                         setUserRole(roleData);
-                        logger.log('AuthContext - Successfully loaded profile/role:', { roleData, profileData });
+                        logger.debug('AuthContext - Successfully loaded profile/role:', { roleData, profileData });
                     } catch (error) {
                         logger.error('Error fetching profile/role:', error);
                         // Fallback: check if user is the admin email
                         if (initialUser.email === 'innercirclelending@gmail.com') {
                             if (mountedRef.current) setUserRole('admin');
-                            logger.log('AuthContext - Set fallback admin role for innercirclelending@gmail.com');
+                            logger.debug('AuthContext - Set fallback admin role for innercirclelending@gmail.com');
                         } else {
                             if (mountedRef.current) setUserRole('user');
                         }
@@ -119,7 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             const newUser = session?.user ?? null;
-            logger.log('AuthContext - Auth state changed:', event, newUser);
+            logger.debug('AuthContext - Auth state changed:', event, newUser);
 
             if (!mountedRef.current) return;
             setUser(newUser);
@@ -140,14 +140,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                     const roleData = await Promise.race([rolePromise, roleTimeoutPromise]);
                     setUserRole(roleData);
-                    logger.log('AuthContext - Auth change: Successfully loaded profile/role:', { roleData, profileData });
+                    logger.debug('AuthContext - Auth change: Successfully loaded profile/role:', { roleData, profileData });
                 } catch (error) {
                     logger.error('Error fetching profile/role on auth change:', error);
                     // Fallback: check if user is the admin email
                     if (newUser.email === 'innercirclelending@gmail.com') {
                         setUserRole('admin');
                         console.log('Set fallback admin role for innercirclelending@gmail.com');
-                        logger.log('AuthContext - Auth change: Set fallback admin role for innercirclelending@gmail.com');
+                        logger.debug('AuthContext - Auth change: Set fallback admin role for innercirclelending@gmail.com');
                     } else {
                         setUserRole('user');
                     }
