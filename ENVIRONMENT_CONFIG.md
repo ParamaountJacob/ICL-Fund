@@ -27,6 +27,37 @@ If you encounter port conflicts:
 2. Kill the process or use alternative port
 3. Vite will automatically try the next available port if configured port is busy
 
+## Console Noise Filtering
+
+### Development Environment Logs
+If you see excessive logs from the development environment:
+
+**Sentry Debug Logs** (StackBlitz/WebContainer):
+```
+Sentry Logger [log]: [Replay] Updating session start time...
+Sentry Logger [log]: Flushing outcomes...
+```
+
+**Browser Extension Logs**:
+```
+[USO] Button detection aborting due to timeout.
+injected.js:5 [USO] Button detection...
+```
+
+### Browser Console Filtering
+1. Open Developer Tools → Console
+2. Add these filters to hide noise:
+   ```
+   -"Sentry Logger" -"[USO]" -"injected.js" -"preloaded using link preload"
+   ```
+3. Or use console level filter: Set to "Warnings" or "Errors" only
+
+### Status Check
+✅ **Server Starting**: Look for URL with your port (5179)  
+✅ **App Loading**: Page should load without critical errors  
+❌ **404s**: A few 404s from missing assets are normal in dev environment  
+❌ **Sentry Logs**: Development environment noise, not your project  
+
 ## Logging Configuration
 
 ### Project Logger Levels
