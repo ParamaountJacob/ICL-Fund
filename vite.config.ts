@@ -11,12 +11,7 @@ export default defineConfig({
     port: 5179,
     host: true,
     strictPort: false,
-    fs: {
-      strict: false
-    },
-    hmr: {
-      port: 5180
-    }
+    hmr: true
   },
   build: {
     copyPublicDir: true,
