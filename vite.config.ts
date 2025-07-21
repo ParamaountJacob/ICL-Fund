@@ -8,6 +8,12 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   server: {
+    // Change default port from 5173 to avoid conflicts
+    port: 3000,
+    // Auto-open browser on server start
+    open: true,
+    // Allow external connections (useful for testing on mobile/other devices)
+    host: true,
     // Ensure proper handling of assets
     fs: {
       strict: false

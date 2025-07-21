@@ -1,5 +1,32 @@
 # Environment Configuration Guide
 
+## Development Server Port Configuration
+
+### Default Port Settings
+- **Development Server**: Port 3000 (changed from default 5173)
+- **Preview Server**: Port 3000
+- **Auto-opens browser** on server start
+
+### Alternative Port Commands
+```bash
+# Default development (port 3000)
+npm run dev
+
+# Alternative ports if 3000 is busy
+npm run dev:3001    # Port 3001
+npm run dev:4000    # Port 4000  
+npm run dev:8080    # Port 8080
+
+# Custom port (any available port)
+npx vite --port 5555
+```
+
+### Port Conflict Resolution
+If you encounter port conflicts:
+1. Check what's using the port: `netstat -ano | findstr :3000` (Windows)
+2. Kill the process or use alternative port
+3. Vite will automatically try the next available port if configured port is busy
+
 ## Logging Configuration
 
 ### Project Logger Levels

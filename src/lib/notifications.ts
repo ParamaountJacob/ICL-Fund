@@ -1,6 +1,5 @@
 import { supabase } from './client';
 import type { Notification, NotificationPayload, UINotification } from '../types/notifications';
-import { logger } from '../utils/logger';
 
 export const notificationService = {
     // Get user notifications
@@ -16,7 +15,7 @@ export const notificationService = {
             if (error) throw error;
             return data || [];
         } catch (error) {
-            logger.error('Error fetching notifications:', error);
+            console.error('Error fetching notifications:', error);
             throw error;
         }
     },
