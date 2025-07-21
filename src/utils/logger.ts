@@ -1,8 +1,8 @@
 // Development-only logging utility with configurable levels
 export const isDevelopment = import.meta.env.DEV;
 
-// Log levels: 0 = silent, 1 = errors only, 2 = warnings + errors, 3 = info + warnings + errors, 4 = all (debug)
-const LOG_LEVEL = parseInt(import.meta.env.VITE_LOG_LEVEL || '2');
+// Force silent logging to reduce console noise
+const LOG_LEVEL = 0;
 
 export const logger = {
     log: (...args: any[]) => {
@@ -30,7 +30,8 @@ export const logger = {
     },
 
     error: (...args: any[]) => {
-        if (isDevelopment && LOG_LEVEL >= 1) {
+        // Always show errors, even with silent logging
+        if (isDevelopment) {
             console.error('[ERROR]', ...args);
         }
     }

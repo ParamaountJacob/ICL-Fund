@@ -8,19 +8,17 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   server: {
-    // Change default port from 5173 to avoid conflicts
     port: 5179,
-    // Auto-open browser on server start
-    open: true,
-    // Allow external connections (useful for testing on mobile/other devices)
     host: true,
-    // Ensure proper handling of assets
+    strictPort: false,
     fs: {
       strict: false
+    },
+    hmr: {
+      port: 5180
     }
   },
   build: {
-    // Ensure public assets are properly copied
     copyPublicDir: true,
     assetsDir: 'assets'
   }
