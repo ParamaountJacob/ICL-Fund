@@ -1,11 +1,21 @@
 // GLOBAL NOTIFICATION SYSTEM - Fixes duplicate toasts and missing success/error handling
 
 import React, { createContext, useContext, useState } from 'react';
-import type { UINotification, NotificationType } from '../types/notifications';
+
+export type NotificationType = 'success' | 'error' | 'warning' | 'info';
+
+interface Notification {
+    id: string;
+    type: NotificationType;
+    title: string;
+    message?: string;
+    duration?: number;
+    persistent?: boolean;
+}
 
 interface NotificationContextType {
-    notifications: UINotification[];
-    addNotification: (notification: Omit<UINotification, 'id'>) => void;
+    notifications: Notification[];
+    addNotification: (notification: Omit<Notification, 'id'>) => void;
     removeNotification: (id: string) => void;
     clearAllNotifications: () => void;
     success: (title: string, message?: string) => void;
@@ -25,11 +35,11 @@ export const useNotifications = () => {
 };
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [notifications, setNotifications] = useState<UINotification[]>([]);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
 
-    const addNotification = (notification: Omit<UINotification, 'id'>) => {
+    const addNotification = (notification: Omit<Notification, 'id'>) => {
         const id = Math.random().toString(36).substring(2);
-        const newNotification: UINotification = {
+        const newNotification: Notification = {
             ...notification,
             id,
             duration: notification.duration ?? 5000
@@ -114,7 +124,7 @@ const NotificationToaster: React.FC = () => {
 };
 
 const NotificationToast: React.FC<{
-    notification: UINotification;
+    notification: Notification;
     onRemove: () => void;
 }> = ({ notification, onRemove }) => {
     const bgColor = {

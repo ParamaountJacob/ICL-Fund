@@ -37,38 +37,65 @@ export interface InvestmentWithApplication extends Investment {
 }
 
 export const investmentService = {
-    // Get user investments with applications (secure RPC only)
+    // Get user investments with applications (with fallback)
     async getUserInvestmentsWithApplications(userId: string): Promise<InvestmentWithApplication[]> {
         try {
-            // Use the secure RPC function - no unsafe fallbacks
+            // Use the new simple workflow function
             const { data: rpcData, error: rpcError } = await supabase
                 .rpc('get_user_applications');
 
-            if (rpcError) {
-                console.error('RPC function failed:', rpcError);
-                throw new Error(`Failed to fetch user investments: ${rpcError.message}`);
+            if (!rpcError && rpcData) {
+                return rpcData;
             }
 
-            return rpcData || [];
+            // Fallback to direct queries if RPC function fails
+            console.warn('RPC function failed, using fallback query:', rpcError);
+
+            const { data, error } = await supabase
+                .from('investments')
+                .select(`
+          *,
+          investment_applications!inner (
+            status,
+            investment_amount
+          )
+        `)
+                .eq('user_id', userId);
+
+            if (error) throw error;
+            return data || [];
         } catch (error) {
             console.error('Error fetching user investments:', error);
             throw error;
         }
     },
 
-    // Get all investments for admin (secure RPC only)
+    // Get all investments for admin (with fallback)
     async getAdminInvestmentsWithUsers(): Promise<InvestmentWithApplication[]> {
         try {
-            // Use the secure RPC function - no unsafe fallbacks
+            // Try the RPC function first
             const { data: rpcData, error: rpcError } = await supabase
                 .rpc('get_admin_investments_with_users');
 
-            if (rpcError) {
-                console.error('RPC function failed:', rpcError);
-                throw new Error(`Failed to fetch admin investments: ${rpcError.message}`);
+            if (!rpcError && rpcData) {
+                return rpcData;
             }
 
-            return rpcData || [];
+            // Fallback to direct queries if RPC function fails
+            console.warn('RPC function failed, using fallback query:', rpcError);
+
+            const { data, error } = await supabase
+                .from('investments')
+                .select(`
+          *,
+          investment_applications (
+            status,
+            investment_amount
+          )
+        `);
+
+            if (error) throw error;
+            return data || [];
         } catch (error) {
             console.error('Error fetching admin investments:', error);
             throw error;

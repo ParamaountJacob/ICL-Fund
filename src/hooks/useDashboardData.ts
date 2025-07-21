@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/client';
-import { authService } from '../lib/auth';
-import { investmentService } from '../lib/investments';
 import { useAuthStore, useInvestmentStore, useNotificationStore } from '../../stores';
 
 interface InvestmentData {

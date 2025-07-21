@@ -7,14 +7,4 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
-  server: {
-    port: 5179,
-    host: true,
-    strictPort: false,
-    hmr: true
-  },
-  build: {
-    copyPublicDir: true,
-    assetsDir: 'assets'
-  }
 });

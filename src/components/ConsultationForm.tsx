@@ -95,19 +95,25 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
 
     setLoading(true);
     try {
-      // First, upsert the profile data using the profile service
-      await profileService.updateUserProfile({
-        user_id: user.id,
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        phone: formData.phone,
-        address: formData.address || undefined,
-        ira_accounts: formData.retirement_account_details || undefined,
-        investment_goals: formData.investment_goals || undefined
-      });
+      // First, upsert the profile data
+      await supabase
+        .from('user_profiles')
+        .upsert(
+          {
+            user_id: user.id,
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            phone: formData.phone,
+            address: formData.address || null,
+            ira_accounts: formData.retirement_account_details || null,
+            investment_goals: formData.investment_goals || null,
+            updated_at: new Date().toISOString()
+          },
+          { onConflict: 'user_id' }
+        );
 
-      // Create consultation request using the CRM service
-      await crmService.createConsultationRequest({
+      // Create consultation request
+      await createConsultationRequest({
         name: `${formData.first_name} ${formData.last_name}`,
         email: formData.email,
         phone: formData.phone,
@@ -301,8 +307,8 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
             {[2, 3, 4].map((step) => (
               <div key={step} className="flex items-center">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${currentStep >= step
-                  ? 'bg-gold text-background'
-                  : 'bg-surface border-2 border-graphite text-text-secondary'
+                    ? 'bg-gold text-background'
+                    : 'bg-surface border-2 border-graphite text-text-secondary'
                   }`}>
                   {currentStep > step ? <CheckCircle className="w-5 h-5" /> : step}
                 </div>
@@ -524,8 +530,8 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, has_retirement_accounts: 'yes' }))}
                     className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${formData.has_retirement_accounts === 'yes'
-                      ? 'border-gold bg-gold/10'
-                      : 'border-graphite bg-surface hover:border-gold/50'
+                        ? 'border-gold bg-gold/10'
+                        : 'border-graphite bg-surface hover:border-gold/50'
                       }`}
                   >
                     <div className="font-semibold mb-2">Yes, I have retirement accounts</div>
@@ -537,8 +543,8 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, has_retirement_accounts: 'no' }))}
                     className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${formData.has_retirement_accounts === 'no'
-                      ? 'border-gold bg-gold/10'
-                      : 'border-graphite bg-surface hover:border-gold/50'
+                        ? 'border-gold bg-gold/10'
+                        : 'border-graphite bg-surface hover:border-gold/50'
                       }`}
                   >
                     <div className="font-semibold mb-2">No, I don't have retirement accounts</div>
@@ -660,10 +666,10 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                               onClick={() => day.isSelectable && setSelectedDate(day.date)}
                               disabled={!day.isSelectable}
                               className={`w-full h-full rounded-lg text-sm transition-all duration-200 ${day.isSelectable
-                                ? selectedDate === day.date
-                                  ? 'bg-gold text-background font-semibold'
-                                  : 'bg-accent hover:bg-gold/20 text-text-primary hover:text-gold'
-                                : 'bg-graphite/20 text-text-secondary cursor-not-allowed'
+                                  ? selectedDate === day.date
+                                    ? 'bg-gold text-background font-semibold'
+                                    : 'bg-accent hover:bg-gold/20 text-text-primary hover:text-gold'
+                                  : 'bg-graphite/20 text-text-secondary cursor-not-allowed'
                                 }`}
                             >
                               {day.display}
@@ -711,8 +717,8 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ onSuccess }) => {
                         type="button"
                         onClick={() => setSelectedTime(time)}
                         className={`p-3 rounded-lg border-2 transition-all duration-200 text-center ${selectedTime === time
-                          ? 'border-gold bg-gold/10 text-gold font-semibold'
-                          : 'border-graphite bg-surface hover:border-gold/50 hover:bg-gold/5 text-text-primary'
+                            ? 'border-gold bg-gold/10 text-gold font-semibold'
+                            : 'border-graphite bg-surface hover:border-gold/50 hover:bg-gold/5 text-text-primary'
                           }`}
                       >
                         {time}

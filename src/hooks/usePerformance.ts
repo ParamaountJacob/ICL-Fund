@@ -20,46 +20,19 @@ export const useDebounce = <T>(value: T, delay: number): T => {
 };
 
 /**
- * Alternative debounced value hook that doesn't return previous value on first call
- */
-export const useDebouncedValue = <T>(value: T, delay: number): T => {
-    const [debouncedValue, setDebouncedValue] = useState<T>(value);
-    const isFirstRender = useRef(true);
-
-    useEffect(() => {
-        // On first render, immediately set the value without delay
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            setDebouncedValue(value);
-            return;
-        }
-
-        const handler = setTimeout(() => {
-            setDebouncedValue(value);
-        }, delay);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [value, delay]);
-
-    return debouncedValue;
-};
-
-/**
  * Custom hook for throttling function calls
  */
 export const useThrottle = <T extends (...args: any[]) => any>(
     callback: T,
     delay: number
 ): T => {
-    const lastRan = useRef<number>(performance.now());
+    const lastRan = useRef<number>(Date.now());
 
     return useCallback(
         ((...args: Parameters<T>) => {
-            if (performance.now() - lastRan.current >= delay) {
+            if (Date.now() - lastRan.current >= delay) {
                 callback(...args);
-                lastRan.current = performance.now();
+                lastRan.current = Date.now();
             }
         }) as T,
         [callback, delay]

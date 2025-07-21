@@ -5,7 +5,18 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useNavigate } from 'react-router-dom';
-import { DatabaseNotification } from '../types/notifications';
+
+interface Notification {
+    id: string;
+    title: string;
+    message: string;
+    type: 'info' | 'success' | 'warning' | 'error';
+    action_type?: string;
+    action_data?: any;
+    is_read: boolean;
+    created_at: string;
+    updated_at: string;
+}
 
 interface NotificationModalProps {
     isOpen: boolean;
@@ -16,7 +27,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
     const { user, isAdmin } = useAuth();
     const { showError, success } = useNotifications();
     const navigate = useNavigate();
-    const [notifications, setNotifications] = useState<DatabaseNotification[]>([]);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [filter, setFilter] = useState<'all' | 'unread'>('all');
     const [isExpanded, setIsExpanded] = useState(false);
@@ -110,7 +121,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
         }
     };
 
-    const handleNotificationClick = (notification: DatabaseNotification) => {
+    const handleNotificationClick = (notification: Notification) => {
         if (!notification.is_read) {
             markAsRead(notification.id);
         }

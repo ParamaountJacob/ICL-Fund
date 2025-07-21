@@ -194,10 +194,7 @@ export const documentService = {
 
       // Send admin notification if requested
       if (sendAdminNotification && status === 'signed') {
-        const notificationSent = await this.sendAdminNotification(applicationId, documentType);
-        if (!notificationSent) {
-          console.warn(`Document signature recorded but admin notification failed for ${applicationId}`);
-        }
+        await this.sendAdminNotification(applicationId, documentType);
       }
 
       // Auto-complete application if all documents are signed
@@ -213,7 +210,7 @@ export const documentService = {
   },
 
   // Send admin notification
-  async sendAdminNotification(applicationId: string, documentType: DocumentType): Promise<boolean> {
+  async sendAdminNotification(applicationId: string, documentType: DocumentType) {
     try {
       const { error } = await supabase.functions.invoke('send-admin-notification', {
         body: {
@@ -226,13 +223,10 @@ export const documentService = {
 
       if (error) {
         console.error('Error sending admin notification:', error);
-        return false; // Return false to indicate failure but don't break the flow
+        // Don't throw - notification failure shouldn't break the flow
       }
-
-      return true; // Return true to indicate success
     } catch (error) {
       console.error('Error invoking admin notification function:', error);
-      return false; // Return false to indicate failure
     }
   },
 

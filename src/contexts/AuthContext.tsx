@@ -11,7 +11,7 @@ interface AuthContextType {
     profile: UserProfile | null;
     userRole: UserRole;
     loading: boolean;
-    signOut: (navigateCallback?: () => void) => Promise<void>;
+    signOut: () => Promise<void>;
     refreshProfile: () => Promise<void>;
     refreshRole: () => Promise<void>;
 }
@@ -31,23 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [userRole, setUserRole] = useState<UserRole>('user');
     const [loading, setLoading] = useState(true);
-    const [isInitialized, setIsInitialized] = useState(false);
     const mountedRef = useRef(false);
-    const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
-
-    // Helper function to create timeout promises with cleanup
-    const createTimeoutPromise = (ms: number, errorMessage: string) => {
-        return new Promise((_, reject) => {
-            const timeoutId = setTimeout(() => reject(new Error(errorMessage)), ms);
-            timeoutsRef.current.push(timeoutId);
-        });
-    };
-
-    // Cleanup function for timeouts
-    const clearAllTimeouts = () => {
-        timeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
-        timeoutsRef.current = [];
-    };
 
     // Initialize auth state
     useEffect(() => {
@@ -60,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                 // Get initial session
                 const { data: { user: initialUser } } = await supabase.auth.getUser();
-                logger.debug('AuthContext - Initial user:', initialUser);
+                logger.log('AuthContext - Initial user:', initialUser);
 
                 if (!mountedRef.current) return;
                 setUser(initialUser);
@@ -69,25 +53,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     // Fetch profile and role from database with timeout protection
                     try {
                         const profilePromise = getUserProfile();
-                        const profileTimeout = createTimeoutPromise(5000, 'Initial getUserProfile timeout');
+                        const profileTimeout = new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('Initial getUserProfile timeout')), 5000)
+                        );
                         const profileData = await Promise.race([profilePromise, profileTimeout]);
 
                         if (!mountedRef.current) return;
                         setProfile(profileData);
 
                         const rolePromise = checkUserRole();
-                        const roleTimeout = createTimeoutPromise(5000, 'Initial checkUserRole timeout');
+                        const roleTimeout = new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('Initial checkUserRole timeout')), 5000)
+                        );
                         const roleData = await Promise.race([rolePromise, roleTimeout]);
 
                         if (!mountedRef.current) return;
                         setUserRole(roleData);
-                        logger.debug('AuthContext - Successfully loaded profile/role:', { roleData, profileData });
+                        logger.log('AuthContext - Successfully loaded profile/role:', { roleData, profileData });
                     } catch (error) {
                         logger.error('Error fetching profile/role:', error);
                         // Fallback: check if user is the admin email
                         if (initialUser.email === 'innercirclelending@gmail.com') {
                             if (mountedRef.current) setUserRole('admin');
-                            logger.debug('AuthContext - Set fallback admin role for innercirclelending@gmail.com');
+                            logger.log('AuthContext - Set fallback admin role for innercirclelending@gmail.com');
                         } else {
                             if (mountedRef.current) setUserRole('user');
                         }
@@ -118,36 +106,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log('Auth state change event:', event);
+            console.log('Session user:', session?.user?.email);
+
             const newUser = session?.user ?? null;
-            logger.debug('AuthContext - Auth state changed:', event, newUser);
+            logger.log('AuthContext - Auth state changed:', event, newUser);
 
             if (!mountedRef.current) return;
             setUser(newUser);
 
             if (newUser) {
+                console.log('User signed in, fetching profile and role...');
+                console.log('User ID:', newUser.id);
+                console.log('User email:', newUser.email);
+
                 // Fetch profile and role when user logs in
                 try {
+                    console.log('Calling getUserProfile()...');
+
                     // Add timeout protection to prevent infinite loading
                     const profilePromise = getUserProfile();
-                    const timeoutPromise = createTimeoutPromise(5000, 'getUserProfile timeout');
+                    const timeoutPromise = new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('getUserProfile timeout')), 5000)
+                    );
 
                     const profileData = await Promise.race([profilePromise, timeoutPromise]);
+                    console.log('getUserProfile() result:', profileData);
                     setProfile(profileData);
+
+                    console.log('Calling checkUserRole()...');
 
                     // Add timeout protection for role check too
                     const rolePromise = checkUserRole();
-                    const roleTimeoutPromise = createTimeoutPromise(5000, 'checkUserRole timeout');
+                    const roleTimeoutPromise = new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('checkUserRole timeout')), 5000)
+                    );
 
                     const roleData = await Promise.race([rolePromise, roleTimeoutPromise]);
+                    console.log('checkUserRole() result:', roleData);
                     setUserRole(roleData);
-                    logger.debug('AuthContext - Auth change: Successfully loaded profile/role:', { roleData, profileData });
+                    console.log('Successfully loaded profile/role:', { roleData, profileData });
+                    logger.log('AuthContext - Auth change: Successfully loaded profile/role:', { roleData, profileData });
                 } catch (error) {
+                    console.error('Error fetching profile/role on auth change:', error);
                     logger.error('Error fetching profile/role on auth change:', error);
                     // Fallback: check if user is the admin email
                     if (newUser.email === 'innercirclelending@gmail.com') {
                         setUserRole('admin');
                         console.log('Set fallback admin role for innercirclelending@gmail.com');
-                        logger.debug('AuthContext - Auth change: Set fallback admin role for innercirclelending@gmail.com');
+                        logger.log('AuthContext - Auth change: Set fallback admin role for innercirclelending@gmail.com');
                     } else {
                         setUserRole('user');
                     }
@@ -167,13 +174,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         return () => {
-            mountedRef.current = false;
-            clearAllTimeouts();
             subscription.unsubscribe();
         };
     }, []);
 
-    const signOut = async (navigateCallback?: () => void) => {
+    const signOut = async () => {
         try {
             console.log('Starting signOut process...');
 
@@ -190,12 +195,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             console.log('Supabase signOut completed, redirecting to home...');
 
-            // Use navigation callback if provided, otherwise fallback to location change
-            if (navigateCallback) {
-                navigateCallback();
-            } else {
-                window.location.href = '/';
-            }
+            // Force page reload to clear any cached state
+            window.location.href = '/';
         } catch (error) {
             console.error('Error signing out:', error);
             // Even if there's an error, clear local state and redirect
@@ -203,12 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setProfile(null);
             setUserRole('user');
             setLoading(false);
-
-            if (navigateCallback) {
-                navigateCallback();
-            } else {
-                window.location.href = '/';
-            }
+            window.location.href = '/';
         }
     };
 
