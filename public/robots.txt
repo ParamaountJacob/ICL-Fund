@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and sensitive routes from crawlers
+Disallow: /admin
+Disallow: /profile
+Disallow: /onboarding
+Disallow: /dashboard
+
+# Sitemap location (when available)
+# Sitemap: https://yourdomain.com/sitemap.xml
