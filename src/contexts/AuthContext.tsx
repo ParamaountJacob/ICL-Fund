@@ -11,7 +11,7 @@ interface AuthContextType {
     profile: UserProfile | null;
     userRole: UserRole;
     loading: boolean;
-    signOut: () => Promise<void>;
+    signOut: (navigateCallback?: () => void) => Promise<void>;
     refreshProfile: () => Promise<void>;
     refreshRole: () => Promise<void>;
 }
@@ -31,7 +31,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [userRole, setUserRole] = useState<UserRole>('user');
     const [loading, setLoading] = useState(true);
+    const [isInitialized, setIsInitialized] = useState(false);
     const mountedRef = useRef(false);
+    const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
+
+    // Helper function to create timeout promises with cleanup
+    const createTimeoutPromise = (ms: number, errorMessage: string) => {
+        return new Promise((_, reject) => {
+            const timeoutId = setTimeout(() => reject(new Error(errorMessage)), ms);
+            timeoutsRef.current.push(timeoutId);
+        });
+    };
+
+    // Cleanup function for timeouts
+    const clearAllTimeouts = () => {
+        timeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
+        timeoutsRef.current = [];
+    };
 
     // Initialize auth state
     useEffect(() => {
@@ -53,18 +69,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     // Fetch profile and role from database with timeout protection
                     try {
                         const profilePromise = getUserProfile();
-                        const profileTimeout = new Promise((_, reject) =>
-                            setTimeout(() => reject(new Error('Initial getUserProfile timeout')), 5000)
-                        );
+                        const profileTimeout = createTimeoutPromise(5000, 'Initial getUserProfile timeout');
                         const profileData = await Promise.race([profilePromise, profileTimeout]);
 
                         if (!mountedRef.current) return;
                         setProfile(profileData);
 
                         const rolePromise = checkUserRole();
-                        const roleTimeout = new Promise((_, reject) =>
-                            setTimeout(() => reject(new Error('Initial checkUserRole timeout')), 5000)
-                        );
+                        const roleTimeout = createTimeoutPromise(5000, 'Initial checkUserRole timeout');
                         const roleData = await Promise.race([rolePromise, roleTimeout]);
 
                         if (!mountedRef.current) return;
@@ -106,9 +118,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log('Auth state change event:', event);
-            console.log('Session user:', session?.user?.email);
-
             const newUser = session?.user ?? null;
             logger.log('AuthContext - Auth state changed:', event, newUser);
 
@@ -116,39 +125,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(newUser);
 
             if (newUser) {
-                console.log('User signed in, fetching profile and role...');
-                console.log('User ID:', newUser.id);
-                console.log('User email:', newUser.email);
-
                 // Fetch profile and role when user logs in
                 try {
-                    console.log('Calling getUserProfile()...');
-
                     // Add timeout protection to prevent infinite loading
                     const profilePromise = getUserProfile();
-                    const timeoutPromise = new Promise((_, reject) =>
-                        setTimeout(() => reject(new Error('getUserProfile timeout')), 5000)
-                    );
+                    const timeoutPromise = createTimeoutPromise(5000, 'getUserProfile timeout');
 
                     const profileData = await Promise.race([profilePromise, timeoutPromise]);
-                    console.log('getUserProfile() result:', profileData);
                     setProfile(profileData);
-
-                    console.log('Calling checkUserRole()...');
 
                     // Add timeout protection for role check too
                     const rolePromise = checkUserRole();
-                    const roleTimeoutPromise = new Promise((_, reject) =>
-                        setTimeout(() => reject(new Error('checkUserRole timeout')), 5000)
-                    );
+                    const roleTimeoutPromise = createTimeoutPromise(5000, 'checkUserRole timeout');
 
                     const roleData = await Promise.race([rolePromise, roleTimeoutPromise]);
-                    console.log('checkUserRole() result:', roleData);
                     setUserRole(roleData);
-                    console.log('Successfully loaded profile/role:', { roleData, profileData });
                     logger.log('AuthContext - Auth change: Successfully loaded profile/role:', { roleData, profileData });
                 } catch (error) {
-                    console.error('Error fetching profile/role on auth change:', error);
                     logger.error('Error fetching profile/role on auth change:', error);
                     // Fallback: check if user is the admin email
                     if (newUser.email === 'innercirclelending@gmail.com') {
@@ -174,11 +167,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         return () => {
+            mountedRef.current = false;
+            clearAllTimeouts();
             subscription.unsubscribe();
         };
     }, []);
 
-    const signOut = async () => {
+    const signOut = async (navigateCallback?: () => void) => {
         try {
             console.log('Starting signOut process...');
 
@@ -195,8 +190,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             console.log('Supabase signOut completed, redirecting to home...');
 
-            // Force page reload to clear any cached state
-            window.location.href = '/';
+            // Use navigation callback if provided, otherwise fallback to location change
+            if (navigateCallback) {
+                navigateCallback();
+            } else {
+                window.location.href = '/';
+            }
         } catch (error) {
             console.error('Error signing out:', error);
             // Even if there's an error, clear local state and redirect
@@ -204,7 +203,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setProfile(null);
             setUserRole('user');
             setLoading(false);
-            window.location.href = '/';
+
+            if (navigateCallback) {
+                navigateCallback();
+            } else {
+                window.location.href = '/';
+            }
         }
     };
 

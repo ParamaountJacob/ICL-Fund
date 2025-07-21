@@ -2,50 +2,57 @@ import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase'; // Use shared Supabase client
 import { useAuth } from '../contexts/AuthContext';
 
-// Enhanced styles for premium hero section and animations
-const styles = `
-  .animate-fadeIn {
-    animation: fadeIn 0.8s ease-in-out;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .sophisticated-bg {
-    background: 
-      radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(255, 215, 0, 0.02) 0%, transparent 50%),
-      linear-gradient(135deg, rgba(255, 215, 0, 0.01) 0%, transparent 50%, rgba(255, 215, 0, 0.01) 100%),
-      #000000;
-    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
-  }
-
-  .scroll-indicator {
-    animation: bounce 2s infinite;
-  }
-
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-8px); }
-    60% { transform: translateY(-4px); }
-  }
-`;
-
-// Inject styles
-if (typeof document !== 'undefined') {
-    const styleSheet = document.createElement('style');
-    styleSheet.innerText = styles;
-    document.head.appendChild(styleSheet);
+interface DataRoomFile {
+    name: string;
+    id: string;
+    updated_at: string;
+    created_at: string;
+    last_accessed_at?: string;
+    metadata?: {
+        size: number;
+        mimetype: string;
+        cacheControl?: string;
+    };
 }
+
+const DataRoomStyles = () => (
+    <style>{`
+    .animate-fadeIn {
+      animation: fadeIn 0.8s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .sophisticated-bg {
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255, 215, 0, 0.02) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(255, 215, 0, 0.01) 0%, transparent 50%, rgba(255, 215, 0, 0.01) 100%),
+        #000000;
+      background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+    }
+
+    .scroll-indicator {
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-8px); }
+      60% { transform: translateY(-4px); }
+    }
+  `}</style>
+);
 
 const BUCKET = 'tim-data-room';
 const USERNAME = 'admin'; // Changed to lowercase for consistency
@@ -64,7 +71,7 @@ export default function DataRoom() {
     const [authenticated, setAuthenticated] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [files, setFiles] = useState<any[]>([]);
+    const [files, setFiles] = useState<DataRoomFile[]>([]);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
     const [requestText, setRequestText] = useState('');
@@ -85,16 +92,9 @@ export default function DataRoom() {
 
     // Check if user is authenticated via AuthContext (admin) or simple login
     useEffect(() => {
-        console.log('DataRoom: Checking auth user:', authUser);
-        console.log('DataRoom: User email:', authUser?.user?.email);
-        console.log('DataRoom: User role:', authUser?.userRole);
-        console.log('DataRoom: User object:', authUser?.user);
-
         const adminStatus = isUserAdmin();
-        console.log('DataRoom: Is admin?', adminStatus);
 
         if (adminStatus) {
-            console.log('DataRoom: Auto-authenticating admin user');
             setAuthenticated(true);
         }
     }, [authUser]);
@@ -147,13 +147,6 @@ export default function DataRoom() {
 
             finalFileName = `${Date.now()}_${targetFolder ? targetFolder + '_' : ''}${baseFileName}${versionSuffix}.${extension}`;
         }
-
-        console.log('Upload details:', {
-            originalName: file.name,
-            targetFolder,
-            isReplace,
-            finalFileName
-        });
 
         const { error } = await supabase.storage.from(BUCKET).upload(finalFileName, file, { upsert: true });
         setUploading(false);
@@ -629,6 +622,7 @@ export default function DataRoom() {
 
     return (
         <div className="min-h-screen sophisticated-bg">
+            <DataRoomStyles />
             {/* Main Data Room Content */}
             <div className="bg-black min-h-screen pt-20">
                 <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">

@@ -120,6 +120,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [activities, setActivities] = useState<UserActivity[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'profile' | 'investments' | 'messages'>(defaultTab || 'profile');
 
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -144,6 +145,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
     if (!user) return;
 
     setLoading(true);
+    setError(null);
     try {
       // Fetch user profile
       const profileData = await getUserProfileById(user.id);
@@ -306,6 +308,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load user data');
     } finally {
       setLoading(false);
     }
@@ -506,6 +509,18 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 <div className="flex items-center justify-center py-12">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                   <span className="ml-3 text-gray-600">Loading user data...</span>
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="text-red-500 text-6xl mb-4">⚠️</div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading User Data</h3>
+                  <p className="text-gray-600 mb-4 text-center">{error}</p>
+                  <button
+                    onClick={fetchUserData}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Try Again
+                  </button>
                 </div>
               ) : (
                 <div>

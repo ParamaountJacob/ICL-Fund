@@ -1,15 +1,5 @@
 import { supabase } from './client';
-
-export interface Notification {
-    id: string;
-    user_id: string;
-    title: string;
-    message: string;
-    type: 'info' | 'success' | 'warning' | 'error' | 'investment' | 'document';
-    read: boolean;
-    action_url?: string;
-    created_at: string;
-}
+import type { Notification, NotificationPayload, UINotification } from '../types/notifications';
 
 export const notificationService = {
     // Get user notifications
@@ -119,21 +109,77 @@ export const notificationService = {
     },
 
     // Subscribe to real-time notifications
-    subscribeToNotifications(userId: string, callback: (notification: Notification) => void) {
-        return supabase
-            .channel('notifications')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'notifications',
-                    filter: `user_id=eq.${userId}`
-                },
-                (payload) => {
-                    callback(payload.new as Notification);
+    subscribeToNotifications(userId: string, callback: (payload: NotificationPayload) => void) {
+        try {
+            const channel = supabase
+                .channel('notifications')
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'notifications',
+                        filter: `user_id=eq.${userId}`
+                    },
+                    (payload) => {
+                        callback({
+                            new: payload.new as Notification,
+                            old: payload.old as Notification,
+                            eventType: payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE'
+                        });
+                    }
+                )
+                .subscribe();
+
+            // Return object with unsubscribe method for proper cleanup
+            return {
+                channel,
+                unsubscribe: () => {
+                    supabase.removeChannel(channel);
                 }
-            )
-            .subscribe();
+            };
+        } catch (error) {
+            console.error('Error subscribing to notifications:', error);
+            // Return a no-op unsubscribe for error cases
+            return {
+                channel: null,
+                unsubscribe: () => { }
+            };
+        }
+    },
+
+    // Subscribe to admin alerts with proper cleanup
+    subscribeToAdminAlerts(callback: (payload: any) => void) {
+        try {
+            const channel = supabase
+                .channel('admin-alerts')
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*',
+                        schema: 'public',
+                        table: 'admin_alerts'
+                    },
+                    (payload) => {
+                        callback(payload);
+                    }
+                )
+                .subscribe();
+
+            // Return object with unsubscribe method for proper cleanup
+            return {
+                channel,
+                unsubscribe: () => {
+                    supabase.removeChannel(channel);
+                }
+            };
+        } catch (error) {
+            console.error('Error subscribing to admin alerts:', error);
+            // Return a no-op unsubscribe for error cases
+            return {
+                channel: null,
+                unsubscribe: () => { }
+            };
+        }
     }
 };
