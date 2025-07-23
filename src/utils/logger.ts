@@ -2,36 +2,28 @@
 export const isDevelopment = import.meta.env.DEV;
 
 // Force silent logging to reduce console noise
-const LOG_LEVEL = 0;
+const LOG_LEVEL = -1; // Completely silent
 
 export const logger = {
     log: (...args: any[]) => {
-        if (isDevelopment && LOG_LEVEL >= 4) {
-            console.log(...args);
-        }
+        // Completely disabled
     },
 
     debug: (...args: any[]) => {
-        if (isDevelopment && LOG_LEVEL >= 4) {
-            console.log('[DEBUG]', ...args);
-        }
+        // Completely disabled
     },
 
     info: (...args: any[]) => {
-        if (isDevelopment && LOG_LEVEL >= 3) {
-            console.info('[INFO]', ...args);
-        }
+        // Completely disabled
     },
 
     warn: (...args: any[]) => {
-        if (isDevelopment && LOG_LEVEL >= 2) {
-            console.warn('[WARN]', ...args);
-        }
+        // Completely disabled
     },
 
     error: (...args: any[]) => {
-        // Always show errors, even with silent logging
-        if (isDevelopment) {
+        // Only show critical errors
+        if (isDevelopment && args[0] && !args[0].toString().includes('Sentry')) {
             console.error('[ERROR]', ...args);
         }
     }
