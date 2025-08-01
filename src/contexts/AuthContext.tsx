@@ -31,6 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [userRole, setUserRole] = useState<UserRole>('user');
     const [loading, setLoading] = useState(true);
+    const [isInitialized, setIsInitialized] = useState(false);
     const mountedRef = useRef(false);
 
     // Initialize auth state
