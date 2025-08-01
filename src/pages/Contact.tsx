@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Video, Phone, ArrowLeft, Clock, User, MessageSquare, DollarSign, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import AuthModal from '../components/AuthModal';
 import { SuccessModal } from '../components/SuccessModal';
 import CalendlyEmbed from '../components/CalendlyEmbed';
@@ -11,6 +12,7 @@ type ContactMethod = 'email' | 'video' | 'phone' | null;
 
 const Contact: React.FC = () => {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [selectedMethod, setSelectedMethod] = useState<ContactMethod>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -399,7 +401,7 @@ const Contact: React.FC = () => {
                 </motion.button>
 
                 <motion.button
-                  onClick={() => setSelectedMethod('video')}
+                  onClick={() => navigate('/video-call-booking')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="w-full p-6 sm:p-8 bg-surface border border-graphite rounded-xl hover:border-gold/50 transition-all duration-300 group"
@@ -424,7 +426,7 @@ const Contact: React.FC = () => {
                 </motion.button>
 
                 <motion.button
-                  onClick={() => setSelectedMethod('phone')}
+                  onClick={() => navigate('/phone-call-booking')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="w-full p-6 sm:p-8 bg-surface border border-graphite rounded-xl hover:border-gold/50 transition-all duration-300 group"

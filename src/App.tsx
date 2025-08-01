@@ -28,6 +28,8 @@ import Onboarding from './pages/Onboarding';
 import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
 import NotificationsPage from './pages/NotificationsPage';
+import VideoCallBooking from './pages/VideoCallBooking';
+import PhoneCallBooking from './pages/PhoneCallBooking';
 import SubscriptionAgreement from './pages/onboarding-flow/SubscriptionAgreement';
 import PromissoryNote from './pages/onboarding-flow/PromissoryNote';
 import WireDetails from './pages/onboarding-flow/WireDetails';
@@ -78,6 +80,8 @@ function AppContent() {
         <Route path="/investor-info" element={<InvestorInfo />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/video-call-booking" element={<VideoCallBooking />} />
+        <Route path="/phone-call-booking" element={<PhoneCallBooking />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/overview" element={<Overview />} />
         <Route path="/dataroom" element={<DataRoom />} />
