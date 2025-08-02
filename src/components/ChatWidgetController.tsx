@@ -36,15 +36,7 @@ const ChatWidgetController: React.FC<ChatWidgetControllerProps> = ({
 
         const handleScroll = () => {
             const scrolled = window.scrollY > showAfterScroll;
-            const newShowState = scrolled && isVisible;
-
-            // Only update if there's an actual change to prevent unnecessary re-renders
-            setShouldShow(prevState => {
-                if (prevState !== newShowState) {
-                    return newShowState;
-                }
-                return prevState;
-            });
+            setShouldShow(scrolled && isVisible);
         };
 
         // Initial check
@@ -85,119 +77,63 @@ const ChatWidgetController: React.FC<ChatWidgetControllerProps> = ({
         };
     }, [shouldShow, shouldHideOnCurrentRoute, isScriptLoaded]);
 
-    // Control widget visibility with aggressive override
+    // Control widget visibility
     useEffect(() => {
         if (!isScriptLoaded) return;
 
-        const controlWidget = () => {
-            // Find all possible chat widget elements
-            const selectors = [
-                '[data-widget-id="688d67de81758bc2473c0cee"]',
-                '.lc-chat-widget',
-                '[class*="leadconnector"]',
-                '[class*="chat-widget"]',
-                '[class*="chat"]',
-                '[id*="chat"]',
-                'iframe[src*="leadconnector"]',
-                'iframe[src*="chat"]'
-            ];
+        // Wait a bit for the widget to initialize
+        const timer = setTimeout(() => {
+            // Try to find and control the LeadConnector widget
+            const chatWidget = document.querySelector('[data-widget-id="688d67de81758bc2473c0cee"]');
+            const chatContainer = document.querySelector('.lc-chat-widget') ||
+                document.querySelector('[class*="chat"]') ||
+                document.querySelector('[id*="chat"]');
 
-            const elements = [];
-            selectors.forEach(selector => {
-                const found = document.querySelectorAll(selector);
-                found.forEach(el => elements.push(el));
-            });
+            const targetElement = chatWidget || chatContainer;
 
-            // Remove duplicates
-            const uniqueElements = [...new Set(elements)];
-
-            uniqueElements.forEach(element => {
-                const el = element as HTMLElement;
-
-                // Force override any inline styles the widget might set
-                el.style.setProperty('transition', 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out', 'important');
-
+            if (targetElement) {
+                const element = targetElement as HTMLElement;
                 if (shouldShow && !shouldHideOnCurrentRoute) {
-                    el.style.setProperty('display', 'block', 'important');
-                    el.style.setProperty('visibility', 'visible', 'important');
-                    el.style.setProperty('opacity', '1', 'important');
-                    el.style.setProperty('transform', 'translateY(0px)', 'important');
-                    el.style.setProperty('pointer-events', 'auto', 'important');
+                    element.style.display = 'block';
+                    element.style.opacity = '1';
+                    element.style.visibility = 'visible';
+                    element.style.transition = 'opacity 0.3s ease-in-out';
                 } else {
-                    // Forcefully hide the widget
-                    el.style.setProperty('opacity', '0', 'important');
-                    el.style.setProperty('transform', 'translateY(10px)', 'important');
-                    el.style.setProperty('visibility', 'hidden', 'important');
-                    el.style.setProperty('pointer-events', 'none', 'important');
-
-                    // Set display none after transition, but keep overriding
-                    setTimeout(() => {
-                        el.style.setProperty('display', 'none', 'important');
-                    }, 300);
-                }
-            });
-        };
-
-        // Initial control
-        const timer = setTimeout(controlWidget, 500);
-
-        // Keep fighting the widget every second when it should be hidden
-        let interval: NodeJS.Timeout | null = null;
-        if (!shouldShow || shouldHideOnCurrentRoute) {
-            interval = setInterval(controlWidget, 1000);
-        }
-
-        // Also try to control via LeadConnector API
-        try {
-            if (window.LeadConnector) {
-                if (shouldShow && !shouldHideOnCurrentRoute) {
-                    window.LeadConnector.show?.();
-                } else {
-                    window.LeadConnector.hide?.();
+                    element.style.display = 'none';
+                    element.style.opacity = '0';
+                    element.style.visibility = 'hidden';
                 }
             }
-        } catch (error) {
-            console.warn('LeadConnector API not available:', error);
-        }
 
-        return () => {
-            clearTimeout(timer);
-            if (interval) clearInterval(interval);
-        };
+            // Also try to control via LeadConnector API if available
+            if (window.LeadConnector) {
+                try {
+                    if (shouldShow && !shouldHideOnCurrentRoute) {
+                        window.LeadConnector.show?.();
+                    } else {
+                        window.LeadConnector.hide?.();
+                    }
+                } catch (error) {
+                    console.warn('LeadConnector API not available:', error);
+                }
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
     }, [shouldShow, shouldHideOnCurrentRoute, isScriptLoaded]);
 
-    // Aggressively hide widget on route changes that should hide it
+    // Hide widget on route changes that should hide it
     useEffect(() => {
         if (shouldHideOnCurrentRoute && isScriptLoaded) {
-            const forceHide = () => {
-                const selectors = [
-                    '[data-widget-id="688d67de81758bc2473c0cee"]',
-                    '.lc-chat-widget',
-                    '[class*="leadconnector"]',
-                    '[class*="chat-widget"]',
-                    '[class*="chat"]',
-                    '[id*="chat"]',
-                    'iframe[src*="leadconnector"]',
-                    'iframe[src*="chat"]'
-                ];
+            const chatElements = document.querySelectorAll(
+                '[data-widget-id="688d67de81758bc2473c0cee"], .lc-chat-widget, [class*="chat"], [id*="chat"]'
+            );
 
-                selectors.forEach(selector => {
-                    const elements = document.querySelectorAll(selector);
-                    elements.forEach(element => {
-                        const el = element as HTMLElement;
-                        el.style.setProperty('display', 'none', 'important');
-                        el.style.setProperty('visibility', 'hidden', 'important');
-                        el.style.setProperty('opacity', '0', 'important');
-                        el.style.setProperty('pointer-events', 'none', 'important');
-                    });
-                });
-            };
-
-            // Force hide immediately and keep enforcing it
-            forceHide();
-            const interval = setInterval(forceHide, 500);
-
-            return () => clearInterval(interval);
+            chatElements.forEach(element => {
+                const el = element as HTMLElement;
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+            });
         }
     }, [location.pathname, shouldHideOnCurrentRoute, isScriptLoaded]);
 
