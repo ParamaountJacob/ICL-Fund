@@ -34,6 +34,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isInitialized, setIsInitialized] = useState(false);
     const mountedRef = useRef(false);
 
+    // Create the context value first, before any async operations
+    const value: AuthContextType = {
+        user,
+        profile,
+        userRole,
+        loading,
+        signOut: async () => {
+            try {
+                console.log('Starting signOut process...');
+
+                // Clear local state first
+                setUser(null);
+                setProfile(null);
+                setUserRole('user');
+                setLoading(false);
+
+                console.log('Local state cleared, calling supabase.auth.signOut()...');
+
+                // Then sign out from Supabase
+                await supabase.auth.signOut();
+
+                console.log('Supabase signOut completed, redirecting to home...');
+
+                // Force page reload to clear any cached state
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Error signing out:', error);
+                // Even if there's an error, clear local state and redirect
+                setUser(null);
+                setProfile(null);
+                setUserRole('user');
+                setLoading(false);
+                window.location.href = '/';
+            }
+        },
+        refreshProfile: async () => {
+            if (user) {
+                try {
+                    const profileData = await getUserProfile();
+                    setProfile(profileData);
+                } catch (error) {
+                    logger.error('Error refreshing profile:', error);
+                    // Set profile to null on error instead of leaving it in unknown state
+                    setProfile(null);
+                }
+            }
+        },
+        refreshRole: async () => {
+            if (user) {
+                try {
+                    const roleData = await checkUserRole();
+                    setUserRole(roleData);
+                } catch (error) {
+                    logger.error('Error refreshing role:', error);
+                    // Set role to 'user' on error as safe fallback
+                    setUserRole('user');
+                }
+            }
+        }
+    };
+
     // Initialize auth state
     useEffect(() => {
         mountedRef.current = true;
@@ -161,74 +222,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
     }, []);
 
-    const signOut = async () => {
-        try {
-            console.log('Starting signOut process...');
-
-            // Clear local state first
-            setUser(null);
-            setProfile(null);
-            setUserRole('user');
-            setLoading(false);
-
-            console.log('Local state cleared, calling supabase.auth.signOut()...');
-
-            // Then sign out from Supabase
-            await supabase.auth.signOut();
-
-            console.log('Supabase signOut completed, redirecting to home...');
-
-            // Force page reload to clear any cached state
-            window.location.href = '/';
-        } catch (error) {
-            console.error('Error signing out:', error);
-            // Even if there's an error, clear local state and redirect
-            setUser(null);
-            setProfile(null);
-            setUserRole('user');
-            setLoading(false);
-            window.location.href = '/';
-        }
-    };
-
-    const refreshProfile = async () => {
-        if (user) {
-            try {
-                const profileData = await getUserProfile();
-                setProfile(profileData);
-            } catch (error) {
-                logger.error('Error refreshing profile:', error);
-                // Set profile to null on error instead of leaving it in unknown state
-                setProfile(null);
-            }
-        }
-    };
-
-    const refreshRole = async () => {
-        if (user) {
-            try {
-                const roleData = await checkUserRole();
-                setUserRole(roleData);
-            } catch (error) {
-                logger.error('Error refreshing role:', error);
-                // Set role to 'user' on error as safe fallback
-                setUserRole('user');
-            }
-        }
-    };
-
-    const value: AuthContextType = {
-        user,
-        profile,
-        userRole,
-        loading,
-        signOut,
-        refreshProfile,
-        refreshRole
-    };
-
     // Ensure we always provide a context value, even during initialization
-    console.log('AuthProvider providing value:', value);
     return (
         <AuthContext.Provider value={value}>
             {children}
