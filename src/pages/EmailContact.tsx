@@ -6,18 +6,18 @@ const EmailContact: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Load the form embed script
-        const script = document.createElement('script');
-        script.src = 'https://link.msgsndr.com/js/form_embed.js';
-        script.async = true;
-        document.body.appendChild(script);
+        // Check if script is already loaded to prevent duplicates
+        const existingScript = document.querySelector('script[src="https://link.msgsndr.com/js/form_embed.js"]');
 
-        return () => {
-            // Clean up script on unmount
-            if (document.body.contains(script)) {
-                document.body.removeChild(script);
-            }
-        };
+        if (!existingScript) {
+            const script = document.createElement('script');
+            script.src = 'https://link.msgsndr.com/js/form_embed.js';
+            script.async = true;
+            script.setAttribute('data-booking-component', 'email');
+            document.head.appendChild(script);
+        }
+
+        // No cleanup needed since script should persist across page navigation
     }, []);
 
     return (
@@ -45,7 +45,7 @@ const EmailContact: React.FC = () => {
                 </div>
 
                 {/* LeadConnector Form Embed */}
-                <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden shadow-2xl">
+                <div className="bg-black border border-gray-800 rounded-lg overflow-hidden shadow-2xl">
                     <iframe
                         src="https://api.leadconnectorhq.com/widget/form/672F7WVRP5znSmIf35ts"
                         style={{
@@ -53,7 +53,7 @@ const EmailContact: React.FC = () => {
                             height: '866px',
                             border: 'none',
                             borderRadius: '8px',
-                            background: 'transparent'
+                            background: 'black'
                         }}
                         id="inline-672F7WVRP5znSmIf35ts"
                         data-layout="{'id':'INLINE'}"
@@ -68,7 +68,6 @@ const EmailContact: React.FC = () => {
                         data-layout-iframe-id="inline-672F7WVRP5znSmIf35ts"
                         data-form-id="672F7WVRP5znSmIf35ts"
                         title="ICL Email"
-                        loading="lazy"
                     />
                 </div>
             </div>

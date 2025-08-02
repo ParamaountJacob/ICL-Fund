@@ -6,19 +6,19 @@ const PhoneCallBooking: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Load the form embed script
-        const script = document.createElement('script');
-        script.src = 'https://link.msgsndr.com/js/form_embed.js';
-        script.type = 'text/javascript';
-        script.async = true;
-        document.body.appendChild(script);
+        // Check if script is already loaded to prevent duplicates
+        const existingScript = document.querySelector('script[src="https://link.msgsndr.com/js/form_embed.js"]');
 
-        return () => {
-            // Clean up script on unmount
-            if (document.body.contains(script)) {
-                document.body.removeChild(script);
-            }
-        };
+        if (!existingScript) {
+            const script = document.createElement('script');
+            script.src = 'https://link.msgsndr.com/js/form_embed.js';
+            script.type = 'text/javascript';
+            script.async = true;
+            script.setAttribute('data-booking-component', 'phone');
+            document.head.appendChild(script);
+        }
+
+        // No cleanup needed since script should persist across page navigation
     }, []);
 
     return (
@@ -46,7 +46,7 @@ const PhoneCallBooking: React.FC = () => {
                 </div>
 
                 {/* Booking embed */}
-                <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden shadow-2xl">
+                <div className="bg-black border border-gray-800 rounded-lg overflow-hidden shadow-2xl">
                     <iframe
                         src="https://api.leadconnectorhq.com/widget/booking/ArouErFpNGMUDeiiUv5k"
                         style={{
@@ -54,12 +54,11 @@ const PhoneCallBooking: React.FC = () => {
                             border: 'none',
                             overflow: 'hidden',
                             minHeight: '600px',
-                            background: 'transparent'
+                            background: 'black'
                         }}
                         scrolling="no"
                         id="ArouErFpNGMUDeiiUv5k_1754087680510"
                         title="Phone Call Booking"
-                        loading="lazy"
                     />
                 </div>
             </div>
