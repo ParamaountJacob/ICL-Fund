@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mail } from 'lucide-react';
 
 const EmailContact: React.FC = () => {
     const navigate = useNavigate();
+    const [iframeHeight, setIframeHeight] = useState(866);
 
     useEffect(() => {
         // Check if script is already loaded to prevent duplicates
@@ -17,7 +18,38 @@ const EmailContact: React.FC = () => {
             document.head.appendChild(script);
         }
 
-        // No cleanup needed since script should persist across page navigation
+        // Inject CSS to make iframes seamless
+        const style = document.createElement('style');
+        style.textContent = `
+            iframe[src*="leadconnectorhq.com"] {
+                background: transparent !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+            
+            /* Hide scrollbars in iframe content */
+            iframe[src*="leadconnectorhq.com"]::-webkit-scrollbar {
+                display: none !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Listen for iframe height changes
+        const handleMessage = (event: MessageEvent) => {
+            if (event.origin !== 'https://api.leadconnectorhq.com') return;
+
+            if (event.data && event.data.type === 'resize' && event.data.height) {
+                setIframeHeight(event.data.height);
+            }
+        };
+
+        window.addEventListener('message', handleMessage);
+
+        return () => {
+            window.removeEventListener('message', handleMessage);
+            document.head.removeChild(style);
+        };
     }, []);
 
     return (
@@ -44,17 +76,23 @@ const EmailContact: React.FC = () => {
                     </p>
                 </div>
 
-                {/* LeadConnector Form Embed */}
-                <div className="bg-black border border-gray-800 rounded-lg overflow-hidden shadow-2xl">
+                {/* LeadConnector Form Embed - Seamless Integration */}
+                <div className="w-full">
                     <iframe
                         src="https://api.leadconnectorhq.com/widget/form/672F7WVRP5znSmIf35ts"
                         style={{
                             width: '100%',
-                            height: '866px',
+                            height: `${iframeHeight}px`,
                             border: 'none',
-                            borderRadius: '8px',
-                            background: 'black'
+                            margin: 0,
+                            padding: 0,
+                            background: 'transparent',
+                            display: 'block',
+                            colorScheme: 'dark'
                         }}
+                        frameBorder="0"
+                        scrolling="no"
+                        seamless
                         id="inline-672F7WVRP5znSmIf35ts"
                         data-layout="{'id':'INLINE'}"
                         data-trigger-type="alwaysShow"
@@ -68,6 +106,28 @@ const EmailContact: React.FC = () => {
                         data-layout-iframe-id="inline-672F7WVRP5znSmIf35ts"
                         data-form-id="672F7WVRP5znSmIf35ts"
                         title="ICL Email"
+                        onLoad={(e) => {
+                            const iframe = e.target as HTMLIFrameElement;
+                            // Try to get actual content height
+                            try {
+                                const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+                                if (iframeDoc) {
+                                    const body = iframeDoc.body;
+                                    const html = iframeDoc.documentElement;
+                                    const height = Math.max(
+                                        body?.scrollHeight || 0,
+                                        body?.offsetHeight || 0,
+                                        html?.clientHeight || 0,
+                                        html?.scrollHeight || 0,
+                                        html?.offsetHeight || 0
+                                    );
+                                    if (height > 0) setIframeHeight(height);
+                                }
+                            } catch (e) {
+                                // Cross-origin restrictions, fallback to postMessage
+                                console.log('Using postMessage for iframe height adjustment');
+                            }
+                        }}
                     />
                 </div>
             </div>

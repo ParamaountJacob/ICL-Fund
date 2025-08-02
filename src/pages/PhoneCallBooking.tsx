@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Phone } from 'lucide-react';
 
 const PhoneCallBooking: React.FC = () => {
     const navigate = useNavigate();
+    const [iframeHeight, setIframeHeight] = useState(600);
 
     useEffect(() => {
         // Check if script is already loaded to prevent duplicates
@@ -18,7 +19,38 @@ const PhoneCallBooking: React.FC = () => {
             document.head.appendChild(script);
         }
 
-        // No cleanup needed since script should persist across page navigation
+        // Inject CSS to make iframes seamless
+        const style = document.createElement('style');
+        style.textContent = `
+            iframe[src*="leadconnectorhq.com"] {
+                background: transparent !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+            
+            /* Hide scrollbars in iframe content */
+            iframe[src*="leadconnectorhq.com"]::-webkit-scrollbar {
+                display: none !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Listen for iframe height changes
+        const handleMessage = (event: MessageEvent) => {
+            if (event.origin !== 'https://api.leadconnectorhq.com') return;
+
+            if (event.data && event.data.type === 'resize' && event.data.height) {
+                setIframeHeight(event.data.height);
+            }
+        };
+
+        window.addEventListener('message', handleMessage);
+
+        return () => {
+            window.removeEventListener('message', handleMessage);
+            document.head.removeChild(style);
+        };
     }, []);
 
     return (
@@ -45,20 +77,47 @@ const PhoneCallBooking: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Booking embed */}
-                <div className="bg-black border border-gray-800 rounded-lg overflow-hidden shadow-2xl">
+                {/* Booking embed - Seamless Integration */}
+                <div className="w-full">
                     <iframe
                         src="https://api.leadconnectorhq.com/widget/booking/ArouErFpNGMUDeiiUv5k"
                         style={{
                             width: '100%',
+                            height: `${iframeHeight}px`,
                             border: 'none',
-                            overflow: 'hidden',
-                            minHeight: '600px',
-                            background: 'black'
+                            margin: 0,
+                            padding: 0,
+                            background: 'transparent',
+                            display: 'block',
+                            colorScheme: 'dark'
                         }}
+                        frameBorder="0"
                         scrolling="no"
+                        seamless
                         id="ArouErFpNGMUDeiiUv5k_1754087680510"
                         title="Phone Call Booking"
+                        onLoad={(e) => {
+                            const iframe = e.target as HTMLIFrameElement;
+                            // Try to get actual content height
+                            try {
+                                const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+                                if (iframeDoc) {
+                                    const body = iframeDoc.body;
+                                    const html = iframeDoc.documentElement;
+                                    const height = Math.max(
+                                        body?.scrollHeight || 0,
+                                        body?.offsetHeight || 0,
+                                        html?.clientHeight || 0,
+                                        html?.scrollHeight || 0,
+                                        html?.offsetHeight || 0
+                                    );
+                                    if (height > 0) setIframeHeight(height);
+                                }
+                            } catch (e) {
+                                // Cross-origin restrictions, fallback to postMessage
+                                console.log('Using postMessage for iframe height adjustment');
+                            }
+                        }}
                     />
                 </div>
             </div>
