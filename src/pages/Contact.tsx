@@ -408,7 +408,7 @@ const Contact: React.FC = () => {
 
               <div className="space-y-6">
                 <motion.button
-                  onClick={openChatWidget}
+                  onClick={() => navigate('/email-contact')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="w-full p-6 sm:p-8 bg-surface border border-graphite rounded-xl hover:border-gold/50 transition-all duration-300 group"
