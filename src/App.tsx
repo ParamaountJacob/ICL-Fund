@@ -119,9 +119,7 @@ function AppContent() {
         autoHideOnHero={true}
         showAfterScroll={200}
         hideOnRoutes={['/video-call-booking', '/phone-call-booking', '/email-contact']}
-      />
-
-      {/* Disabled profile update modal */}
+      />      {/* Disabled profile update modal */}
       {/* <ForceProfileUpdateModal
         isOpen={showForceProfileUpdate}
         onClose={() => {

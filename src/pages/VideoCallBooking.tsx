@@ -27,7 +27,7 @@ const VideoCallBooking: React.FC = () => {
             <div className="p-6">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg border border-gray-600 hover:border-gray-500 transition-all duration-200"
                 >
                     <ArrowLeft size={20} />
                     Back

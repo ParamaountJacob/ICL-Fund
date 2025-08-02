@@ -8,6 +8,12 @@ import CalendlyEmbed from '../components/CalendlyEmbed';
 import TimeSelection from '../components/TimeSelection';
 import { useAuth } from '../contexts/AuthContext';
 
+declare global {
+  interface Window {
+    LeadConnector?: any;
+  }
+}
+
 type ContactMethod = 'email' | 'video' | 'phone' | null;
 
 const Contact: React.FC = () => {
@@ -336,6 +342,32 @@ const Contact: React.FC = () => {
     }
   };
 
+  // Function to trigger chat widget
+  const openChatWidget = () => {
+    // First try to find and click the chat widget trigger
+    const chatWidget = document.querySelector('[data-widget-id="688d67de81758bc2473c0cee"]') as HTMLElement;
+    const chatButton = document.querySelector('.lc-chat-button, .lc-chat-trigger, [class*="chat-button"], [class*="chat-trigger"]') as HTMLElement;
+
+    if (chatButton) {
+      chatButton.click();
+    } else if (chatWidget) {
+      chatWidget.click();
+    } else if (window.LeadConnector) {
+      // Try using LeadConnector API
+      try {
+        window.LeadConnector.open?.();
+        window.LeadConnector.show?.();
+      } catch (error) {
+        console.warn('Could not open chat widget:', error);
+        // Fallback to email contact page
+        navigate('/email-contact');
+      }
+    } else {
+      // Fallback to email contact page if chat widget isn't available
+      navigate('/email-contact');
+    }
+  };
+
   const resetForm = () => {
     setSelectedMethod(null);
     setSelectedDate('');
@@ -376,7 +408,7 @@ const Contact: React.FC = () => {
 
               <div className="space-y-6">
                 <motion.button
-                  onClick={() => navigate('/email-contact')}
+                  onClick={openChatWidget}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="w-full p-6 sm:p-8 bg-surface border border-graphite rounded-xl hover:border-gold/50 transition-all duration-300 group"
