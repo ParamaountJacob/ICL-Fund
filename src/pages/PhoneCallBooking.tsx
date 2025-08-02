@@ -1,22 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Phone } from 'lucide-react';
 
 const PhoneCallBooking: React.FC = () => {
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Check if script is already loaded to prevent duplicates
-        const existingScript = document.querySelector('script[src="https://link.msgsndr.com/js/form_embed.js"]');
-
-        if (!existingScript) {
-            const script = document.createElement('script');
-            script.src = 'https://link.msgsndr.com/js/form_embed.js';
-            script.type = 'text/javascript';
-            script.async = true;
-            document.head.appendChild(script);
-        }
-    }, []);
+    // No need to load script here - it's preloaded globally
+    // This makes the page load instantly
 
     return (
         <div className="min-h-screen bg-black text-white pt-16">

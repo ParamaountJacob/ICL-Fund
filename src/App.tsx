@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ContactPreloader from './components/ContactPreloader';
 import ProtectedRoute from './components/ProtectedRoute';
 import ForceProfileUpdateModal from './components/ForceProfileUpdateModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -72,6 +73,10 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-background text-text-primary overflow-x-hidden max-w-full">
       <Navbar />
+
+      {/* Preload contact forms in background for instant loading */}
+      <ContactPreloader />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
