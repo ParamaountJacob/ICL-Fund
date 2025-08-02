@@ -45,14 +45,15 @@ const EmailContact: React.FC = () => {
                 </div>
 
                 {/* LeadConnector Form Embed */}
-                <div className="bg-white rounded-lg overflow-hidden shadow-2xl" style={{ minHeight: '866px' }}>
+                <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden shadow-2xl">
                     <iframe
                         src="https://api.leadconnectorhq.com/widget/form/672F7WVRP5znSmIf35ts"
                         style={{
                             width: '100%',
                             height: '866px',
                             border: 'none',
-                            borderRadius: '8px'
+                            borderRadius: '8px',
+                            background: 'transparent'
                         }}
                         id="inline-672F7WVRP5znSmIf35ts"
                         data-layout="{'id':'INLINE'}"
@@ -67,6 +68,7 @@ const EmailContact: React.FC = () => {
                         data-layout-iframe-id="inline-672F7WVRP5znSmIf35ts"
                         data-form-id="672F7WVRP5znSmIf35ts"
                         title="ICL Email"
+                        loading="lazy"
                     />
                 </div>
             </div>

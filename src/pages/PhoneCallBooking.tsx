@@ -46,18 +46,20 @@ const PhoneCallBooking: React.FC = () => {
                 </div>
 
                 {/* Booking embed */}
-                <div className="bg-white rounded-lg overflow-hidden shadow-2xl">
+                <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden shadow-2xl">
                     <iframe
                         src="https://api.leadconnectorhq.com/widget/booking/ArouErFpNGMUDeiiUv5k"
                         style={{
                             width: '100%',
                             border: 'none',
                             overflow: 'hidden',
-                            minHeight: '600px'
+                            minHeight: '600px',
+                            background: 'transparent'
                         }}
                         scrolling="no"
                         id="ArouErFpNGMUDeiiUv5k_1754087680510"
                         title="Phone Call Booking"
+                        loading="lazy"
                     />
                 </div>
             </div>

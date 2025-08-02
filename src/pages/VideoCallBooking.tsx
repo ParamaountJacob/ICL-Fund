@@ -46,18 +46,20 @@ const VideoCallBooking: React.FC = () => {
                 </div>
 
                 {/* Booking embed */}
-                <div className="bg-white rounded-lg overflow-hidden shadow-2xl">
+                <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden shadow-2xl">
                     <iframe
                         src="https://api.leadconnectorhq.com/widget/booking/Zp3dkGUPA56lYxTr5NCw"
                         style={{
                             width: '100%',
                             border: 'none',
                             overflow: 'hidden',
-                            minHeight: '600px'
+                            minHeight: '600px',
+                            background: 'transparent'
                         }}
                         scrolling="no"
                         id="Zp3dkGUPA56lYxTr5NCw_1754087690502"
                         title="Video Call Booking"
+                        loading="lazy"
                     />
                 </div>
             </div>
