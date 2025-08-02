@@ -38,6 +38,7 @@ import { RealTimeMonitoringDashboard } from './components/RealTimeMonitoringDash
 import { AdminPerformanceDashboard } from './components/AdminPerformanceDashboard';
 import { SystemHealthChecker } from './components/SystemHealthChecker';
 import { AdminLayout } from './components/AdminLayout';
+import ChatWidgetController from './components/ChatWidgetController';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -112,7 +113,12 @@ function AppContent() {
       </Routes>
       <Footer />
 
-      {/* Disabled profile update modal */}
+      {/* Chat Widget - Hidden on hero section, shows after scroll */}
+      <ChatWidgetController
+        autoHideOnHero={true}
+        showAfterScroll={200}
+        hideOnRoutes={['/video-call-booking', '/phone-call-booking', '/email-contact']}
+      />      {/* Disabled profile update modal */}
       {/* <ForceProfileUpdateModal
         isOpen={showForceProfileUpdate}
         onClose={() => {
