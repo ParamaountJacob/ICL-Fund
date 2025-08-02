@@ -51,8 +51,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUser(initialUser);
 
                 if (initialUser) {
-                    // Fetch profile and role from database
+                    // Fetch profile and role from database - functions now handle timeouts internally
                     try {
+                        console.log('AuthContext: Fetching initial profile and role...');
                         const profileData = await getUserProfile();
 
                         if (!mountedRef.current) return;
@@ -114,7 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 console.log('User ID:', newUser.id);
                 console.log('User email:', newUser.email);
 
-                // Fetch profile and role when user logs in
+                // Fetch profile and role when user logs in - functions now handle timeouts internally
                 try {
                     console.log('Calling getUserProfile()...');
                     const profileData = await getUserProfile();
@@ -197,6 +198,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setProfile(profileData);
             } catch (error) {
                 logger.error('Error refreshing profile:', error);
+                // Set profile to null on error instead of leaving it in unknown state
+                setProfile(null);
             }
         }
     };
@@ -208,6 +211,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUserRole(roleData);
             } catch (error) {
                 logger.error('Error refreshing role:', error);
+                // Set role to 'user' on error as safe fallback
+                setUserRole('user');
             }
         }
     };
