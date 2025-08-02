@@ -6,9 +6,7 @@ import { Shield, TrendingUp, Clock, Eye, ArrowRight, Phone, Mail, Globe } from '
 const Overview: React.FC = () => {
     const [showDetailedSection, setShowDetailedSection] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [videoPreloaded, setVideoPreloaded] = useState(false);
     const detailedSectionRef = useRef<HTMLDivElement>(null);
-    const videoPreloadRef = useRef<HTMLVideoElement>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,56 +24,33 @@ const Overview: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Preload homepage video
+    // Optimize scroll handling with better performance
     useEffect(() => {
-        const video = videoPreloadRef.current;
-        if (video) {
-            const handleCanPlayThrough = () => {
-                setVideoPreloaded(true);
-                console.log('Homepage video preloaded successfully');
-            };
+        const handleScroll = () => {
+            const scrollY = window.scrollY;
+            const windowHeight = window.innerHeight;
 
-            const handleError = () => {
-                console.log('Video preload failed, but will continue anyway');
-                setVideoPreloaded(true); // Set to true anyway to allow navigation
-            };
+            // Show detailed section after scrolling 20% of viewport
+            if (scrollY > windowHeight * 0.2 && !showDetailedSection) {
+                setShowDetailedSection(true);
+            }
+        };
 
-            video.addEventListener('canplaythrough', handleCanPlayThrough);
-            video.addEventListener('error', handleError);
-
-            // Start preloading
-            video.load();
-
-            return () => {
-                video.removeEventListener('canplaythrough', handleCanPlayThrough);
-                video.removeEventListener('error', handleError);
-            };
-        }
-    }, []);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [showDetailedSection]);
 
     const handleNavigation = async (path: string) => {
         setIsTransitioning(true);
 
-        // Wait for transition animation
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Shorter transition for better perceived performance
+        await new Promise(resolve => setTimeout(resolve, 150));
 
         navigate(path);
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-6 py-8 pt-24 md:pt-32">
-            {/* Hidden video for preloading homepage video */}
-            <video
-                ref={videoPreloadRef}
-                muted
-                playsInline
-                preload="auto"
-                className="hidden"
-                aria-hidden="true"
-            >
-                <source src="https://res.cloudinary.com/digjsdron/video/upload/v1752590378/Homescreen_q1odxc.mp4" type="video/mp4" />
-            </video>
-
             {/* Page Transition Overlay */}
             <AnimatePresence>
                 {isTransitioning && (
@@ -95,8 +70,8 @@ const Overview: React.FC = () => {
                             <div className="mb-4">
                                 <motion.div
                                     animate={{ rotate: 360 }}
-                                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                    className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full"
+                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                    className="w-6 h-6 border-2 border-gold/20 border-t-gold rounded-full"
                                 ></motion.div>
                             </div>
                             Transitioning...
@@ -104,33 +79,29 @@ const Overview: React.FC = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-            {/* Business Card Container - Desktop: Card Proportions, Mobile: Full Screen */}
+            {/* Business Card Container - Optimized for faster loading */}
             <motion.div
-                initial={{ opacity: 0, scale: 0.9, rotateY: -15 }}
-                animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                transition={{ duration: 1.2, ease: "easeOut" }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
                 className="w-full max-w-5xl mx-auto"
             >
-                {/* Main Business Card */}
-                <div className="relative bg-gradient-to-br from-gray-900 to-black rounded-xl overflow-hidden business-card-shadow border border-gold/30">
-                    {/* Ornate Border Pattern */}
-                    <div className="absolute inset-0 opacity-20">
-                        <div className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 border-gold/40 rounded-tl-xl"></div>
-                        <div className="absolute top-0 right-0 w-20 h-20 border-t-2 border-r-2 border-gold/40 rounded-tr-xl"></div>
-                        <div className="absolute bottom-0 left-0 w-20 h-20 border-b-2 border-l-2 border-gold/40 rounded-bl-xl"></div>
-                        <div className="absolute bottom-0 right-0 w-20 h-20 border-b-2 border-r-2 border-gold/40 rounded-br-xl"></div>
+                {/* Main Business Card - Simplified for performance */}
+                <div className="relative bg-gradient-to-br from-gray-900 to-black rounded-xl overflow-hidden shadow-2xl border border-gold/30">
+                    {/* Simplified Border Pattern */}
+                    <div className="absolute inset-0 opacity-10">
+                        <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-gold/30 rounded-tl-xl"></div>
+                        <div className="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-gold/30 rounded-tr-xl"></div>
+                        <div className="absolute bottom-0 left-0 w-16 h-16 border-b-2 border-l-2 border-gold/30 rounded-bl-xl"></div>
+                        <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-gold/30 rounded-br-xl"></div>
                     </div>
 
-                    {/* Decorative Corner Elements */}
-                    <div className="absolute top-4 left-4 w-8 h-8 opacity-30">
-                        <div className="w-full h-full border border-gold/60 rounded-full flex items-center justify-center">
-                            <div className="w-3 h-3 bg-gold/60 rounded-full"></div>
-                        </div>
+                    {/* Simple Corner Elements */}
+                    <div className="absolute top-4 left-4 w-6 h-6 opacity-20">
+                        <div className="w-full h-full border border-gold/40 rounded-full"></div>
                     </div>
-                    <div className="absolute top-4 right-4 w-8 h-8 opacity-30">
-                        <div className="w-full h-full border border-gold/60 rounded-full flex items-center justify-center">
-                            <div className="w-3 h-3 bg-gold/60 rounded-full"></div>
-                        </div>
+                    <div className="absolute top-4 right-4 w-6 h-6 opacity-20">
+                        <div className="w-full h-full border border-gold/40 rounded-full"></div>
                     </div>
 
                     {/* Card Content */}
@@ -177,9 +148,9 @@ const Overview: React.FC = () => {
 
                         {/* Key Metrics - Card Style */}
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 1.0 }}
+                            transition={{ duration: 0.5, delay: 0.3 }}
                             className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
                         >
                             <div className="text-center p-4 luxury-glass rounded-lg backdrop-blur-sm">
@@ -201,9 +172,9 @@ const Overview: React.FC = () => {
 
                         {/* What We Do - Elegant List */}
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 1.2 }}
+                            transition={{ duration: 0.5, delay: 0.5 }}
                             className="mb-8"
                         >
                             <h3 className="text-gold text-lg font-semibold mb-4 text-center tracking-wide">What We Do</h3>
@@ -271,7 +242,7 @@ const Overview: React.FC = () => {
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 1.6 }}
+                            transition={{ duration: 0.5, delay: 0.7 }}
                             className="text-center mt-6"
                         >
                             <div className="w-48 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent mx-auto mb-3"></div>
