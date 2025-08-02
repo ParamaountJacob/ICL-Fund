@@ -63,11 +63,11 @@ const Contact: React.FC = () => {
               onClick={() => navigate(method.path)}
               className="w-full group"
             >
-              <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-8 hover:border-gray-700 hover:bg-gray-900/70 transition-all duration-300">
-                <div className="flex items-start gap-6">
+              <div className="bg-gray-900/80 border border-gray-700 rounded-xl p-8 hover:border-gray-600 hover:bg-gray-800/80 transition-all duration-300">
+                <div className="flex items-center gap-6">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center group-hover:bg-gray-700 transition-colors">
-                      <method.icon className={`w-6 h-6 ${method.iconColor}`} />
+                    <div className="w-16 h-16 rounded-full bg-transparent flex items-center justify-center">
+                      <method.icon className="w-8 h-8 text-yellow-500" />
                     </div>
                   </div>
 
