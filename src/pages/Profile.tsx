@@ -109,6 +109,7 @@ const Profile: React.FC = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [documentAccess, setDocumentAccess] = useState<Record<DocumentType, boolean>>({
     pitch_deck: false,
     ppm: false,
@@ -1287,24 +1288,71 @@ const Profile: React.FC = () => {
                             <p className="text-text-secondary text-sm">Update your account password</p>
                           </div>
                           <button
-                            onClick={updatePassword}
+                            onClick={() => setShowPasswordForm(!showPasswordForm)}
                             className="w-full sm:w-auto bg-gold text-background px-4 py-2 rounded-lg font-medium hover:bg-gold/90 transition-all duration-300 text-sm"
                           >
-                            Change Password
+                            {showPasswordForm ? 'Cancel' : 'Change Password'}
                           </button>
                         </div>
-                      </div>
 
-                      <div className="p-4 bg-accent rounded-lg border border-graphite">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-text-primary">Two-Factor Authentication</h4>
-                            <p className="text-text-secondary text-sm">Add an extra layer of security</p>
+                        {showPasswordForm && (
+                          <div className="mt-4 space-y-3 border-t border-graphite pt-4">
+                            <div>
+                              <label className="block text-sm font-medium text-text-secondary mb-2">
+                                New Password
+                              </label>
+                              <input
+                                type="password"
+                                value={passwordData.newPassword}
+                                onChange={(e) => setPasswordData(prev => ({
+                                  ...prev,
+                                  newPassword: e.target.value
+                                }))}
+                                className="w-full px-3 py-2 bg-background border border-graphite rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary"
+                                placeholder="Enter new password"
+                                minLength={6}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-text-secondary mb-2">
+                                Confirm New Password
+                              </label>
+                              <input
+                                type="password"
+                                value={passwordData.confirmPassword}
+                                onChange={(e) => setPasswordData(prev => ({
+                                  ...prev,
+                                  confirmPassword: e.target.value
+                                }))}
+                                className="w-full px-3 py-2 bg-background border border-graphite rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold text-text-primary"
+                                placeholder="Confirm new password"
+                                minLength={6}
+                              />
+                            </div>
+                            <div className="flex gap-3 pt-2">
+                              <button
+                                onClick={updatePassword}
+                                disabled={isLoading || !passwordData.newPassword || !passwordData.confirmPassword}
+                                className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-all duration-300 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {isLoading ? 'Updating...' : 'Update Password'}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setShowPasswordForm(false);
+                                  setPasswordData({
+                                    currentPassword: '',
+                                    newPassword: '',
+                                    confirmPassword: ''
+                                  });
+                                }}
+                                className="bg-graphite text-text-primary px-4 py-2 rounded-lg font-medium hover:bg-graphite/80 transition-all duration-300 text-sm"
+                              >
+                                Cancel
+                              </button>
+                            </div>
                           </div>
-                          <button className="w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-all duration-300 text-sm">
-                            Enable 2FA
-                          </button>
-                        </div>
+                        )}
                       </div>
 
                       <div className="p-4 bg-accent rounded-lg border border-graphite">
