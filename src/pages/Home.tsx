@@ -4,7 +4,6 @@ import HeroDetails from '../components/HeroDetails';
 import About from '../components/About';
 import Process from '../components/Process';
 import Leadership from '../components/Leadership';
-import Investors from '../components/Investors';
 import Philosophy from '../components/Philosophy';
 import Trust from '../components/Trust';
 import NewsletterSignup from '../components/NewsletterSignup';
@@ -19,7 +18,6 @@ const Home: React.FC = () => {
         <About />
         <Process />
         <Leadership />
-        <Investors />
         <Philosophy />
 
         {/* Newsletter Section */}
