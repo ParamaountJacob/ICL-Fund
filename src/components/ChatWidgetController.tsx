@@ -22,21 +22,129 @@ const ChatWidgetController: React.FC<ChatWidgetControllerProps> = ({
     autoHideOnHero = true
 }) => {
     const [shouldShow, setShouldShow] = useState(false);
-    const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+    const [isScriptInjected, setIsScriptInjected] = useState(false);
     const location = useLocation();
-    const widgetRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const scriptRef = useRef<HTMLScriptElement | null>(null);
+    const cleanupIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     // Check if current route should hide the widget
     const shouldHideOnCurrentRoute = hideOnRoutes.includes(location.pathname);
 
-    // Handle scroll-based visibility
+    // IRONCLAD: Nuclear cleanup function
+    const nuclearDestroy = () => {
+        console.log('🚀 NUCLEAR DESTROY: Obliterating chat widget');
+
+        // 1. Remove the script
+        if (scriptRef.current && document.body.contains(scriptRef.current)) {
+            document.body.removeChild(scriptRef.current);
+            scriptRef.current = null;
+        }
+
+        // 2. Find and destroy ALL possible chat elements
+        const selectors = [
+            '[data-widget-id="688d67de81758bc2473c0cee"]',
+            '.lc-chat-widget',
+            '.leadconnector-chat',
+            '[class*="chat-widget"]',
+            '[class*="leadconnector"]',
+            '[id*="chat"]',
+            '[id*="leadconnector"]',
+            'iframe[src*="leadconnectorhq"]',
+            'div[style*="z-index: 9999"]',
+            'div[style*="position: fixed"][style*="bottom"]'
+        ];
+
+        selectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+                element.remove();
+                console.log(`💥 Destroyed element: ${selector}`);
+            });
+        });
+
+        // 3. Clear any global variables
+        if (window.LeadConnector) {
+            try {
+                delete window.LeadConnector;
+            } catch (e) {
+                window.LeadConnector = undefined;
+            }
+        }
+
+        // 4. Clear intervals
+        if (cleanupIntervalRef.current) {
+            clearInterval(cleanupIntervalRef.current);
+            cleanupIntervalRef.current = null;
+        }
+
+        setIsScriptInjected(false);
+        console.log('✅ NUCLEAR DESTROY: Complete');
+    };
+
+    // IRONCLAD: Script injection function
+    const injectScript = () => {
+        if (isScriptInjected || shouldHideOnCurrentRoute) return;
+
+        console.log('🚀 INJECTING: Chat widget script');
+
+        // Create the script
+        const script = document.createElement('script');
+        script.src = 'https://widgets.leadconnectorhq.com/loader.js';
+        script.setAttribute('data-resources-url', 'https://widgets.leadconnectorhq.com/chat-widget/loader.js');
+        script.setAttribute('data-widget-id', '688d67de81758bc2473c0cee');
+        script.async = true;
+        script.defer = true;
+
+        script.onload = () => {
+            console.log('✅ Script loaded successfully');
+            setIsScriptInjected(true);
+            scriptRef.current = script;
+
+            // Set up continuous monitoring to ensure widget stays in our container
+            cleanupIntervalRef.current = setInterval(() => {
+                if (!shouldShow) return;
+
+                const widgetElements = document.querySelectorAll(
+                    '[data-widget-id="688d67de81758bc2473c0cee"], .lc-chat-widget, [class*="chat-widget"]'
+                );
+
+                widgetElements.forEach(element => {
+                    const el = element as HTMLElement;
+                    // Ensure the widget respects our container's visibility
+                    if (containerRef.current && containerRef.current.style.display === 'none') {
+                        el.style.display = 'none !important';
+                        el.style.visibility = 'hidden !important';
+                        el.style.opacity = '0 !important';
+                    }
+                });
+            }, 500);
+        };
+
+        script.onerror = () => {
+            console.error('❌ Failed to load chat widget script');
+            setIsScriptInjected(false);
+        };
+
+        document.body.appendChild(script);
+    };
+
+    // Handle scroll-based visibility with bidirectional detection
     useEffect(() => {
-        if (!autoHideOnHero || shouldHideOnCurrentRoute) return;
+        if (!autoHideOnHero || shouldHideOnCurrentRoute) {
+            setShouldShow(false);
+            return;
+        }
 
         const handleScroll = () => {
             const scrolled = window.scrollY > showAfterScroll;
-            setShouldShow(scrolled && isVisible);
+            const newShouldShow = scrolled && isVisible;
+
+            // Only update if there's a change
+            if (newShouldShow !== shouldShow) {
+                setShouldShow(newShouldShow);
+                console.log(`📜 Scroll: ${newShouldShow ? 'SHOW' : 'HIDE'} widget (scrollY: ${window.scrollY})`);
+            }
         };
 
         // Initial check
@@ -44,112 +152,80 @@ const ChatWidgetController: React.FC<ChatWidgetControllerProps> = ({
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [autoHideOnHero, showAfterScroll, isVisible, shouldHideOnCurrentRoute]);
+    }, [autoHideOnHero, showAfterScroll, isVisible, shouldHideOnCurrentRoute, shouldShow]);
 
-    // Load the chat widget script when needed
+    // IRONCLAD: Main visibility control
     useEffect(() => {
-        if (!shouldShow || shouldHideOnCurrentRoute || isScriptLoaded) return;
-
-        // Load the script dynamically
-        const script = document.createElement('script');
-        script.src = 'https://widgets.leadconnectorhq.com/loader.js';
-        script.setAttribute('data-resources-url', 'https://widgets.leadconnectorhq.com/chat-widget/loader.js');
-        script.setAttribute('data-widget-id', '688d67de81758bc2473c0cee');
-        script.async = true;
-
-        script.onload = () => {
-            setIsScriptLoaded(true);
-            scriptRef.current = script;
-        };
-
-        script.onerror = () => {
-            console.error('Failed to load chat widget script');
-        };
-
-        document.body.appendChild(script);
-
-        return () => {
-            // Clean up script when component unmounts
-            if (scriptRef.current && document.body.contains(scriptRef.current)) {
-                document.body.removeChild(scriptRef.current);
-                setIsScriptLoaded(false);
-            }
-        };
-    }, [shouldShow, shouldHideOnCurrentRoute, isScriptLoaded]);
-
-    // Control widget visibility
-    useEffect(() => {
-        if (!isScriptLoaded) return;
-
-        // Wait a bit for the widget to initialize
-        const timer = setTimeout(() => {
-            // Try to find and control the LeadConnector widget
-            const chatWidget = document.querySelector('[data-widget-id="688d67de81758bc2473c0cee"]');
-            const chatContainer = document.querySelector('.lc-chat-widget') ||
-                document.querySelector('[class*="chat"]') ||
-                document.querySelector('[id*="chat"]');
-
-            const targetElement = chatWidget || chatContainer;
-
-            if (targetElement) {
-                const element = targetElement as HTMLElement;
-                if (shouldShow && !shouldHideOnCurrentRoute) {
-                    element.style.display = 'block';
-                    element.style.opacity = '1';
-                    element.style.visibility = 'visible';
-                    element.style.transition = 'opacity 0.3s ease-in-out';
-                } else {
-                    element.style.display = 'none';
-                    element.style.opacity = '0';
-                    element.style.visibility = 'hidden';
-                }
+        if (shouldShow && !shouldHideOnCurrentRoute) {
+            // Show: Inject script if not already injected
+            if (!isScriptInjected) {
+                injectScript();
             }
 
-            // Also try to control via LeadConnector API if available
-            if (window.LeadConnector) {
-                try {
-                    if (shouldShow && !shouldHideOnCurrentRoute) {
-                        window.LeadConnector.show?.();
-                    } else {
-                        window.LeadConnector.hide?.();
-                    }
-                } catch (error) {
-                    console.warn('LeadConnector API not available:', error);
-                }
+            // Make container visible
+            if (containerRef.current) {
+                containerRef.current.style.display = 'block';
+                containerRef.current.style.visibility = 'visible';
+                containerRef.current.style.opacity = '1';
             }
-        }, 500);
 
-        return () => clearTimeout(timer);
-    }, [shouldShow, shouldHideOnCurrentRoute, isScriptLoaded]);
+            console.log('👁️ SHOW: Widget should be visible');
+        } else {
+            // Hide: Nuclear option
+            if (containerRef.current) {
+                containerRef.current.style.display = 'none';
+                containerRef.current.style.visibility = 'hidden';
+                containerRef.current.style.opacity = '0';
+            }
 
-    // Hide widget on route changes that should hide it
-    useEffect(() => {
-        if (shouldHideOnCurrentRoute && isScriptLoaded) {
-            const chatElements = document.querySelectorAll(
-                '[data-widget-id="688d67de81758bc2473c0cee"], .lc-chat-widget, [class*="chat"], [id*="chat"]'
-            );
-
-            chatElements.forEach(element => {
-                const el = element as HTMLElement;
-                el.style.display = 'none';
-                el.style.visibility = 'hidden';
-            });
+            // NUCLEAR: Completely destroy everything
+            nuclearDestroy();
+            console.log('🙈 HIDE: Widget destroyed');
         }
-    }, [location.pathname, shouldHideOnCurrentRoute, isScriptLoaded]);
+    }, [shouldShow, shouldHideOnCurrentRoute, isScriptInjected]);
+
+    // Route change cleanup
+    useEffect(() => {
+        if (shouldHideOnCurrentRoute) {
+            nuclearDestroy();
+        }
+    }, [location.pathname, shouldHideOnCurrentRoute]);
+
+    // Component unmount cleanup
+    useEffect(() => {
+        return () => {
+            nuclearDestroy();
+        };
+    }, []);
 
     return (
         <div
-            ref={widgetRef}
-            id="chat-widget-controller"
+            ref={containerRef}
+            id="chat-widget-fortress"
             style={{
                 position: 'fixed',
-                bottom: 0,
-                right: 0,
+                bottom: '20px',
+                right: '20px',
                 zIndex: 9999,
-                pointerEvents: 'none' // Don't interfere with clicks
+                display: shouldShow && !shouldHideOnCurrentRoute ? 'block' : 'none',
+                visibility: shouldShow && !shouldHideOnCurrentRoute ? 'visible' : 'hidden',
+                opacity: shouldShow && !shouldHideOnCurrentRoute ? 1 : 0,
+                transition: 'opacity 0.3s ease-in-out',
+                pointerEvents: shouldShow ? 'auto' : 'none'
             }}
         >
-            {/* This div helps us track the widget but doesn't render anything visible */}
+            {/* FORTRESS CONTAINER: The widget will be injected here by the script */}
+            {shouldShow && !shouldHideOnCurrentRoute && (
+                <div
+                    id="chat-widget-container"
+                    style={{
+                        position: 'relative',
+                        zIndex: 10000
+                    }}
+                >
+                    {/* Script will inject the widget here */}
+                </div>
+            )}
         </div>
     );
 };
