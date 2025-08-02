@@ -17,9 +17,9 @@ const EmailContact: React.FC = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background pt-20">
             {/* Mobile-optimized Header */}
-            <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-graphite">
+            <div className="fixed top-16 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-b border-graphite">
                 <div className="container mx-auto px-4 sm:px-6 py-4">
                     <div className="flex items-center justify-between">
                         <button
@@ -43,9 +43,7 @@ const EmailContact: React.FC = () => {
                         <div className="w-16 md:w-20"></div> {/* Spacer for balance */}
                     </div>
                 </div>
-            </div>
-
-            <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8 max-w-4xl">
+            </div>            <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8 max-w-4xl">
                 {/* Description */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
