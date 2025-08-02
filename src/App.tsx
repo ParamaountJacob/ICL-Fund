@@ -30,6 +30,7 @@ import Dashboard from './pages/Dashboard';
 import NotificationsPage from './pages/NotificationsPage';
 import VideoCallBooking from './pages/VideoCallBooking';
 import PhoneCallBooking from './pages/PhoneCallBooking';
+import EmailContact from './pages/EmailContact';
 import SubscriptionAgreement from './pages/onboarding-flow/SubscriptionAgreement';
 import PromissoryNote from './pages/onboarding-flow/PromissoryNote';
 import WireDetails from './pages/onboarding-flow/WireDetails';
@@ -40,6 +41,7 @@ import { RealTimeMonitoringDashboard } from './components/RealTimeMonitoringDash
 import { AdminPerformanceDashboard } from './components/AdminPerformanceDashboard';
 import { SystemHealthChecker } from './components/SystemHealthChecker';
 import { AdminLayout } from './components/AdminLayout';
+import ChatWidgetController from './components/ChatWidgetController';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -73,6 +75,7 @@ function AppContent() {
   // Simplified - no profile checking or force updates
   return (
     <div className="min-h-screen bg-background text-text-primary overflow-x-hidden max-w-full">
+      <ChatWidgetController />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -80,6 +83,7 @@ function AppContent() {
         <Route path="/investor-info" element={<InvestorInfo />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/email-contact" element={<EmailContact />} />
         <Route path="/video-call-booking" element={<VideoCallBooking />} />
         <Route path="/phone-call-booking" element={<PhoneCallBooking />} />
         <Route path="/privacy" element={<Privacy />} />
