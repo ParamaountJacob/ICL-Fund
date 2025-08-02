@@ -36,7 +36,15 @@ const ChatWidgetController: React.FC<ChatWidgetControllerProps> = ({
 
         const handleScroll = () => {
             const scrolled = window.scrollY > showAfterScroll;
-            setShouldShow(scrolled && isVisible);
+            const newShowState = scrolled && isVisible;
+
+            // Only update if there's an actual change to prevent unnecessary re-renders
+            setShouldShow(prevState => {
+                if (prevState !== newShowState) {
+                    return newShowState;
+                }
+                return prevState;
+            });
         };
 
         // Initial check
@@ -93,15 +101,26 @@ const ChatWidgetController: React.FC<ChatWidgetControllerProps> = ({
 
             if (targetElement) {
                 const element = targetElement as HTMLElement;
+
+                // Add smooth transition
+                element.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
+
                 if (shouldShow && !shouldHideOnCurrentRoute) {
                     element.style.display = 'block';
-                    element.style.opacity = '1';
                     element.style.visibility = 'visible';
-                    element.style.transition = 'opacity 0.3s ease-in-out';
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0px)';
                 } else {
-                    element.style.display = 'none';
                     element.style.opacity = '0';
+                    element.style.transform = 'translateY(10px)';
                     element.style.visibility = 'hidden';
+
+                    // Hide completely after transition
+                    setTimeout(() => {
+                        if (element.style.opacity === '0') {
+                            element.style.display = 'none';
+                        }
+                    }, 300);
                 }
             }
 
