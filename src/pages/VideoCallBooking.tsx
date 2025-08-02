@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Video } from 'lucide-react';
 
 const VideoCallBooking: React.FC = () => {
     const navigate = useNavigate();
-    const [iframeHeight, setIframeHeight] = useState(600);
 
     useEffect(() => {
         // Check if script is already loaded to prevent duplicates
@@ -15,42 +14,8 @@ const VideoCallBooking: React.FC = () => {
             script.src = 'https://link.msgsndr.com/js/form_embed.js';
             script.type = 'text/javascript';
             script.async = true;
-            script.setAttribute('data-booking-component', 'video');
             document.head.appendChild(script);
         }
-
-        // Inject CSS to make iframes seamless
-        const style = document.createElement('style');
-        style.textContent = `
-            iframe[src*="leadconnectorhq.com"] {
-                background: transparent !important;
-                border: none !important;
-                outline: none !important;
-                box-shadow: none !important;
-            }
-            
-            /* Hide scrollbars in iframe content */
-            iframe[src*="leadconnectorhq.com"]::-webkit-scrollbar {
-                display: none !important;
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Listen for iframe height changes
-        const handleMessage = (event: MessageEvent) => {
-            if (event.origin !== 'https://api.leadconnectorhq.com') return;
-
-            if (event.data && event.data.type === 'resize' && event.data.height) {
-                setIframeHeight(event.data.height);
-            }
-        };
-
-        window.addEventListener('message', handleMessage);
-
-        return () => {
-            window.removeEventListener('message', handleMessage);
-            document.head.removeChild(style);
-        };
     }, []);
 
     return (
@@ -83,41 +48,14 @@ const VideoCallBooking: React.FC = () => {
                         src="https://api.leadconnectorhq.com/widget/booking/Zp3dkGUPA56lYxTr5NCw"
                         style={{
                             width: '100%',
-                            height: `${iframeHeight}px`,
+                            height: '600px',
                             border: 'none',
-                            margin: 0,
-                            padding: 0,
-                            background: 'transparent',
-                            display: 'block',
-                            colorScheme: 'dark'
+                            background: 'transparent'
                         }}
                         frameBorder="0"
                         scrolling="no"
-                        seamless
                         id="Zp3dkGUPA56lYxTr5NCw_1754087690502"
                         title="Video Call Booking"
-                        onLoad={(e) => {
-                            const iframe = e.target as HTMLIFrameElement;
-                            // Try to get actual content height
-                            try {
-                                const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-                                if (iframeDoc) {
-                                    const body = iframeDoc.body;
-                                    const html = iframeDoc.documentElement;
-                                    const height = Math.max(
-                                        body?.scrollHeight || 0,
-                                        body?.offsetHeight || 0,
-                                        html?.clientHeight || 0,
-                                        html?.scrollHeight || 0,
-                                        html?.offsetHeight || 0
-                                    );
-                                    if (height > 0) setIframeHeight(height);
-                                }
-                            } catch (e) {
-                                // Cross-origin restrictions, fallback to postMessage
-                                console.log('Using postMessage for iframe height adjustment');
-                            }
-                        }}
                     />
                 </div>
             </div>
