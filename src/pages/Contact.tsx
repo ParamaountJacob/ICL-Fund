@@ -1,18 +1,21 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Video, Phone } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Contact: React.FC = () => {
+  const navigate = useNavigate();
+
   const handleContactClick = (type: string) => {
-    const formIds = {
-      email: '672F7WVRP5znSmIf35ts',
-      video: 'Zp3dkGUPA56lYxTr5NCw',
-      phone: 'ArouErFpNGMUDeiiUv5k'
+    const routes = {
+      email: '/email-contact',
+      video: '/video-call-booking',
+      phone: '/phone-call-booking'
     };
 
-    const formId = formIds[type as keyof typeof formIds];
-    if (formId) {
-      window.open(`https://iclcapitalfund.leadconnectorhq.com/widget/form/${formId}`, '_blank');
+    const route = routes[type as keyof typeof routes];
+    if (route) {
+      navigate(route);
     }
   };
 
