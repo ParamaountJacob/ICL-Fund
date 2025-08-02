@@ -68,7 +68,7 @@ const PitchDeckContent: React.FC = () => {
       {modalIsOpen && (
         <div
           ref={modalRef}
-          className="fixed inset-0 bg-black/90 z-50 overflow-auto"
+          className="fixed inset-0 bg-black/90 z-[60] overflow-auto"
           onClick={(e) => {
             if (e.target === modalRef.current) {
               setModalIsOpen(false);
@@ -76,34 +76,36 @@ const PitchDeckContent: React.FC = () => {
             }
           }}
         >
-          <div className="sticky top-0 left-0 right-0 p-4 bg-black/50 backdrop-blur-sm flex justify-between items-center">
+          {/* Fixed Controls Bar */}
+          <div className="fixed top-0 left-0 right-0 p-4 bg-black/80 backdrop-blur-sm flex justify-between items-center z-[70] border-b border-white/10">
             <button
               onClick={() => setModalIsHorizontal(!modalIsHorizontal)}
-              className="px-4 py-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-colors"
+              className="px-3 py-2 sm:px-4 sm:py-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-colors text-sm sm:text-base font-medium"
             >
-              {modalIsHorizontal ? 'Switch to Vertical' : 'Switch to Horizontal'}
+              {modalIsHorizontal ? 'Vertical View' : 'Horizontal View'}
             </button>
             <button
               onClick={() => {
                 setModalIsOpen(false);
                 document.body.style.overflow = 'auto';
               }}
-              className="px-4 py-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-colors"
+              className="px-3 py-2 sm:px-4 sm:py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-white transition-colors text-sm sm:text-base font-medium border border-red-500/30"
             >
-              Exit Fullscreen
+              ✕ Close
             </button>
           </div>
 
-          <div className={`p-8 flex ${modalIsHorizontal ? 'flex-row overflow-x-auto' : 'flex-col'} items-center justify-center min-h-[calc(100vh-80px)]`}>
+          {/* Content Area */}
+          <div className={`pt-20 p-4 sm:p-8 flex ${modalIsHorizontal ? 'flex-row overflow-x-auto' : 'flex-col'} items-center justify-center min-h-screen`}>
             {images.map((src, index) => (
               <img
                 key={index}
                 src={src}
                 alt={`Pitch Deck Page ${index + 1}`}
                 className={`
-                  ${modalIsHorizontal ? 'mr-8 last:mr-0 max-h-[80vh]' : 'mb-8 last:mb-0'}
+                  ${modalIsHorizontal ? 'mr-4 sm:mr-8 last:mr-0 max-h-[80vh]' : 'mb-4 sm:mb-8 last:mb-0'}
                   max-w-[95vw] md:max-w-4xl w-auto h-auto rounded-lg shadow-2xl object-contain
-                  ${modalIsHorizontal ? 'h-[80vh]' : 'max-h-[85vh]'}
+                  ${modalIsHorizontal ? 'h-[75vh] sm:h-[80vh]' : 'max-h-[75vh] sm:max-h-[85vh]'}
                 `}
               />
             ))}
