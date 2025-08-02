@@ -46,18 +46,6 @@ const EmailContact: React.FC = () => {
             </div>
 
             <div className="container mx-auto px-4 sm:px-6 pt-12 pb-6 md:pt-16 md:pb-8 max-w-4xl">
-                {/* Description */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="mb-6 md:mb-8 text-center"
-                >
-                    <p className="text-base md:text-lg text-text-secondary leading-relaxed">
-                        Send us a message and we'll get back to you within 1-2 business days.
-                    </p>
-                </motion.div>
-
                 {/* Loading State */}
                 {isLoading && (
                     <motion.div

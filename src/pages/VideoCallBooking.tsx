@@ -46,22 +46,6 @@ const VideoCallBooking: React.FC = () => {
             </div>
 
             <div className="container mx-auto px-4 sm:px-6 pt-12 pb-6 md:pt-16 md:pb-8 max-w-4xl">
-                {/* Description */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="mb-6 md:mb-8 text-center"
-                >
-                    <p className="text-base md:text-lg text-text-secondary leading-relaxed">
-                        Schedule a face-to-face consultation with screen sharing capabilities.
-                    </p>
-                    <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-gold/10 text-gold rounded-full text-sm">
-                        <span className="w-2 h-2 bg-gold rounded-full animate-pulse"></span>
-                        Same day availability
-                    </div>
-                </motion.div>
-
                 {/* Loading State */}
                 {isLoading && (
                     <motion.div
