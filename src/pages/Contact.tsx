@@ -33,66 +33,96 @@ const Contact: React.FC = () => {
           </p>
         </motion.div>
 
-        <div className="flex justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl">
-            {/* Email Contact */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-surface rounded-xl p-8 border border-graphite hover:border-gold/50 transition-all duration-300 cursor-pointer group hover:bg-gold/5"
-              onClick={() => handleContactClick('email')}
-            >
-              <div className="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/30 transition-all duration-300">
-                <Mail className="w-8 h-8 text-gold" />
-              </div>
-              <h3 className="text-xl font-semibold text-text-primary mb-2 mt-4">Email Us</h3>
-              <p className="text-text-secondary mb-4">Send us a message and we'll get back to you within 24 hours.</p>
-              <div className="text-gold font-medium group-hover:text-gold/80">
-                Get Started →
-              </div>
-            </motion.div>
-
-            {/* Video Call */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-surface rounded-xl p-8 border border-gold/20 hover:border-gold/40 transition-all duration-300 cursor-pointer group hover:bg-gold/5 relative"
-              onClick={() => handleContactClick('video')}
-            >
-              {/* Golden frame effect for center card */}
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gold/5 to-transparent pointer-events-none"></div>
-              <div className="relative z-10">
-                <div className="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/30 transition-all duration-300">
-                  <Video className="w-8 h-8 text-gold" />
+        <div className="max-w-2xl mx-auto space-y-6">
+          {/* Email Contact */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            onClick={() => handleContactClick('email')}
+            className="w-full group cursor-pointer"
+          >
+            <div className="bg-surface border border-graphite rounded-xl p-8 hover:border-gold/50 hover:bg-gold/5 transition-all duration-300">
+              <div className="flex items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/30 transition-all duration-300">
+                    <Mail className="w-8 h-8 text-gold" />
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold text-text-primary mb-2 mt-4">Video Call</h3>
-                <p className="text-text-secondary mb-4">Schedule a face-to-face meeting to discuss your needs in detail.</p>
-                <div className="text-gold font-medium group-hover:text-gold/80">
-                  Schedule Now →
+                <div className="flex-1 text-left">
+                  <h3 className="text-2xl font-semibold text-text-primary mb-2">
+                    Email
+                  </h3>
+                  <p className="text-text-secondary text-lg mb-3 leading-relaxed">
+                    Send us a detailed message about your investment goals
+                  </p>
+                  <div className="flex items-center gap-2 text-text-secondary">
+                    <span className="text-sm">1-2 days</span>
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
 
-            {/* Phone Call */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-surface rounded-xl p-8 border border-graphite hover:border-gold/50 transition-all duration-300 cursor-pointer group hover:bg-gold/5"
-              onClick={() => handleContactClick('phone')}
-            >
-              <div className="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/30 transition-all duration-300">
-                <Phone className="w-8 h-8 text-gold" />
+          {/* Video Call */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            onClick={() => handleContactClick('video')}
+            className="w-full group cursor-pointer"
+          >
+            <div className="bg-surface border border-graphite rounded-xl p-8 hover:border-gold/50 hover:bg-gold/5 transition-all duration-300">
+              <div className="flex items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/30 transition-all duration-300">
+                    <Video className="w-8 h-8 text-gold" />
+                  </div>
+                </div>
+                <div className="flex-1 text-left">
+                  <h3 className="text-2xl font-semibold text-text-primary mb-2">
+                    Video Call
+                  </h3>
+                  <p className="text-text-secondary text-lg mb-3 leading-relaxed">
+                    Face-to-face consultation with screen sharing
+                  </p>
+                  <div className="flex items-center gap-2 text-text-secondary">
+                    <span className="text-sm">Same day</span>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-text-primary mb-2 mt-4">Phone Call</h3>
-              <p className="text-text-secondary mb-4">Speak directly with our team for immediate assistance.</p>
-              <div className="text-gold font-medium group-hover:text-gold/80">
-                Call Now →
+            </div>
+          </motion.div>
+
+          {/* Phone Call */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            onClick={() => handleContactClick('phone')}
+            className="w-full group cursor-pointer"
+          >
+            <div className="bg-surface border border-graphite rounded-xl p-8 hover:border-gold/50 hover:bg-gold/5 transition-all duration-300">
+              <div className="flex items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/30 transition-all duration-300">
+                    <Phone className="w-8 h-8 text-gold" />
+                  </div>
+                </div>
+                <div className="flex-1 text-left">
+                  <h3 className="text-2xl font-semibold text-text-primary mb-2">
+                    Phone Call
+                  </h3>
+                  <p className="text-text-secondary text-lg mb-3 leading-relaxed">
+                    Direct phone consultation for focused discussion
+                  </p>
+                  <div className="flex items-center gap-2 text-text-secondary">
+                    <span className="text-sm">3-4 hours</span>
+                  </div>
+                </div>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>
