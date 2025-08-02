@@ -41,7 +41,6 @@ import { RealTimeMonitoringDashboard } from './components/RealTimeMonitoringDash
 import { AdminPerformanceDashboard } from './components/AdminPerformanceDashboard';
 import { SystemHealthChecker } from './components/SystemHealthChecker';
 import { AdminLayout } from './components/AdminLayout';
-import ChatWidgetController from './components/ChatWidgetController';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -75,7 +74,6 @@ function AppContent() {
   // Simplified - no profile checking or force updates
   return (
     <div className="min-h-screen bg-background text-text-primary overflow-x-hidden max-w-full">
-      <ChatWidgetController />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
