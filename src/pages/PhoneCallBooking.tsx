@@ -38,13 +38,13 @@ const PhoneCallBooking: React.FC = () => {
                         src="https://api.leadconnectorhq.com/widget/booking/ArouErFpNGMUDeiiUv5k"
                         style={{
                             width: '100%',
-                            minHeight: '800px',
-                            height: 'auto',
+                            height: '1000px',
                             border: 'none',
-                            background: 'transparent'
+                            background: 'transparent',
+                            overflow: 'hidden'
                         }}
                         frameBorder="0"
-                        scrolling="auto"
+                        scrolling="no"
                         id="ArouErFpNGMUDeiiUv5k_1754087680510"
                         title="Phone Call Booking"
                     />

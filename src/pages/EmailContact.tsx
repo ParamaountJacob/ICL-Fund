@@ -38,13 +38,13 @@ const EmailContact: React.FC = () => {
                         src="https://api.leadconnectorhq.com/widget/form/672F7WVRP5znSmIf35ts"
                         style={{
                             width: '100%',
-                            minHeight: '900px',
-                            height: 'auto',
+                            height: '1000px',
                             border: 'none',
-                            background: 'transparent'
+                            background: 'transparent',
+                            overflow: 'hidden'
                         }}
                         frameBorder="0"
-                        scrolling="auto"
+                        scrolling="no"
                         id="inline-672F7WVRP5znSmIf35ts"
                         data-layout="{'id':'INLINE'}"
                         data-trigger-type="alwaysShow"

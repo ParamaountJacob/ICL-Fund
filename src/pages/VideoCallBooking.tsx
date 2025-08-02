@@ -38,13 +38,13 @@ const VideoCallBooking: React.FC = () => {
                         src="https://api.leadconnectorhq.com/widget/booking/Zp3dkGUPA56lYxTr5NCw"
                         style={{
                             width: '100%',
-                            minHeight: '800px',
-                            height: 'auto',
+                            height: '1000px',
                             border: 'none',
-                            background: 'transparent'
+                            background: 'transparent',
+                            overflow: 'hidden'
                         }}
                         frameBorder="0"
-                        scrolling="auto"
+                        scrolling="no"
                         id="Zp3dkGUPA56lYxTr5NCw_1754087690502"
                         title="Video Call Booking"
                     />
