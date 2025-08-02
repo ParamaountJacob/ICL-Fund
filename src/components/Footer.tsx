@@ -50,8 +50,8 @@ const Footer: React.FC = () => {
               <Link to="/faq" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
                 FAQ
               </Link>
-              <Link to="/verification" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
-                Verification Steps
+              <Link to="/overview" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
+                Overview
               </Link>
             </div>
           </div>
