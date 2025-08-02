@@ -18,6 +18,19 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true
+  },
+  global: {
+    headers: {
+      'x-client-timeout': '10000' // 10 second timeout
+    }
+  },
+  db: {
+    schema: 'public'
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
   }
 });
 
@@ -401,32 +414,14 @@ export const requestDocument = async (documentType: DocumentType) => {
 
 export const checkUserRole = async (): Promise<UserRole> => {
   try {
-    console.log('checkUserRole: Starting function...');
-
-    // Add timeout protection to the auth.getUser() call
-    const getUserTimeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('checkUserRole: auth.getUser() timeout after 3 seconds')), 3000)
-    );
-
-    const getUserPromise = supabase.auth.getUser();
-    const { data: { user } } = await Promise.race([getUserPromise, getUserTimeout]);
-
-    console.log('checkUserRole: Got user from auth:', user ? `User ID: ${user.id}` : 'No user');
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return 'user';
 
-    // Add timeout protection to the database query
-    const dbQueryTimeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('checkUserRole: database query timeout after 4 seconds')), 4000)
-    );
-
-    const dbQueryPromise = supabase
+    const { data, error } = await supabase
       .from('user_profiles')
       .select('role')
       .eq('user_id', user.id)
       .maybeSingle();
-
-    console.log('checkUserRole: Starting database query...');
-    const { data, error } = await Promise.race([dbQueryPromise, dbQueryTimeout]);
 
     if (error) {
       console.error('Error checking user role:', error);
@@ -440,24 +435,11 @@ export const checkUserRole = async (): Promise<UserRole> => {
       return user.email === 'innercirclelending@gmail.com' ? 'admin' : 'user';
     }
 
-    const role = (data?.role || 'user') as UserRole;
-    console.log('checkUserRole: Successfully retrieved role:', role);
-    return role;
+    return (data?.role || 'user') as UserRole;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('checkUserRole failed:', errorMessage);
+    console.error('checkUserRole failed:', error);
 
-    // Try to get user for email fallback before giving up
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email === 'innercirclelending@gmail.com') {
-        console.log('checkUserRole: Using email fallback for admin');
-        return 'admin';
-      }
-    } catch (fallbackError) {
-      console.error('checkUserRole: Even fallback failed:', fallbackError);
-    }
-
+    // Don't throw - return safe default instead
     console.warn('checkUserRole: Returning default user role due to errors');
     return 'user';
   }
@@ -465,32 +447,14 @@ export const checkUserRole = async (): Promise<UserRole> => {
 
 export const getUserProfile = async (): Promise<UserProfile | null> => {
   try {
-    console.log('getUserProfile: Starting function...');
-
-    // Add timeout protection to the auth.getUser() call
-    const getUserTimeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('getUserProfile: auth.getUser() timeout after 3 seconds')), 3000)
-    );
-
-    const getUserPromise = supabase.auth.getUser();
-    const { data: { user } } = await Promise.race([getUserPromise, getUserTimeout]);
-
-    console.log('getUserProfile: Got user from auth:', user ? `User ID: ${user.id}` : 'No user');
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null;
 
-    // Add timeout protection to the database query
-    const dbQueryTimeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('getUserProfile: database query timeout after 4 seconds')), 4000)
-    );
-
-    const dbQueryPromise = supabase
+    const { data, error } = await supabase
       .from('user_profiles')
       .select('*')
       .eq('user_id', user.id)
       .maybeSingle();
-
-    console.log('getUserProfile: Starting database query...');
-    const { data, error } = await Promise.race([dbQueryPromise, dbQueryTimeout]);
 
     if (error) {
       console.error('Error fetching user profile:', error);
@@ -504,11 +468,9 @@ export const getUserProfile = async (): Promise<UserProfile | null> => {
       return null;
     }
 
-    console.log('getUserProfile: Successfully retrieved profile:', data ? 'Profile found' : 'No profile found');
     return data;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('getUserProfile failed:', errorMessage);
+    console.error('getUserProfile failed:', error);
 
     // Instead of throwing and causing the timeout error, return null
     // This prevents the "getUserProfile timeout" error from appearing
