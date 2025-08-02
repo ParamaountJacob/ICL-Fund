@@ -62,6 +62,7 @@ const ContactPreloader: React.FC = () => {
     return (
         <div style={{ display: 'none' }} aria-hidden="true">
             {/* Progressive loading: only render iframes as we reach each phase */}
+            {/* Using unique IDs to avoid conflicts with main page iframes */}
 
             {/* Load email form first (most commonly used) */}
             {loadingPhase !== 'waiting' && loadingPhase !== 'script' && (
@@ -76,6 +77,7 @@ const ContactPreloader: React.FC = () => {
                     }}
                     title="Email Contact Preload"
                     tabIndex={-1}
+                    id="preload-email-form"
                 />
             )}
 
@@ -92,6 +94,7 @@ const ContactPreloader: React.FC = () => {
                     }}
                     title="Video Booking Preload"
                     tabIndex={-1}
+                    id="preload-video-booking"
                 />
             )}
 
@@ -108,6 +111,7 @@ const ContactPreloader: React.FC = () => {
                     }}
                     title="Phone Booking Preload"
                     tabIndex={-1}
+                    id="preload-phone-booking"
                 />
             )}
         </div>
