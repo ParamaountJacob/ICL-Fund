@@ -1,145 +1,157 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
 interface ChatWidgetControllerProps {
     isVisible?: boolean;
     hideOnRoutes?: string[];
-    showOnRoutes?: string[];
+    showAfterScroll?: number;
+    autoHideOnHero?: boolean;
+}
+
+declare global {
+    interface Window {
+        LeadConnector?: any;
+        lcwSettings?: any;
+    }
 }
 
 const ChatWidgetController: React.FC<ChatWidgetControllerProps> = ({
     isVisible = true,
     hideOnRoutes = [],
-    showOnRoutes = []
+    showAfterScroll = 100,
+    autoHideOnHero = true
 }) => {
-    const [widgetElement, setWidgetElement] = useState<HTMLElement | null>(null);
-    const [currentPath, setCurrentPath] = useState(window.location.pathname);
+    const [shouldShow, setShouldShow] = useState(false);
+    const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+    const location = useLocation();
+    const widgetRef = useRef<HTMLDivElement>(null);
+    const scriptRef = useRef<HTMLScriptElement | null>(null);
 
+    // Check if current route should hide the widget
+    const shouldHideOnCurrentRoute = hideOnRoutes.includes(location.pathname);
+
+    // Handle scroll-based visibility
     useEffect(() => {
-        // Function to find the chat widget element
-        const findWidget = () => {
-            // Try multiple selectors to find the widget
-            const selectors = [
-                '[data-widget-id="688d67de81758bc2473c0cee"]',
-                '.leadconnector-chat-widget',
-                '[id*="leadconnector"]',
-                '[class*="chat-widget"]',
-                'iframe[src*="leadconnectorhq"]'
-            ];
+        if (!autoHideOnHero || shouldHideOnCurrentRoute) return;
 
-            for (const selector of selectors) {
-                const element = document.querySelector(selector) as HTMLElement;
-                if (element) {
-                    return element;
-                }
-            }
-            return null;
+        const handleScroll = () => {
+            const scrolled = window.scrollY > showAfterScroll;
+            setShouldShow(scrolled && isVisible);
         };
 
-        // Try to find widget immediately
-        let widget = findWidget();
+        // Initial check
+        handleScroll();
 
-        if (!widget) {
-            // If not found, keep checking until it loads
-            const interval = setInterval(() => {
-                widget = findWidget();
-                if (widget) {
-                    setWidgetElement(widget);
-                    clearInterval(interval);
-                }
-            }, 500);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [autoHideOnHero, showAfterScroll, isVisible, shouldHideOnCurrentRoute]);
 
-            // Clear interval after 10 seconds to avoid infinite checking
-            setTimeout(() => clearInterval(interval), 10000);
-        } else {
-            setWidgetElement(widget);
-        }
+    // Load the chat widget script when needed
+    useEffect(() => {
+        if (!shouldShow || shouldHideOnCurrentRoute || isScriptLoaded) return;
 
-        // Listen for route changes
-        const handleRouteChange = () => {
-            setCurrentPath(window.location.pathname);
+        // Load the script dynamically
+        const script = document.createElement('script');
+        script.src = 'https://widgets.leadconnectorhq.com/loader.js';
+        script.setAttribute('data-resources-url', 'https://widgets.leadconnectorhq.com/chat-widget/loader.js');
+        script.setAttribute('data-widget-id', '688d67de81758bc2473c0cee');
+        script.async = true;
+
+        script.onload = () => {
+            setIsScriptLoaded(true);
+            scriptRef.current = script;
         };
 
-        window.addEventListener('popstate', handleRouteChange);
+        script.onerror = () => {
+            console.error('Failed to load chat widget script');
+        };
 
-        // For React Router, we can also listen to navigation events
-        const observer = new MutationObserver(() => {
-            if (window.location.pathname !== currentPath) {
-                setCurrentPath(window.location.pathname);
-            }
-        });
-
-        observer.observe(document.body, { childList: true, subtree: true });
+        document.body.appendChild(script);
 
         return () => {
-            window.removeEventListener('popstate', handleRouteChange);
-            observer.disconnect();
-        };
-    }, [currentPath]);
-
-    useEffect(() => {
-        if (!widgetElement) return;
-
-        // Determine if widget should be visible based on routes
-        let shouldShow = isVisible;
-
-        if (hideOnRoutes.length > 0) {
-            shouldShow = shouldShow && !hideOnRoutes.some(route => currentPath.includes(route));
-        }
-
-        if (showOnRoutes.length > 0) {
-            shouldShow = showOnRoutes.some(route => currentPath.includes(route));
-        }
-
-        // Apply visibility with smooth transition
-        if (shouldShow) {
-            showWidget(widgetElement);
-        } else {
-            hideWidget(widgetElement);
-        }
-    }, [widgetElement, currentPath, isVisible, hideOnRoutes, showOnRoutes]);
-
-    const hideWidget = (element: HTMLElement) => {
-        element.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-        element.style.opacity = '0';
-        element.style.transform = 'scale(0.8)';
-        element.style.pointerEvents = 'none';
-
-        // Optionally completely hide after animation
-        setTimeout(() => {
-            if (element.style.opacity === '0') {
-                element.style.display = 'none';
+            // Clean up script when component unmounts
+            if (scriptRef.current && document.body.contains(scriptRef.current)) {
+                document.body.removeChild(scriptRef.current);
+                setIsScriptLoaded(false);
             }
-        }, 300);
-    };
+        };
+    }, [shouldShow, shouldHideOnCurrentRoute, isScriptLoaded]);
 
-    const showWidget = (element: HTMLElement) => {
-        element.style.display = 'block';
-        element.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-        element.style.opacity = '1';
-        element.style.transform = 'scale(1)';
-        element.style.pointerEvents = 'auto';
-    };
-
-    // Expose methods to parent components
+    // Control widget visibility
     useEffect(() => {
-        // Add global methods to control widget
-        (window as any).chatWidget = {
-            hide: () => widgetElement && hideWidget(widgetElement),
-            show: () => widgetElement && showWidget(widgetElement),
-            toggle: () => {
-                if (widgetElement) {
-                    const isHidden = widgetElement.style.opacity === '0' || widgetElement.style.display === 'none';
-                    if (isHidden) {
-                        showWidget(widgetElement);
-                    } else {
-                        hideWidget(widgetElement);
-                    }
+        if (!isScriptLoaded) return;
+
+        // Wait a bit for the widget to initialize
+        const timer = setTimeout(() => {
+            // Try to find and control the LeadConnector widget
+            const chatWidget = document.querySelector('[data-widget-id="688d67de81758bc2473c0cee"]');
+            const chatContainer = document.querySelector('.lc-chat-widget') ||
+                document.querySelector('[class*="chat"]') ||
+                document.querySelector('[id*="chat"]');
+
+            const targetElement = chatWidget || chatContainer;
+
+            if (targetElement) {
+                const element = targetElement as HTMLElement;
+                if (shouldShow && !shouldHideOnCurrentRoute) {
+                    element.style.display = 'block';
+                    element.style.opacity = '1';
+                    element.style.visibility = 'visible';
+                    element.style.transition = 'opacity 0.3s ease-in-out';
+                } else {
+                    element.style.display = 'none';
+                    element.style.opacity = '0';
+                    element.style.visibility = 'hidden';
                 }
             }
-        };
-    }, [widgetElement]);
 
-    return null; // This component doesn't render anything visible
+            // Also try to control via LeadConnector API if available
+            if (window.LeadConnector) {
+                try {
+                    if (shouldShow && !shouldHideOnCurrentRoute) {
+                        window.LeadConnector.show?.();
+                    } else {
+                        window.LeadConnector.hide?.();
+                    }
+                } catch (error) {
+                    console.warn('LeadConnector API not available:', error);
+                }
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [shouldShow, shouldHideOnCurrentRoute, isScriptLoaded]);
+
+    // Hide widget on route changes that should hide it
+    useEffect(() => {
+        if (shouldHideOnCurrentRoute && isScriptLoaded) {
+            const chatElements = document.querySelectorAll(
+                '[data-widget-id="688d67de81758bc2473c0cee"], .lc-chat-widget, [class*="chat"], [id*="chat"]'
+            );
+
+            chatElements.forEach(element => {
+                const el = element as HTMLElement;
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+            });
+        }
+    }, [location.pathname, shouldHideOnCurrentRoute, isScriptLoaded]);
+
+    return (
+        <div
+            ref={widgetRef}
+            id="chat-widget-controller"
+            style={{
+                position: 'fixed',
+                bottom: 0,
+                right: 0,
+                zIndex: 9999,
+                pointerEvents: 'none' // Don't interfere with clicks
+            }}
+        >
+            {/* This div helps us track the widget but doesn't render anything visible */}
+        </div>
+    );
 };
 
 export default ChatWidgetController;

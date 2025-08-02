@@ -76,9 +76,6 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-background text-text-primary overflow-x-hidden max-w-full">
       <Navbar />
-      <ChatWidgetController
-        hideOnRoutes={['/video-call-booking', '/phone-call-booking']}
-      />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -116,6 +113,13 @@ function AppContent() {
         </Route> */}
       </Routes>
       <Footer />
+
+      {/* Chat Widget - Hidden on hero section, shows after scroll */}
+      <ChatWidgetController
+        autoHideOnHero={true}
+        showAfterScroll={200}
+        hideOnRoutes={['/video-call-booking', '/phone-call-booking', '/email-contact']}
+      />
 
       {/* Disabled profile update modal */}
       {/* <ForceProfileUpdateModal
