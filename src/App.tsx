@@ -41,6 +41,7 @@ import { RealTimeMonitoringDashboard } from './components/RealTimeMonitoringDash
 import { AdminPerformanceDashboard } from './components/AdminPerformanceDashboard';
 import { SystemHealthChecker } from './components/SystemHealthChecker';
 import { AdminLayout } from './components/AdminLayout';
+import ChatWidgetController from './components/ChatWidgetController';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -75,6 +76,9 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-background text-text-primary overflow-x-hidden max-w-full">
       <Navbar />
+      <ChatWidgetController
+        hideOnRoutes={['/video-call-booking', '/phone-call-booking']}
+      />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
