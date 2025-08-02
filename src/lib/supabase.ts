@@ -400,29 +400,59 @@ export const requestDocument = async (documentType: DocumentType) => {
 };
 
 export const checkUserRole = async (): Promise<UserRole> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return 'user';
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return 'user';
 
-  const { data } = await supabase
-    .from('user_profiles')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle();
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('user_id', user.id)
+      .maybeSingle();
 
-  return (data?.role || 'user') as UserRole;
+    if (error) {
+      console.error('Error checking user role:', error);
+      // If table doesn't exist, fallback to email check
+      if (error.code === '42P01') {
+        console.warn('user_profiles table does not exist, using email fallback');
+        return user.email === 'innercirclelending@gmail.com' ? 'admin' : 'user';
+      }
+      throw error;
+    }
+
+    return (data?.role || 'user') as UserRole;
+  } catch (error) {
+    console.error('checkUserRole failed:', error);
+    throw error;
+  }
 };
 
 export const getUserProfile = async (): Promise<UserProfile | null> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
 
-  const { data } = await supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .maybeSingle();
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle();
 
-  return data;
+    if (error) {
+      console.error('Error fetching user profile:', error);
+      // If table doesn't exist, return null instead of throwing
+      if (error.code === '42P01') {
+        console.warn('user_profiles table does not exist');
+        return null;
+      }
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('getUserProfile failed:', error);
+    throw error;
+  }
 };
 
 export const getUserProfileById = async (userId: string): Promise<UserProfile | null> => {

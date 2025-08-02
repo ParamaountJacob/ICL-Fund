@@ -54,8 +54,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     // Fetch profile and role from database with timeout protection
                     try {
                         const profilePromise = getUserProfile();
-                        const profileTimeout = new Promise((_, reject) =>
-                            setTimeout(() => reject(new Error('Initial getUserProfile timeout')), 5000)
+                        const profileTimeout = new Promise<never>((_, reject) =>
+                            setTimeout(() => reject(new Error('Initial getUserProfile timeout')), 8000) // Increased to 8 seconds
                         );
                         const profileData = await Promise.race([profilePromise, profileTimeout]);
 
@@ -63,8 +63,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         setProfile(profileData);
 
                         const rolePromise = checkUserRole();
-                        const roleTimeout = new Promise((_, reject) =>
-                            setTimeout(() => reject(new Error('Initial checkUserRole timeout')), 5000)
+                        const roleTimeout = new Promise<never>((_, reject) =>
+                            setTimeout(() => reject(new Error('Initial checkUserRole timeout')), 8000) // Increased to 8 seconds
                         );
                         const roleData = await Promise.race([rolePromise, roleTimeout]);
 
@@ -73,6 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         logger.log('AuthContext - Successfully loaded profile/role:', { roleData, profileData });
                     } catch (error) {
                         logger.error('Error fetching profile/role:', error);
+                        console.warn('Profile/role fetch failed, using fallback values:', error);
                         // Fallback: check if user is the admin email
                         if (initialUser.email === 'innercirclelending@gmail.com') {
                             if (mountedRef.current) setUserRole('admin');
@@ -127,24 +128,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                     // Add timeout protection to prevent infinite loading
                     const profilePromise = getUserProfile();
-                    const timeoutPromise = new Promise((_, reject) =>
-                        setTimeout(() => reject(new Error('getUserProfile timeout')), 5000)
+                    const timeoutPromise = new Promise<never>((_, reject) =>
+                        setTimeout(() => reject(new Error('getUserProfile timeout')), 8000) // Increased to 8 seconds
                     );
 
                     const profileData = await Promise.race([profilePromise, timeoutPromise]);
                     console.log('getUserProfile() result:', profileData);
+                    if (!mountedRef.current) return;
                     setProfile(profileData);
 
                     console.log('Calling checkUserRole()...');
 
                     // Add timeout protection for role check too
                     const rolePromise = checkUserRole();
-                    const roleTimeoutPromise = new Promise((_, reject) =>
-                        setTimeout(() => reject(new Error('checkUserRole timeout')), 5000)
+                    const roleTimeoutPromise = new Promise<never>((_, reject) =>
+                        setTimeout(() => reject(new Error('checkUserRole timeout')), 8000) // Increased to 8 seconds
                     );
 
                     const roleData = await Promise.race([rolePromise, roleTimeoutPromise]);
                     console.log('checkUserRole() result:', roleData);
+                    if (!mountedRef.current) return;
                     setUserRole(roleData);
                     console.log('Successfully loaded profile/role:', { roleData, profileData });
                     logger.log('AuthContext - Auth change: Successfully loaded profile/role:', { roleData, profileData });
