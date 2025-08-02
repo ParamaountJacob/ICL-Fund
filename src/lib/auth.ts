@@ -1,4 +1,5 @@
 import { supabase } from './client';
+import { goHighLevelService } from './gohighlevel';
 import type { UserRole } from '../types';
 
 export interface AuthUser {
@@ -47,19 +48,40 @@ export const authService = {
         return await supabase.auth.signInWithPassword({ email, password });
     },
 
-    // Sign up
+    // Sign up with GoHighLevel integration
     async signUp(email: string, password: string, userData?: {
         first_name?: string;
         last_name?: string;
         phone?: string;
     }) {
-        return await supabase.auth.signUp({
+        // Create user account without email verification
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
-                data: userData
+                data: userData,
+                emailRedirectTo: undefined // Disable email verification
             }
         });
+
+        // If user was created successfully, sync to GoHighLevel
+        if (data.user && !error) {
+            try {
+                await goHighLevelService.syncContact({
+                    email: email,
+                    firstName: userData?.first_name,
+                    lastName: userData?.last_name,
+                    phone: userData?.phone,
+                    source: 'ICL Website Signup'
+                });
+                console.log('User synced to GoHighLevel successfully');
+            } catch (ghlError) {
+                console.error('Failed to sync user to GoHighLevel:', ghlError);
+                // Don't fail the signup if GoHighLevel sync fails
+            }
+        }
+
+        return { data, error };
     },
 
     // Sign in with OAuth
@@ -104,6 +126,29 @@ export const authService = {
             });
 
         if (profileError) throw profileError;
+
+        // Sync updates to GoHighLevel
+        try {
+            await goHighLevelService.syncContact({
+                email: user.email!,
+                firstName: updates.first_name,
+                lastName: updates.last_name,
+                phone: updates.phone,
+                source: 'ICL Profile Update'
+            });
+        } catch (ghlError) {
+            console.error('Failed to sync profile update to GoHighLevel:', ghlError);
+            // Don't fail the profile update if GoHighLevel sync fails
+        }
+    },
+
+    // Reset password (disabled - will not send emails)
+    async resetPassword(email: string) {
+        console.log('Password reset disabled. Please contact support for password assistance.');
+        return {
+            data: null,
+            error: new Error('Password reset is disabled. Please contact support for assistance.')
+        };
     },
 
     // Check if user has role
