@@ -51,22 +51,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUser(initialUser);
 
                 if (initialUser) {
-                    // Fetch profile and role from database with timeout protection
+                    // Fetch profile and role from database
                     try {
-                        const profilePromise = getUserProfile();
-                        const profileTimeout = new Promise<never>((_, reject) =>
-                            setTimeout(() => reject(new Error('Initial getUserProfile timeout')), 8000) // Increased to 8 seconds
-                        );
-                        const profileData = await Promise.race([profilePromise, profileTimeout]);
+                        const profileData = await getUserProfile();
 
                         if (!mountedRef.current) return;
                         setProfile(profileData);
 
-                        const rolePromise = checkUserRole();
-                        const roleTimeout = new Promise<never>((_, reject) =>
-                            setTimeout(() => reject(new Error('Initial checkUserRole timeout')), 8000) // Increased to 8 seconds
-                        );
-                        const roleData = await Promise.race([rolePromise, roleTimeout]);
+                        const roleData = await checkUserRole();
 
                         if (!mountedRef.current) return;
                         setUserRole(roleData);
@@ -125,27 +117,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 // Fetch profile and role when user logs in
                 try {
                     console.log('Calling getUserProfile()...');
-
-                    // Add timeout protection to prevent infinite loading
-                    const profilePromise = getUserProfile();
-                    const timeoutPromise = new Promise<never>((_, reject) =>
-                        setTimeout(() => reject(new Error('getUserProfile timeout')), 8000) // Increased to 8 seconds
-                    );
-
-                    const profileData = await Promise.race([profilePromise, timeoutPromise]);
+                    const profileData = await getUserProfile();
                     console.log('getUserProfile() result:', profileData);
                     if (!mountedRef.current) return;
                     setProfile(profileData);
 
                     console.log('Calling checkUserRole()...');
-
-                    // Add timeout protection for role check too
-                    const rolePromise = checkUserRole();
-                    const roleTimeoutPromise = new Promise<never>((_, reject) =>
-                        setTimeout(() => reject(new Error('checkUserRole timeout')), 8000) // Increased to 8 seconds
-                    );
-
-                    const roleData = await Promise.race([rolePromise, roleTimeoutPromise]);
+                    const roleData = await checkUserRole();
                     console.log('checkUserRole() result:', roleData);
                     if (!mountedRef.current) return;
                     setUserRole(roleData);

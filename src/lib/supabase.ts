@@ -417,13 +417,21 @@ export const checkUserRole = async (): Promise<UserRole> => {
         console.warn('user_profiles table does not exist, using email fallback');
         return user.email === 'innercirclelending@gmail.com' ? 'admin' : 'user';
       }
-      throw error;
+      // For other errors, return fallback role based on email
+      console.warn('checkUserRole using email fallback due to error:', error.message);
+      return user.email === 'innercirclelending@gmail.com' ? 'admin' : 'user';
     }
 
     return (data?.role || 'user') as UserRole;
   } catch (error) {
     console.error('checkUserRole failed:', error);
-    throw error;
+    // Fallback to 'user' role on any error
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user?.email === 'innercirclelending@gmail.com' ? 'admin' : 'user';
+    } catch {
+      return 'user';
+    }
   }
 };
 
@@ -445,13 +453,16 @@ export const getUserProfile = async (): Promise<UserProfile | null> => {
         console.warn('user_profiles table does not exist');
         return null;
       }
-      throw error;
+      // For other errors, return null instead of throwing to prevent app crashes
+      console.warn('getUserProfile returning null due to error:', error.message);
+      return null;
     }
 
     return data;
   } catch (error) {
     console.error('getUserProfile failed:', error);
-    throw error;
+    // Return null instead of throwing to prevent app crashes
+    return null;
   }
 };
 
