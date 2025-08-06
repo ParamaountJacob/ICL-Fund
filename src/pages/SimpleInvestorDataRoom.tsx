@@ -47,18 +47,11 @@ export default function SimpleInvestorDataRoom() {
     if (!user) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4">
-                <div className="bg-black/60 backdrop-blur-lg rounded-2xl shadow-2xl p-8 max-w-lg w-full border border-gold/30">
+                <div className="bg-black/60 backdrop-blur-lg rounded-2xl shadow-2xl p-8 max-w-md w-full border border-gold/30">
                     <div className="text-center mb-8">
-                        <div className="text-5xl mb-4">🏦</div>
-                        <h1 className="text-2xl font-bold text-gold mb-2">ICL Fund Data Room</h1>
-                        <p className="text-white/70 text-sm mb-4">Access Private Placement Memorandum, Pitch Deck & Investment Thesis</p>
-
-                        <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20 mb-6">
-                            <p className="text-blue-400 text-sm">
-                                <strong>Quick Account Creation Required</strong><br />
-                                Just email + password. Takes 30 seconds.
-                            </p>
-                        </div>
+                        <div className="text-5xl mb-4">🔒</div>
+                        <h1 className="text-2xl font-bold text-gold mb-2">Sign In Required</h1>
+                        <p className="text-white/70 text-sm">Please log in to access investor documents</p>
                     </div>
 
                     <div className="space-y-4">
@@ -66,18 +59,19 @@ export default function SimpleInvestorDataRoom() {
                             href="/contact"
                             className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-gold/80 to-yellow-500/80 text-black font-semibold hover:from-gold hover:to-yellow-500 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-gold/30 block text-center"
                         >
-                            📧 Request Account Access
+                            Contact for Access
                         </a>
-                        <p className="text-white/50 text-xs text-center">
-                            Or contact: innercirclelending@gmail.com
-                        </p>
+                        <a
+                            href="/"
+                            className="w-full px-4 py-3 rounded-xl bg-black/40 text-white border border-gold/40 hover:bg-black/60 transition-all duration-300 block text-center"
+                        >
+                            Return to Home
+                        </a>
                     </div>
                 </div>
             </div>
         );
-    }
-
-    return (
+    } return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
             <div className="max-w-5xl mx-auto px-4 py-8">
                 {/* Header */}
