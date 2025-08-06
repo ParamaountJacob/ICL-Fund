@@ -20,7 +20,6 @@ import PitchDeck from './pages/PitchDeck';
 import PPM from './pages/PPM';
 import PPMView from './pages/PPMView';
 import Profile from './pages/Profile';
-import DataRoom from './pages/DataRoom';
 import SimpleInvestorDataRoom from './pages/SimpleInvestorDataRoom';
 import PublicInvestorPortal from './pages/PublicInvestorPortal';
 import SimpleProfile from './pages/SimpleProfile';
