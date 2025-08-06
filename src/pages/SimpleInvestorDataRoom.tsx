@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import AuthModal from '../components/AuthModal';
 
 const FUND_DOCUMENTS = [
     {
@@ -29,8 +30,23 @@ const FUND_DOCUMENTS = [
 export default function SimpleInvestorDataRoom() {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [pendingDocument, setPendingDocument] = useState<typeof FUND_DOCUMENTS[0] | null>(null);
 
     function handleDocumentClick(doc: typeof FUND_DOCUMENTS[0]) {
+        // Check if user is logged in
+        if (!user) {
+            // Set pending document and show auth modal
+            setPendingDocument(doc);
+            setShowAuthModal(true);
+            return;
+        }
+
+        // User is logged in, proceed with document access
+        executeDocumentAction(doc);
+    }
+
+    function executeDocumentAction(doc: typeof FUND_DOCUMENTS[0]) {
         if (doc.type === 'pitch-deck') {
             // Navigate to existing pitch deck page
             navigate('/pitch-deck');
@@ -44,34 +60,22 @@ export default function SimpleInvestorDataRoom() {
         }
     }
 
-    if (!user) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4">
-                <div className="bg-black/60 backdrop-blur-lg rounded-2xl shadow-2xl p-8 max-w-md w-full border border-gold/30">
-                    <div className="text-center mb-8">
-                        <div className="text-5xl mb-4">🔒</div>
-                        <h1 className="text-2xl font-bold text-gold mb-2">Sign In Required</h1>
-                        <p className="text-white/70 text-sm">Please log in to access investor documents</p>
-                    </div>
+    const handleAuthSuccess = () => {
+        setShowAuthModal(false);
 
-                    <div className="space-y-4">
-                        <a
-                            href="/contact"
-                            className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-gold/80 to-yellow-500/80 text-black font-semibold hover:from-gold hover:to-yellow-500 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-gold/30 block text-center"
-                        >
-                            Contact for Access
-                        </a>
-                        <a
-                            href="/"
-                            className="w-full px-4 py-3 rounded-xl bg-black/40 text-white border border-gold/40 hover:bg-black/60 transition-all duration-300 block text-center"
-                        >
-                            Return to Home
-                        </a>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+        // Execute the pending document action after successful authentication
+        if (pendingDocument) {
+            executeDocumentAction(pendingDocument);
+        }
+
+        // Clear pending document
+        setPendingDocument(null);
+    };
+
+    const handleAuthClose = () => {
+        setShowAuthModal(false);
+        setPendingDocument(null);
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
@@ -89,11 +93,19 @@ export default function SimpleInvestorDataRoom() {
                         Comprehensive fund documentation including our Private Placement Memorandum,
                         Investment Pitch Deck, and Strategic Investment Thesis.
                     </p>
-                    <div className="inline-block p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                        <p className="text-green-400 text-sm">
-                            ✅ Authenticated: {user.user?.email}
-                        </p>
-                    </div>
+                    {user ? (
+                        <div className="inline-block p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                            <p className="text-green-400 text-sm">
+                                ✅ Authenticated: {user.user?.email}
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="inline-block p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                            <p className="text-yellow-400 text-sm">
+                                🔒 Sign in required to access documents
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Fund Overview - TLDR */}
@@ -303,6 +315,14 @@ export default function SimpleInvestorDataRoom() {
                     </div>
                 </div>
             </div>
+
+            {/* Auth Modal */}
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={handleAuthClose}
+                onSuccess={handleAuthSuccess}
+                onSignUpSuccess={handleAuthSuccess}
+            />
         </div>
     );
 }
