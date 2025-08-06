@@ -21,6 +21,8 @@ import PPM from './pages/PPM';
 import PPMView from './pages/PPMView';
 import Profile from './pages/Profile';
 import DataRoom from './pages/DataRoom';
+import SimpleInvestorDataRoom from './pages/SimpleInvestorDataRoom';
+import PublicInvestorPortal from './pages/PublicInvestorPortal';
 import SimpleProfile from './pages/SimpleProfile';
 import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
@@ -88,6 +90,8 @@ function AppContent() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/overview" element={<Overview />} />
         <Route path="/dataroom" element={<DataRoom />} />
+        <Route path="/investor-docs" element={<SimpleInvestorDataRoom />} />
+        <Route path="/investor-portal" element={<PublicInvestorPortal />} />
         <Route path="/pitch-deck" element={<ProtectedRoute><PitchDeck /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
