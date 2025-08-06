@@ -89,7 +89,7 @@ function AppContent() {
         <Route path="/phone-call-booking" element={<PhoneCallBooking />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/overview" element={<Overview />} />
-        <Route path="/dataroom" element={<DataRoom />} />
+        <Route path="/dataroom" element={<SimpleInvestorDataRoom />} />
         <Route path="/investor-docs" element={<SimpleInvestorDataRoom />} />
         <Route path="/investor-portal" element={<PublicInvestorPortal />} />
         <Route path="/pitch-deck" element={<ProtectedRoute><PitchDeck /></ProtectedRoute>} />

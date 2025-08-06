@@ -38,8 +38,15 @@ SELECT
     pg_size_pretty(pg_database_size(current_database())) as database_size,
     pg_size_pretty(pg_total_relation_size('user_profiles')) as user_profiles_size;
 
--- 7. Check for any custom functions that might be failing during user creation
-SELECT routine_name, routine_type 
-FROM information_schema.routines 
-WHERE routine_schema = 'public' 
-AND routine_name LIKE '%user%';
+-- IMMEDIATE DIAGNOSIS: Check the handle_new_user function that's likely failing
+SELECT proname, prosrc 
+FROM pg_proc 
+WHERE proname = 'handle_new_user';
+
+-- Also check what triggers are calling this function
+SELECT t.trigger_name, t.event_manipulation, t.action_timing,
+       t.event_object_schema, t.event_object_table, t.action_statement
+FROM information_schema.triggers t
+WHERE t.action_statement LIKE '%handle_new_user%';
+
+-- Check if this function is causing the signup failure
