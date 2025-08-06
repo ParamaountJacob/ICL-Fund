@@ -5,9 +5,15 @@
 SELECT COUNT(*) as user_count FROM auth.users;
 
 -- 2. Check user_profiles table structure and RLS
-SELECT schemaname, tablename, hasrls 
+SELECT schemaname, tablename, tableowner
 FROM pg_tables 
 WHERE tablename = 'user_profiles';
+
+-- 2b. Check RLS status specifically
+SELECT c.relname as table_name, c.relrowsecurity as rls_enabled
+FROM pg_class c
+JOIN pg_namespace n ON c.relnamespace = n.oid
+WHERE c.relname = 'user_profiles' AND n.nspname = 'public';
 
 -- 3. Check for triggers on user_profiles that might be failing
 SELECT trigger_name, event_manipulation, action_statement
