@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthModal from '../components/AuthModal';
 import {
     FileText,
-    PresentationChart,
+    Presentation,
     Target,
     Shield,
     TrendingUp,
@@ -26,7 +26,7 @@ const FUND_DOCUMENTS = [
         id: 'pitch-deck',
         name: 'Investment Pitch Deck',
         description: 'Comprehensive presentation covering strategy, market analysis, and projections',
-        icon: PresentationChart,
+        icon: Presentation,
         type: 'pitch-deck'
     },
     {
