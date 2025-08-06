@@ -20,7 +20,6 @@ import PitchDeck from './pages/PitchDeck';
 import PPM from './pages/PPM';
 import PPMView from './pages/PPMView';
 import Profile from './pages/Profile';
-import SimpleInvestorDataRoom from './pages/SimpleInvestorDataRoom';
 import PublicInvestorPortal from './pages/PublicInvestorPortal';
 import SimpleProfile from './pages/SimpleProfile';
 import Admin from './pages/Admin';
@@ -88,8 +87,6 @@ function AppContent() {
         <Route path="/phone-call-booking" element={<PhoneCallBooking />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/overview" element={<Overview />} />
-        <Route path="/dataroom" element={<SimpleInvestorDataRoom />} />
-        <Route path="/investor-docs" element={<SimpleInvestorDataRoom />} />
         <Route path="/investor-portal" element={<PublicInvestorPortal />} />
         <Route path="/pitch-deck" element={<ProtectedRoute><PitchDeck /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

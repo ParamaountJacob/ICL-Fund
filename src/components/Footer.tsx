@@ -34,9 +34,6 @@ const Footer: React.FC = () => {
             <Link to="/contact" className="text-sm text-text-secondary hover:text-text-primary transition-colors">
               Contact
             </Link>
-            <Link to="/dataroom" className="text-sm text-text-secondary hover:text-text-primary transition-colors">
-              Data Room
-            </Link>
           </div>
 
           <div className="text-center">
