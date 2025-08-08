@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Video, Phone } from 'lucide-react';
+import { Mail, Video } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Contact: React.FC = () => {
@@ -9,8 +9,7 @@ const Contact: React.FC = () => {
   const handleContactClick = (type: string) => {
     const routes = {
       email: '/email-contact',
-      video: '/video-call-booking',
-      phone: '/phone-call-booking'
+      video: '/video-call-booking'
     };
 
     const route = routes[type as keyof typeof routes];
@@ -91,36 +90,6 @@ const Contact: React.FC = () => {
                   </p>
                   <div className="flex items-center gap-2 text-text-secondary">
                     <span className="text-sm">Same day</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Phone Call */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            onClick={() => handleContactClick('phone')}
-            className="w-full group cursor-pointer"
-          >
-            <div className="bg-surface border border-graphite rounded-xl p-8 hover:border-gold/50 hover:bg-gold/5 transition-all duration-300">
-              <div className="flex items-center gap-6">
-                <div className="flex-shrink-0">
-                  <div className="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/30 transition-all duration-300">
-                    <Phone className="w-8 h-8 text-gold" />
-                  </div>
-                </div>
-                <div className="flex-1 text-left">
-                  <h3 className="text-2xl font-semibold text-text-primary mb-2">
-                    Phone Call
-                  </h3>
-                  <p className="text-text-secondary text-lg mb-3 leading-relaxed">
-                    Direct phone consultation for focused discussion
-                  </p>
-                  <div className="flex items-center gap-2 text-text-secondary">
-                    <span className="text-sm">3-4 hours</span>
                   </div>
                 </div>
               </div>
