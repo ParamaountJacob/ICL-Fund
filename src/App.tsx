@@ -26,7 +26,6 @@ import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
 import NotificationsPage from './pages/NotificationsPage';
 import VideoCallBooking from './pages/VideoCallBooking';
-import PhoneCallBooking from './pages/PhoneCallBooking';
 import EmailContact from './pages/EmailContact';
 import SubscriptionAgreement from './pages/onboarding-flow/SubscriptionAgreement';
 import PromissoryNote from './pages/onboarding-flow/PromissoryNote';
@@ -84,7 +83,6 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/email-contact" element={<EmailContact />} />
         <Route path="/video-call-booking" element={<VideoCallBooking />} />
-        <Route path="/phone-call-booking" element={<PhoneCallBooking />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/overview" element={<Overview />} />
         <Route path="/investor-portal" element={<PublicInvestorPortal />} />
