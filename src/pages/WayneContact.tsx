@@ -9,6 +9,8 @@ const WAYNE_BOOKING_WIDGET = 'https://api.leadconnectorhq.com/widget/booking/lUY
 const WayneContact: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
+    // Provide a taller height so embedded widget rarely needs its own scrollbar on mobile
+    const [iframeHeight, setIframeHeight] = useState(1100);
 
     useEffect(() => {
         const timer = setTimeout(() => setIsLoading(false), 2000);
@@ -24,6 +26,23 @@ const WayneContact: React.FC = () => {
         }
 
         return () => clearTimeout(timer);
+    }, []);
+
+    useEffect(() => {
+        // After mount / orientation change, set a generous height: viewport + padding
+        const compute = () => {
+            const vh = window.innerHeight || 800;
+            // Add extra space so widget internal content (header + calendar + timezone selector) fits
+            const target = Math.max(vh + 500, 1100); // ensure at least 1100px
+            setIframeHeight(target);
+        };
+        compute();
+        window.addEventListener('orientationchange', compute);
+        window.addEventListener('resize', compute);
+        return () => {
+            window.removeEventListener('orientationchange', compute);
+            window.removeEventListener('resize', compute);
+        };
     }, []);
 
     return (
@@ -93,8 +112,7 @@ const WayneContact: React.FC = () => {
                             className="w-full"
                             id="wayne-booking-widget"
                             style={{
-                                height: 'min(1000px, 80vh)',
-                                minHeight: '600px',
+                                height: `${iframeHeight}px`,
                                 border: 'none',
                                 background: 'transparent'
                             }}
