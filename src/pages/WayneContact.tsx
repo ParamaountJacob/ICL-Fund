@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Video, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-// Dedicated Wayne booking page. Replace widget URL if Wayne has a unique calendar.
-const WAYNE_BOOKING_WIDGET = 'https://api.leadconnectorhq.com/widget/booking/Zp3dkGUPA56lYxTr5NCw';
+// Dedicated Wayne booking page (updated widget ID provided by user).
+const WAYNE_BOOKING_WIDGET = 'https://api.leadconnectorhq.com/widget/booking/lUYY4S2MCpGeexdimCwC';
 
 const WayneContact: React.FC = () => {
     const navigate = useNavigate();
@@ -12,6 +12,17 @@ const WayneContact: React.FC = () => {
 
     useEffect(() => {
         const timer = setTimeout(() => setIsLoading(false), 2000);
+
+        // Inject LeadConnector script once (needed for some widgets to auto-resize)
+        const scriptId = 'leadconnector-form-embed';
+        if (!document.getElementById(scriptId)) {
+            const s = document.createElement('script');
+            s.id = scriptId;
+            s.src = 'https://link.msgsndr.com/js/form_embed.js';
+            s.async = true;
+            document.body.appendChild(s);
+        }
+
         return () => clearTimeout(timer);
     }, []);
 
@@ -82,6 +93,7 @@ const WayneContact: React.FC = () => {
                         <iframe
                             src={WAYNE_BOOKING_WIDGET}
                             className="w-full"
+                            id="wayne-booking-widget"
                             style={{
                                 height: 'min(1000px, 80vh)',
                                 minHeight: '600px',
