@@ -74,7 +74,7 @@ const WayneContact: React.FC = () => {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 sm:px-6 pt-16 pb-6 md:pt-20 md:pb-8 max-w-4xl">
+            <div className="container mx-auto px-4 sm:px-6 pt-10 pb-4 md:pt-14 md:pb-6 max-w-4xl">
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -109,12 +109,13 @@ const WayneContact: React.FC = () => {
                     <div className="bg-surface border border-graphite rounded-lg overflow-hidden shadow-lg">
                         <iframe
                             src={WAYNE_BOOKING_WIDGET}
-                            className="w-full"
+                            className="w-full block"
                             id="wayne-booking-widget"
                             style={{
                                 height: `${iframeHeight}px`,
                                 border: 'none',
-                                background: 'transparent'
+                                background: 'transparent',
+                                display: 'block'
                             }}
                             frameBorder="0"
                             scrolling="no"
