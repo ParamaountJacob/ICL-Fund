@@ -51,10 +51,11 @@ const WayneContact: React.FC = () => {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-10 md:mb-14"
                 >
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Direct With Wayne</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Catch Up With Wayne</h2>
                     <p className="text-text-secondary max-w-2xl mx-auto leading-relaxed">
-                        Schedule a private video consultation directly with Wayne Griswold to discuss strategy,
-                        capital deployment, or due diligence. Same secure booking experience—exclusive access.
+                        A personal video session to reconnect with Wayne Griswold. Learn about his background, current
+                        focus, philosophy, and ask high‑level questions. This is a relationship conversation—not a
+                        solicitation or investment advisory discussion.
                     </p>
                 </motion.div>
 
@@ -107,11 +108,15 @@ const WayneContact: React.FC = () => {
                         <ul className="inline-flex flex-wrap gap-4 justify-center text-xs">
                             <li className="flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 bg-gold rounded-full" />
-                                Strategic review
+                                Friendly re‑introduction
                             </li>
                             <li className="flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 bg-gold rounded-full" />
-                                Discreet & secure
+                                Background & philosophy
+                            </li>
+                            <li className="flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 bg-gold rounded-full" />
+                                Open Q&A (general only)
                             </li>
                             <li className="flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 bg-gold rounded-full" />
@@ -120,7 +125,8 @@ const WayneContact: React.FC = () => {
                         </ul>
                     </div>
                     <p className="text-xs text-text-secondary/70">
-                        All conversations are confidential and may be subject to investor qualification standards.
+                        Conversation is informal, confidential, and for general relationship purposes only. Nothing
+                        discussed constitutes investment advice or an offer to invest.
                     </p>
                 </motion.div>
             </div>
