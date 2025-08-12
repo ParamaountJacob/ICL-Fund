@@ -64,9 +64,7 @@ const WayneContact: React.FC = () => {
                 >
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">Catch Up With Wayne</h2>
                     <p className="text-text-secondary max-w-2xl mx-auto leading-relaxed">
-                        A personal video session to reconnect with Wayne Griswold. Learn about his background, current
-                        focus, philosophy, and ask high‑level questions. This is a relationship conversation—not a
-                        solicitation or investment advisory discussion.
+                        A personal video session to reconnect with Wayne Griswold.
                     </p>
                 </motion.div>
 
@@ -109,38 +107,7 @@ const WayneContact: React.FC = () => {
                     </div>
                 </motion.div>
 
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="mt-6 md:mt-8 text-center space-y-3"
-                >
-                    <div className="text-sm text-text-secondary">
-                        <p className="mb-2">What to expect:</p>
-                        <ul className="inline-flex flex-wrap gap-4 justify-center text-xs">
-                            <li className="flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 bg-gold rounded-full" />
-                                Friendly re‑introduction
-                            </li>
-                            <li className="flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 bg-gold rounded-full" />
-                                Background & philosophy
-                            </li>
-                            <li className="flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 bg-gold rounded-full" />
-                                Open Q&A (general only)
-                            </li>
-                            <li className="flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 bg-gold rounded-full" />
-                                30–45 minutes
-                            </li>
-                        </ul>
-                    </div>
-                    <p className="text-xs text-text-secondary/70">
-                        Conversation is informal, confidential, and for general relationship purposes only. Nothing
-                        discussed constitutes investment advice or an offer to invest.
-                    </p>
-                </motion.div>
+                {/* Footer space intentionally minimal after simplification */}
             </div>
         </div>
     );
