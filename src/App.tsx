@@ -27,6 +27,7 @@ import Dashboard from './pages/Dashboard';
 import NotificationsPage from './pages/NotificationsPage';
 import VideoCallBooking from './pages/VideoCallBooking';
 import EmailContact from './pages/EmailContact';
+import WayneContact from './pages/WayneContact';
 import SubscriptionAgreement from './pages/onboarding-flow/SubscriptionAgreement';
 import PromissoryNote from './pages/onboarding-flow/PromissoryNote';
 import WireDetails from './pages/onboarding-flow/WireDetails';
@@ -83,6 +84,7 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/email-contact" element={<EmailContact />} />
         <Route path="/video-call-booking" element={<VideoCallBooking />} />
+        <Route path="/wayne" element={<WayneContact />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/overview" element={<Overview />} />
         <Route path="/investor-portal" element={<PublicInvestorPortal />} />

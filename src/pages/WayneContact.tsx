@@ -3,22 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Video, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const VideoCallBooking: React.FC = () => {
+// Dedicated Wayne booking page. Replace widget URL if Wayne has a unique calendar.
+const WAYNE_BOOKING_WIDGET = 'https://api.leadconnectorhq.com/widget/booking/Zp3dkGUPA56lYxTr5NCw';
+
+const WayneContact: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Simulate iframe loading
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 2000);
-
+        const timer = setTimeout(() => setIsLoading(false), 2000);
         return () => clearTimeout(timer);
     }, []);
 
     return (
         <div className="min-h-screen bg-background pt-20">
-            {/* Mobile-optimized Header */}
+            {/* Sticky Header */}
             <div className="fixed top-16 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-b border-graphite">
                 <div className="container mx-auto px-4 sm:px-6 py-4">
                     <div className="flex items-center justify-between">
@@ -29,23 +28,36 @@ const VideoCallBooking: React.FC = () => {
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </button>
-
-                        <div className="flex items-center gap-2 md:gap-3">
-                            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gold/20 flex items-center justify-center">
-                                <Video className="w-4 h-4 md:w-5 md:h-5 text-gold" />
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full overflow-hidden border border-gold/30 bg-gold/10 flex items-center justify-center">
+                                <img
+                                    src="https://res.cloudinary.com/digjsdron/image/upload/v1746554204/Wayne_Griswold_o3w3rl.webp"
+                                    alt="Wayne Griswold"
+                                    className="w-full h-full object-cover"
+                                    loading="lazy"
+                                />
                             </div>
-                            <h1 className="text-lg md:text-xl font-semibold text-text-primary">
-                                Video Call
-                            </h1>
+                            <h1 className="text-lg md:text-xl font-semibold text-text-primary">Wayne Griswold</h1>
                         </div>
-
-                        <div className="w-10 h-10"></div> {/* Spacer for balance */}
+                        <div className="w-10 h-10" />
                     </div>
                 </div>
             </div>
 
             <div className="container mx-auto px-4 sm:px-6 pt-16 pb-6 md:pt-20 md:pb-8 max-w-4xl">
-                {/* Loading State */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="text-center mb-10 md:mb-14"
+                >
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Direct With Wayne</h2>
+                    <p className="text-text-secondary max-w-2xl mx-auto leading-relaxed">
+                        Schedule a private video consultation directly with Wayne Griswold to discuss strategy,
+                        capital deployment, or due diligence. Same secure booking experience—exclusive access.
+                    </p>
+                </motion.div>
+
                 {isLoading && (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -54,12 +66,11 @@ const VideoCallBooking: React.FC = () => {
                     >
                         <div className="flex items-center gap-3 text-text-secondary">
                             <Loader2 className="w-5 h-5 animate-spin" />
-                            <span>Loading booking calendar...</span>
+                            <span>Loading Wayne's calendar...</span>
                         </div>
                     </motion.div>
                 )}
 
-                {/* Enhanced Iframe Container */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: isLoading ? 0 : 1, y: 0 }}
@@ -68,7 +79,7 @@ const VideoCallBooking: React.FC = () => {
                 >
                     <div className="bg-surface border border-graphite rounded-lg overflow-hidden shadow-lg">
                         <iframe
-                            src="https://api.leadconnectorhq.com/widget/booking/Zp3dkGUPA56lYxTr5NCw"
+                            src={WAYNE_BOOKING_WIDGET}
                             className="w-full"
                             style={{
                                 height: 'min(1000px, 80vh)',
@@ -79,14 +90,12 @@ const VideoCallBooking: React.FC = () => {
                             frameBorder="0"
                             scrolling="no"
                             loading="lazy"
-                            id="Zp3dkGUPA56lYxTr5NCw_1754087690502"
-                            title="Video Call Booking Calendar"
+                            title="Wayne Griswold Booking Calendar"
                             onLoad={() => setIsLoading(false)}
                         />
                     </div>
                 </motion.div>
 
-                {/* Mobile Footer Info */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -97,23 +106,26 @@ const VideoCallBooking: React.FC = () => {
                         <p className="mb-2">What to expect:</p>
                         <ul className="inline-flex flex-wrap gap-4 justify-center text-xs">
                             <li className="flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 bg-gold rounded-full"></span>
-                                Screen sharing enabled
+                                <span className="w-1.5 h-1.5 bg-gold rounded-full" />
+                                Strategic review
                             </li>
                             <li className="flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 bg-gold rounded-full"></span>
-                                HD video quality
+                                <span className="w-1.5 h-1.5 bg-gold rounded-full" />
+                                Discreet & secure
                             </li>
                             <li className="flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 bg-gold rounded-full"></span>
-                                30-60 minutes
+                                <span className="w-1.5 h-1.5 bg-gold rounded-full" />
+                                30–45 minutes
                             </li>
                         </ul>
                     </div>
+                    <p className="text-xs text-text-secondary/70">
+                        All conversations are confidential and may be subject to investor qualification standards.
+                    </p>
                 </motion.div>
             </div>
         </div>
     );
 };
 
-export default VideoCallBooking;
+export default WayneContact;
