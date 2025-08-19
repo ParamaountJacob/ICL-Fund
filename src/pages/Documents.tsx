@@ -44,7 +44,7 @@ const Documents: React.FC = () => {
                                 <span className="mx-2">·</span>
                                 <a className="text-gold underline" href="https://www.blackrock.com/corporate/newsroom/press-releases/article/corporate-one/press-releases/blackrock-family-office-survey-2025" target="_blank" rel="noreferrer">BlackRock (2025)</a>
                                 <span className="mx-2">·</span>
-                                <a className="text-gold underline" href="https://www.rockco.com/app/uploads/2024/08/Rockefeller-Capital-Markets-Midyear-Outlook-2024.pdf" target="_blank" rel="noreferrer">Rockefeller (2024)</a>
+                                <a className="text-gold underline" href="https://rcmbrand.rockco.com/The%20Long%20and%20Short%20of%20It%20-%20Private%20Credit%20February%202024.pdf" target="_blank" rel="noreferrer">Rockefeller (2024)</a>
                             </span>
                         </div>
                         <div className="flex items-center justify-center gap-3 md:gap-4 mb-8">
