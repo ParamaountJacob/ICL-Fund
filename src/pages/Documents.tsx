@@ -27,26 +27,24 @@ const Documents: React.FC = () => {
                         transition={{ duration: 0.8 }}
                         className="max-w-3xl sm:max-w-4xl mx-auto mb-8 sm:mb-10 md:mb-14 text-center"
                     >
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold tracking-tight mb-3 sm:mb-4">Investor Documents</h1>
-                        <p className="text-base sm:text-lg md:text-xl text-text-secondary leading-relaxed">Access our Pitch Deck and One-Pager without logging in.</p>
-                        <p className="mt-3 sm:mt-4 text-sm sm:text-base text-text-secondary leading-relaxed">
-                            Inner Circle Lending focuses on private credit opportunities with a disciplined, fundamentals-driven approach. We prioritize prudent underwriting, risk management, and reliable cash flow structures across 12–24 month horizons.
-                        </p>
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold tracking-tight mb-2 sm:mb-3">Investor Documents</h1>
+                        <p className="text-base sm:text-lg md:text-xl text-text-secondary leading-relaxed">Pitch Deck and One‑Pager. No login required.</p>
                     </motion.div>
 
                     <div className="max-w-6xl mx-auto">
-                        {/* Subtle market context footnote */}
-                        <div className="text-center text-xs md:text-sm text-text-secondary/80 mb-4 sm:mb-6 px-1">
-                            Recent commentary from leading institutions highlights growing investor interest in private credit
-                            <span className="hidden sm:inline"> — </span>
-                            <span className="block sm:inline mt-1 sm:mt-0">
+                        {/* Sources (discreet) */}
+                        <details className="mx-auto max-w-3xl text-center text-xs md:text-sm text-text-secondary/80 mb-4 sm:mb-6">
+                            <summary className="inline-flex items-center gap-2 cursor-pointer select-none rounded-md px-2 py-1 hover:bg-accent/60 text-text-secondary">
+                                <span>Sources</span>
+                            </summary>
+                            <div className="mt-2 space-x-2">
                                 <a className="text-gold underline" href="https://privatebank.jpmorgan.com/latam/en/insights/markets-and-investing/why-private-credit-remains-a-strong-opportunity" target="_blank" rel="noreferrer">J.P. Morgan (2025)</a>
-                                <span className="mx-2">·</span>
+                                <span className="text-text-secondary/50">·</span>
                                 <a className="text-gold underline" href="https://www.blackrock.com/corporate/newsroom/press-releases/article/corporate-one/press-releases/blackrock-family-office-survey-2025" target="_blank" rel="noreferrer">BlackRock (2025)</a>
-                                <span className="mx-2">·</span>
+                                <span className="text-text-secondary/50">·</span>
                                 <a className="text-gold underline" href="https://rcmbrand.rockco.com/The%20Long%20and%20Short%20of%20It%20-%20Private%20Credit%20February%202024.pdf" target="_blank" rel="noreferrer">Rockefeller (2024)</a>
-                            </span>
-                        </div>
+                            </div>
+                        </details>
                         <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-center gap-3 md:gap-4 mb-6 sm:mb-8">
                             <button
                                 onClick={() => setView('deck')}
@@ -66,8 +64,8 @@ const Documents: React.FC = () => {
                             {view === 'deck' ? (
                                 <div>
                                     <div className="max-w-4xl mx-auto mb-4 sm:mb-6 text-center px-2">
-                                        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-1 sm:mb-2">Investment Pitch Deck</h2>
-                                        <p className="text-sm sm:text-base text-text-secondary">Click any page to view fullscreen. No password or login required.</p>
+                                        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-1 sm:mb-2">Pitch Deck</h2>
+                                        <p className="text-sm sm:text-base text-text-secondary">Tap any page to view fullscreen.</p>
                                     </div>
                                     <PitchDeckContent />
                                 </div>
@@ -75,7 +73,7 @@ const Documents: React.FC = () => {
                                 <div className="max-w-5xl mx-auto">
                                     <div className="max-w-3xl mx-auto mb-4 sm:mb-6 text-center px-2">
                                         <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-1 sm:mb-2">One-Pager</h2>
-                                        <p className="text-sm sm:text-base text-text-secondary">Inline preview below. Click the image to view fullscreen within the site.</p>
+                                        <p className="text-sm sm:text-base text-text-secondary">Tap the image to view fullscreen.</p>
                                     </div>
                                     <div className="bg-accent border border-graphite rounded-lg sm:rounded-xl p-0 overflow-hidden">
                                         <img
