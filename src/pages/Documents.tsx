@@ -30,7 +30,7 @@ const Documents: React.FC = () => {
                         <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold tracking-tight mb-2 sm:mb-3">Investor Documents</h1>
                         <p className="text-base sm:text-lg md:text-xl text-text-secondary leading-relaxed">Pitch Deck and One‑Pager.</p>
                         <p className="mt-2 text-sm sm:text-base text-text-secondary leading-relaxed">
-                            We’re a private credit fund. Recent commentary from J.P. Morgan, BlackRock, and Rockefeller highlights private credit as a steadier, lower‑rate‑sensitivity allocation.
+                            We're a private credit fund. J.P. Morgan, BlackRock, and Rockefeller research indicates private credit offers steadier returns with lower rate sensitivity.
                         </p>
                     </motion.div>
 
