@@ -73,7 +73,22 @@ const Navbar: React.FC = () => {
         transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
       >
         <div className="container px-4 md:px-6 mx-auto flex items-center justify-between max-w-full">
-          <Link to="/" className="flex items-center space-x-2 text-text-primary">
+          <Link
+            to="/"
+            className="flex items-center space-x-2 text-text-primary"
+            onClick={(e) => {
+              // If already on the home page, prevent redundant navigation and scroll to top
+              if (pathname === '/') {
+                e.preventDefault();
+                try {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } catch {
+                  // Fallback for older browsers
+                  window.scrollTo(0, 0);
+                }
+              }
+            }}
+          >
             <img
               src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
               alt="Inner Circle Lending"
