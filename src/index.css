@@ -61,17 +61,12 @@
     pointer-events: none;
   }
 
-  /* Presidential signature-level cursive styling for 'Founder' */
+  /* Small caps styling for 'FOUNDER' */
   .founder-script {
-    font-family: 'Times New Roman', 'Georgia', serif;
-    font-style: italic;
-    font-weight: 500;
-    font-size: 1.02em;
-    letter-spacing: 0.01em;
-    color: #D4AF37;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    transform: translateY(-0.5px);
-    display: inline-block;
+    font-variant: small-caps;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
 }
 
