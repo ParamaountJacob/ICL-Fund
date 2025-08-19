@@ -63,12 +63,18 @@
 
   /* Small caps styling for 'FOUNDER' with gold color */
   .founder-script {
-    font-variant: small-caps;
-    font-weight: 600;
-    letter-spacing: 0.05em;
     color: #D4AF37;
-    font-size: 1.05em;
-    text-transform: capitalize;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .founder-script::first-letter {
+    font-size: 1.4em;
+    font-weight: 700;
+    float: left;
+    line-height: 0.8;
+    margin-right: 0.05em;
+    margin-top: 0.1em;
   }
 }
 
