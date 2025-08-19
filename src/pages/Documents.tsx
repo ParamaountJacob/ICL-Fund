@@ -126,6 +126,41 @@ const Documents: React.FC = () => {
                             )}
                         </div>
                     </div>
+
+                    {/* CTA Section */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.3 }}
+                        className="max-w-4xl mx-auto mt-16 md:mt-24 text-center"
+                    >
+                        <div className="bg-gradient-to-r from-gold/10 to-gold/5 p-8 md:p-12 rounded-xl border border-gold/20">
+                            <h3 className="text-2xl md:text-3xl font-display font-semibold text-gold mb-4">
+                                Ready to Explore Your Investment Options?
+                            </h3>
+                            <p className="text-lg text-text-secondary mb-8 max-w-2xl mx-auto leading-relaxed">
+                                Our private lending opportunities offer 11-15% fixed returns with strategic tax advantages.
+                                Connect with our team to discuss your portfolio goals and explore how we can help optimize your capital deployment.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                                <button
+                                    onClick={() => navigate('/contact', { state: { consultation: true } })}
+                                    className="px-8 py-4 bg-gold hover:bg-yellow-500 text-background font-semibold rounded-lg transition-all duration-300 text-lg w-full sm:w-auto"
+                                >
+                                    Meet the <span className="founder-script">Founder</span>
+                                </button>
+                                <button
+                                    onClick={() => navigate('/investor-info')}
+                                    className="px-8 py-4 border border-gold text-gold hover:bg-gold/10 font-semibold rounded-lg transition-all duration-300 text-lg w-full sm:w-auto"
+                                >
+                                    Learn More About Investing
+                                </button>
+                            </div>
+                            <p className="text-sm text-text-secondary/70 mt-6">
+                                Accredited investors only. Minimum investment requirements apply.
+                            </p>
+                        </div>
+                    </motion.div>
                 </div>
             </section>
         </div>
