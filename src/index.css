@@ -67,8 +67,8 @@
     font-weight: 600;
     letter-spacing: 0.05em;
     color: #D4AF37;
-    text-transform: lowercase;
-    /* This makes small-caps work properly with first letter bigger */
+    font-size: 1.05em;
+    text-transform: capitalize;
   }
 }
 
