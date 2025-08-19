@@ -29,10 +29,13 @@ const Documents: React.FC = () => {
                     >
                         <h1 className="heading-xl mb-4">Investor Documents</h1>
                         <p className="text-lg md:text-xl text-text-secondary">Access our Pitch Deck and One-Pager without logging in.</p>
+                        <p className="mt-4 text-text-secondary">
+                            Inner Circle Lending provides asset-backed, private credit opportunities targeting 11–15% fixed returns with 12–24 month terms. Our approach emphasizes capital preservation, disciplined underwriting, and consistent monthly income.
+                        </p>
                     </motion.div>
 
                     <div className="max-w-6xl mx-auto">
-                        <div className="flex items-center justify-center gap-3 md:gap-4 mb-10">
+                        <div className="flex items-center justify-center gap-3 md:gap-4 mb-8">
                             <button
                                 onClick={() => setView('deck')}
                                 className={`px-4 md:px-6 py-2.5 md:py-3 rounded-lg border text-sm md:text-base font-medium transition-all ${view === 'deck' ? 'bg-gold text-background border-gold' : 'bg-accent text-text-secondary border-graphite hover:border-gold/50'}`}

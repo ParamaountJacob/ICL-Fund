@@ -42,9 +42,7 @@ const InvestorInfo: React.FC = () => {
     navigate('/documents?view=deck');
   };
 
-  const handleViewOnePager = () => {
-    navigate('/documents?view=onepager');
-  };
+  // Removed separate One-Pager flow from Investor Info per request
 
   const handleAuthSuccess = () => {
     setShowAuthModal(false);
@@ -486,21 +484,13 @@ const InvestorInfo: React.FC = () => {
                   financial projections, and risk analysis.
                 </p>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <button
-                    onClick={handleViewPitchDeck}
-                    className="bg-gold text-background px-8 py-4 text-lg font-semibold rounded-xl hover:bg-gold/90 transition-all duration-300 inline-flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105"
-                  >
-                    View Pitch Deck
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={handleViewOnePager}
-                    className="px-8 py-4 text-lg font-semibold rounded-xl border border-graphite bg-accent text-text-primary hover:border-gold/50 transition-all"
-                  >
-                    View One-Pager
-                  </button>
-                </div>
+                <button
+                  onClick={handleViewPitchDeck}
+                  className="bg-gold text-background px-8 py-4 text-lg font-semibold rounded-xl hover:bg-gold/90 transition-all duration-300 inline-flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  View Pitch Deck
+                  <ArrowRight className="w-5 h-5" />
+                </button>
               </div>
             </div>
           </div>
