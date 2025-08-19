@@ -30,11 +30,29 @@ const Documents: React.FC = () => {
                         <h1 className="heading-xl mb-4">Investor Documents</h1>
                         <p className="text-lg md:text-xl text-text-secondary">Access our Pitch Deck and One-Pager without logging in.</p>
                         <p className="mt-4 text-text-secondary">
-                            Inner Circle Lending provides asset-backed, private credit opportunities targeting 11–15% fixed returns with 12–24 month terms. Our approach emphasizes capital preservation, disciplined underwriting, and consistent monthly income.
+                            Inner Circle Lending focuses on private credit opportunities with a disciplined, fundamentals-driven approach. We prioritize prudent underwriting, risk management, and reliable cash flow structures across 12–24 month horizons.
                         </p>
                     </motion.div>
 
                     <div className="max-w-6xl mx-auto">
+                        {/* Market context - verifiable sources */}
+                        <div className="bg-accent border border-graphite rounded-xl p-4 md:p-6 mb-8">
+                            <h3 className="text-lg md:text-xl font-semibold mb-3">Why private credit is in focus</h3>
+                            <ul className="space-y-3 text-sm md:text-base text-text-secondary list-disc pl-5">
+                                <li>
+                                    <span className="text-text-primary">“Private credit has recently enjoyed surging popularity.”</span>
+                                    <span className="ml-2">— J.P. Morgan Private Bank, Sitara Sundar, Head of Alternative Investment Strategy & Market Intelligence (July 31, 2025). <a className="text-gold underline" href="https://privatebank.jpmorgan.com/latam/en/insights/markets-and-investing/why-private-credit-remains-a-strong-opportunity" target="_blank" rel="noreferrer">Source</a></span>
+                                </li>
+                                <li>
+                                    <span className="text-text-primary">“In our view, 2022 and 2023 were the Golden Age for private credit.”</span>
+                                    <span className="ml-2">— Rockefeller Global Family Office, Chloe Duanshi, Head of Investment Research & Strategy (Feb 2024). <a className="text-gold underline" href="https://www.rockco.com/app/uploads/2024/08/Rockefeller-Capital-Markets-Midyear-Outlook-2024.pdf" target="_blank" rel="noreferrer">PDF</a></span>
+                                </li>
+                                <li>
+                                    <span className="text-text-primary">“Nearly one-third (32%) of family offices intend to increase their allocations to private credit… the highest figure for any alternative asset class.”</span>
+                                    <span className="ml-2">— BlackRock Global Family Office Survey (June 17, 2025). <a className="text-gold underline" href="https://www.blackrock.com/corporate/newsroom/press-releases/article/corporate-one/press-releases/blackrock-family-office-survey-2025" target="_blank" rel="noreferrer">Press release</a></span>
+                                </li>
+                            </ul>
+                        </div>
                         <div className="flex items-center justify-center gap-3 md:gap-4 mb-8">
                             <button
                                 onClick={() => setView('deck')}
