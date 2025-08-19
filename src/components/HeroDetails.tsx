@@ -36,6 +36,20 @@ const HeroDetails: React.FC = () => {
                             Turn your tax liability into a yield-generating asset. We help you unlock funds from dormant 401(k)s,
                             tax payments, or crypto holdings and deploy them strategically across short-term, secured business loans.
                         </p>
+
+                        {/* Subtle market context */}
+                        <p className="mt-6 text-sm md:text-base text-text-secondary/80 max-w-3xl mx-auto">
+                            Investor interest in private credit has strengthened in recent periods,
+                            as noted by leading institutions
+                            <span className="hidden sm:inline"> — </span>
+                            <span className="block sm:inline mt-1 sm:mt-0">
+                                <a className="text-gold underline" href="https://privatebank.jpmorgan.com/latam/en/insights/markets-and-investing/why-private-credit-remains-a-strong-opportunity" target="_blank" rel="noreferrer">J.P. Morgan (2025)</a>
+                                <span className="mx-2">·</span>
+                                <a className="text-gold underline" href="https://www.blackrock.com/corporate/newsroom/press-releases/article/corporate-one/press-releases/blackrock-family-office-survey-2025" target="_blank" rel="noreferrer">BlackRock (2025)</a>
+                                <span className="mx-2">·</span>
+                                <a className="text-gold underline" href="https://www.rockco.com/app/uploads/2024/08/Rockefeller-Capital-Markets-Midyear-Outlook-2024.pdf" target="_blank" rel="noreferrer">Rockefeller (2024)</a>
+                            </span>
+                        </p>
                     </motion.div>
 
                     <motion.div
