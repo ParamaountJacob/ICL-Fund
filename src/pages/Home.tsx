@@ -1,6 +1,7 @@
 import React from 'react';
 import Hero from '../components/Hero';
 import HeroDetails from '../components/HeroDetails';
+import MarketContext from '../components/MarketContext';
 import About from '../components/About';
 import Process from '../components/Process';
 import Leadership from '../components/Leadership';
@@ -19,6 +20,7 @@ const Home: React.FC = () => {
         <Process />
         <Leadership />
         <Philosophy />
+        <MarketContext />
 
         {/* Newsletter Section */}
         <section className="py-12 md:py-32 bg-premium-gradient from-surface to-background bg-premium-pattern">
