@@ -30,7 +30,7 @@ const Documents: React.FC = () => {
                         <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold tracking-tight mb-2 sm:mb-3">Investor Documents</h1>
                         <p className="text-base sm:text-lg md:text-xl text-text-secondary leading-relaxed">Pitch Deck and One‑Pager.</p>
                         <p className="mt-2 text-sm sm:text-base text-text-secondary leading-relaxed">
-                            We’re a private credit fund. Leading institutions note debt/private credit is among the steadier allocations today with lower rate sensitivity—see sources below.
+                            We’re a private credit fund. Recent commentary from J.P. Morgan, BlackRock, and Rockefeller highlights private credit as a steadier, lower‑rate‑sensitivity allocation.
                         </p>
                     </motion.div>
 
@@ -38,7 +38,7 @@ const Documents: React.FC = () => {
                         {/* Sources (discreet) */}
                         <details className="mx-auto max-w-3xl text-center text-xs md:text-sm text-text-secondary/80 mb-4 sm:mb-6">
                             <summary className="inline-flex items-center gap-2 cursor-pointer select-none rounded-md px-2 py-1 hover:bg-accent/60 text-text-secondary">
-                                <span>Sources for market context</span>
+                                <span>Sources: J.P. Morgan · BlackRock · Rockefeller</span>
                             </summary>
                             <div className="mt-2 space-x-2">
                                 <a className="text-gold underline" href="https://privatebank.jpmorgan.com/latam/en/insights/markets-and-investing/why-private-credit-remains-a-strong-opportunity" target="_blank" rel="noreferrer">J.P. Morgan (2025)</a>
