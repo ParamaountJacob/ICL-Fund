@@ -17,6 +17,7 @@ import FAQ from './pages/FAQ';
 import Privacy from './pages/Privacy';
 import Overview from './pages/Overview';
 import PitchDeck from './pages/PitchDeck';
+import Documents from './pages/Documents';
 import PPM from './pages/PPM';
 import PPMView from './pages/PPMView';
 import Profile from './pages/Profile';
@@ -88,7 +89,8 @@ function AppContent() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/overview" element={<Overview />} />
         <Route path="/investor-portal" element={<PublicInvestorPortal />} />
-        <Route path="/pitch-deck" element={<ProtectedRoute><PitchDeck /></ProtectedRoute>} />
+        <Route path="/pitch-deck" element={<PitchDeck />} />
+        <Route path="/documents" element={<Documents />} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
         {/* Disabled investment routes - backend stripped */}
