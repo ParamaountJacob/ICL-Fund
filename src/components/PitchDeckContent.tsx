@@ -75,7 +75,7 @@ const PitchDeckContent: React.FC = () => {
                         </button>
                     </div>
 
-                    <div className={`pt-20 p-4 sm:p-8 flex ${modalIsHorizontal ? 'flex-row overflow-x-auto' : 'flex-col'} items-center justify-center min-h-screen`}>
+                    <div className={`pt-24 p-4 sm:p-8 flex ${modalIsHorizontal ? 'flex-row overflow-x-auto' : 'flex-col'} items-center justify-center min-h-screen`}>
                         {images.map((src, index) => (
                             <img
                                 key={index}
