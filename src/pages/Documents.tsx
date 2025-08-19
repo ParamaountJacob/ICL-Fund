@@ -28,14 +28,17 @@ const Documents: React.FC = () => {
                         className="max-w-3xl sm:max-w-4xl mx-auto mb-8 sm:mb-10 md:mb-14 text-center"
                     >
                         <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold tracking-tight mb-2 sm:mb-3">Investor Documents</h1>
-                        <p className="text-base sm:text-lg md:text-xl text-text-secondary leading-relaxed">Pitch Deck and One‑Pager. No login required.</p>
+                        <p className="text-base sm:text-lg md:text-xl text-text-secondary leading-relaxed">Pitch Deck and One‑Pager.</p>
+                        <p className="mt-2 text-sm sm:text-base text-text-secondary leading-relaxed">
+                            We’re a private credit fund. Leading institutions note debt/private credit is among the steadier allocations today with lower rate sensitivity—see sources below.
+                        </p>
                     </motion.div>
 
                     <div className="max-w-6xl mx-auto">
                         {/* Sources (discreet) */}
                         <details className="mx-auto max-w-3xl text-center text-xs md:text-sm text-text-secondary/80 mb-4 sm:mb-6">
                             <summary className="inline-flex items-center gap-2 cursor-pointer select-none rounded-md px-2 py-1 hover:bg-accent/60 text-text-secondary">
-                                <span>Sources</span>
+                                <span>Sources for market context</span>
                             </summary>
                             <div className="mt-2 space-x-2">
                                 <a className="text-gold underline" href="https://privatebank.jpmorgan.com/latam/en/insights/markets-and-investing/why-private-credit-remains-a-strong-opportunity" target="_blank" rel="noreferrer">J.P. Morgan (2025)</a>
