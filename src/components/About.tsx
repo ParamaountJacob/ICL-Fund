@@ -175,7 +175,7 @@ const About: React.FC = () => {
               onClick={() => navigate('/contact', { state: { consultation: true } })}
               className="button"
             >
-              Schedule Your Free Consultation
+              Get in Touch
             </button>
           </motion.div>
         </div>
