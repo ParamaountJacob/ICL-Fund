@@ -61,12 +61,14 @@
     pointer-events: none;
   }
 
-  /* Small caps styling for 'FOUNDER' */
+  /* Small caps styling for 'FOUNDER' with gold color */
   .founder-script {
     font-variant: small-caps;
     font-weight: 600;
     letter-spacing: 0.05em;
-    text-transform: uppercase;
+    color: #D4AF37;
+    text-transform: lowercase;
+    /* This makes small-caps work properly with first letter bigger */
   }
 }
 
