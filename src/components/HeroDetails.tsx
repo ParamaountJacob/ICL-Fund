@@ -91,11 +91,14 @@ const HeroDetails: React.FC = () => {
                                 onClick={() => navigate('/contact', { state: { consultation: true } })}
                                 className="button text-lg px-8 py-4 relative z-10 w-full max-w-xs sm:w-auto sm:min-w-[240px]"
                             >
-                                Schedule Free Consultation
+                                Meet the Founder
                             </button>
-                            <a href="#unlock" className="button-gold text-lg px-8 py-4 relative z-10 w-full max-w-xs sm:w-auto sm:min-w-[240px] text-center">
+                            <button
+                                onClick={() => navigate('/docs')}
+                                className="button-gold text-lg px-8 py-4 relative z-10 w-full max-w-xs sm:w-auto sm:min-w-[240px] text-center"
+                            >
                                 Learn More
-                            </a>
+                            </button>
                         </div>
                     </motion.div>
 

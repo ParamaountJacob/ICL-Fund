@@ -229,7 +229,7 @@ const Overview: React.FC = () => {
                                         Get In Touch
                                     </Link>
                                     <button
-                                        onClick={() => handleNavigation('/')}
+                                        onClick={() => handleNavigation('/docs')}
                                         className="px-6 py-2 border border-gold/50 text-gold font-semibold text-sm rounded-lg hover:bg-gold/10 transition-all duration-300"
                                     >
                                         Learn More
@@ -450,10 +450,10 @@ const Overview: React.FC = () => {
                                 to="/contact"
                                 className="px-8 py-3 bg-gradient-to-r from-gold to-yellow-600 text-black font-semibold rounded-lg hover:from-yellow-600 hover:to-gold transition-all duration-300 shadow-lg"
                             >
-                                Schedule Consultation
+                                Meet the Founder
                             </Link>
                             <button
-                                onClick={() => handleNavigation('/')}
+                                onClick={() => handleNavigation('/docs')}
                                 className="px-8 py-3 border border-gold/50 text-gold font-semibold rounded-lg hover:bg-gold/10 transition-all duration-300"
                             >
                                 Learn More

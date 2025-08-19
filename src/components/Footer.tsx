@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
             <Link to="/investor-info" className="text-sm text-text-secondary hover:text-text-primary transition-colors">
               Investor Info
             </Link>
-            <Link to="/documents" className="text-sm text-text-secondary hover:text-text-primary transition-colors">
+            <Link to="/docs" className="text-sm text-text-secondary hover:text-text-primary transition-colors">
               Documents
             </Link>
             <Link to="/contact" className="text-sm text-text-secondary hover:text-text-primary transition-colors">
@@ -56,7 +56,7 @@ const Footer: React.FC = () => {
               <Link to="/overview" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
                 Overview
               </Link>
-              <Link to="/documents" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
+              <Link to="/docs" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
                 Documents
               </Link>
             </div>

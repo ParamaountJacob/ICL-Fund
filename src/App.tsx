@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ContactPreloader from './components/ContactPreloader';
@@ -90,7 +90,11 @@ function AppContent() {
         <Route path="/overview" element={<Overview />} />
         <Route path="/investor-portal" element={<PublicInvestorPortal />} />
         <Route path="/pitch-deck" element={<PitchDeck />} />
-        <Route path="/documents" element={<Documents />} />
+        {/* Change Documents path to /docs */}
+        <Route path="/docs" element={<Documents />} />
+        {/* Legacy redirects to /docs */}
+        <Route path="/documents" element={<Navigate to="/docs" replace />} />
+        <Route path="/Documents" element={<Navigate to="/docs" replace />} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
         {/* Disabled investment routes - backend stripped */}

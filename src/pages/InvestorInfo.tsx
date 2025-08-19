@@ -39,7 +39,7 @@ const InvestorInfo: React.FC = () => {
 
   const handleViewPitchDeck = () => {
     // Make publicly accessible without auth
-    navigate('/documents?view=deck');
+    navigate('/docs?view=deck');
   };
 
   // Removed separate One-Pager flow from Investor Info per request
