@@ -86,7 +86,7 @@ const Contact: React.FC = () => {
                     Video Call
                   </h3>
                   <p className="text-text-secondary text-lg mb-3 leading-relaxed">
-                    Face-to-face consultation with screen sharing
+                    Video call to learn more about the fund
                   </p>
                   <div className="flex items-center gap-2 text-text-secondary">
                     <span className="text-sm">Same day</span>

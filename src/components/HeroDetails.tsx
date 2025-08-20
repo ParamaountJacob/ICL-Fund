@@ -91,7 +91,7 @@ const HeroDetails: React.FC = () => {
                                 onClick={() => navigate('/contact', { state: { consultation: true } })}
                                 className="button text-lg px-8 py-4 relative z-10 w-full max-w-xs sm:w-auto sm:min-w-[240px]"
                             >
-                                Meet the <span className="founder-script">Founder</span>
+                                Ask the <span className="founder-script">Founder</span>
                             </button>
                             <button
                                 onClick={() => navigate('/docs')}

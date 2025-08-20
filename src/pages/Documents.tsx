@@ -145,9 +145,9 @@ const Documents: React.FC = () => {
                             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                                 <button
                                     onClick={() => navigate('/contact', { state: { consultation: true } })}
-                                    className="px-8 py-4 bg-gold hover:bg-yellow-500 text-background font-semibold rounded-lg transition-all duration-300 text-lg w-full sm:w-auto"
+                                    className="px-8 py-4 bg-gold hover:bg-yellow-500 text-black font-semibold rounded-lg transition-all duration-300 text-lg w-full sm:w-auto"
                                 >
-                                    Meet the <span className="founder-script">Founder</span>
+                                    Ask the Founder
                                 </button>
                                 <button
                                     onClick={() => navigate('/investor-info')}

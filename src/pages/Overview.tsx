@@ -450,7 +450,7 @@ const Overview: React.FC = () => {
                                 to="/contact"
                                 className="px-8 py-3 bg-gradient-to-r from-gold to-yellow-600 text-black font-semibold rounded-lg hover:from-yellow-600 hover:to-gold transition-all duration-300 shadow-lg"
                             >
-                                Meet the <span className="founder-script">Founder</span>
+                                Ask the <span className="founder-script">Founder</span>
                             </Link>
                             <button
                                 onClick={() => handleNavigation('/docs')}
