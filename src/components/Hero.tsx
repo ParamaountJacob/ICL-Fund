@@ -58,7 +58,7 @@ const Hero: React.FC = () => {
         >
           <img
             src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
-            alt="Inner Circle Lending"
+            alt="InnerCircle"
             className="h-8 md:h-10 lg:h-11 w-auto"
           />
           <span className="text-white font-thin text-xl md:text-2xl lg:text-3xl tracking-widest">INNERCIRCLE</span>

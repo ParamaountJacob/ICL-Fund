@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
           >
             <img
               src="https://res.cloudinary.com/digjsdron/image/upload/v1746553996/icl-logo_egk3su.webp"
-              alt="Inner Circle Lending"
+              alt="InnerCircle"
               className="h-5 md:h-8 w-auto"
             />
             <span className="font-display font-semibold text-sm md:text-lg uppercase tracking-wide">InnerCircle</span>
