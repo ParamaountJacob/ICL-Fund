@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Video, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useEmbedHeight, ensureLeadConnectorScript } from '../hooks/useEmbedHeight';
 
 // Dedicated Wayne booking page (updated widget ID provided by user).
 const WAYNE_BOOKING_WIDGET = 'https://api.leadconnectorhq.com/widget/booking/lUYY4S2MCpGeexdimCwC';
@@ -9,40 +10,15 @@ const WAYNE_BOOKING_WIDGET = 'https://api.leadconnectorhq.com/widget/booking/lUY
 const WayneContact: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
-    // Provide a taller height so embedded widget rarely needs its own scrollbar on mobile
-    const [iframeHeight, setIframeHeight] = useState(1100);
+    const iframeHeight = useEmbedHeight({ reservedTop: 160, min: 900, extra: 300 });
 
     useEffect(() => {
         const timer = setTimeout(() => setIsLoading(false), 2000);
 
-        // Inject LeadConnector script once (needed for some widgets to auto-resize)
-        const scriptId = 'leadconnector-form-embed';
-        if (!document.getElementById(scriptId)) {
-            const s = document.createElement('script');
-            s.id = scriptId;
-            s.src = 'https://link.msgsndr.com/js/form_embed.js';
-            s.async = true;
-            document.body.appendChild(s);
-        }
+        // Ensure script for auto-resize behavior
+        ensureLeadConnectorScript();
 
         return () => clearTimeout(timer);
-    }, []);
-
-    useEffect(() => {
-        // After mount / orientation change, set a generous height: viewport + padding
-        const compute = () => {
-            const vh = window.innerHeight || 800;
-            // Add extra space so widget internal content (header + calendar + timezone selector) fits
-            const target = Math.max(vh + 500, 1100); // ensure at least 1100px
-            setIframeHeight(target);
-        };
-        compute();
-        window.addEventListener('orientationchange', compute);
-        window.addEventListener('resize', compute);
-        return () => {
-            window.removeEventListener('orientationchange', compute);
-            window.removeEventListener('resize', compute);
-        };
     }, []);
 
     return (
@@ -109,7 +85,7 @@ const WayneContact: React.FC = () => {
                     <div className="bg-surface border border-graphite rounded-lg overflow-hidden shadow-lg">
                         <iframe
                             src={WAYNE_BOOKING_WIDGET}
-                            className="w-full block"
+                            className="w-full block bg-transparent"
                             id="wayne-booking-widget"
                             style={{
                                 height: `${iframeHeight}px`,
@@ -118,7 +94,7 @@ const WayneContact: React.FC = () => {
                                 display: 'block'
                             }}
                             frameBorder="0"
-                            scrolling="no"
+                            scrolling="yes"
                             loading="lazy"
                             title="Wayne Griswold Booking Calendar"
                             onLoad={() => setIsLoading(false)}

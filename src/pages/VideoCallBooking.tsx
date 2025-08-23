@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Video, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useEmbedHeight, ensureLeadConnectorScript } from '../hooks/useEmbedHeight';
 
 const VideoCallBooking: React.FC = () => {
     const navigate = useNavigate();
@@ -13,8 +14,11 @@ const VideoCallBooking: React.FC = () => {
             setIsLoading(false);
         }, 2000);
 
+        ensureLeadConnectorScript();
         return () => clearTimeout(timer);
     }, []);
+
+    const iframeHeight = useEmbedHeight({ reservedTop: 160, min: 700, extra: 120 });
 
     return (
         <div className="min-h-screen bg-background pt-20">
@@ -69,15 +73,10 @@ const VideoCallBooking: React.FC = () => {
                     <div className="bg-surface border border-graphite rounded-lg overflow-hidden shadow-lg">
                         <iframe
                             src="https://api.leadconnectorhq.com/widget/booking/Zp3dkGUPA56lYxTr5NCw"
-                            className="w-full"
-                            style={{
-                                height: 'min(1000px, 80vh)',
-                                minHeight: '600px',
-                                border: 'none',
-                                background: 'transparent'
-                            }}
+                            className="w-full block bg-transparent"
+                            style={{ height: `${iframeHeight}px`, border: 'none', background: 'transparent', display: 'block' }}
                             frameBorder="0"
-                            scrolling="no"
+                            scrolling="yes"
                             loading="lazy"
                             id="Zp3dkGUPA56lYxTr5NCw_1754087690502"
                             title="Video Call Booking Calendar"
