@@ -44,7 +44,7 @@ const Footer: React.FC = () => {
               &copy; {currentYear} Inner Circle Lending. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-4 px-4">
-              <Link to="/privacy" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
+              <Link to="/terms" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
                 Terms
               </Link>
               <Link to="/privacy" className="text-xs text-text-secondary hover:text-text-primary transition-colors">

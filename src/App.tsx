@@ -15,6 +15,7 @@ import InvestorInfo from './pages/InvestorInfo';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
 import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
 import Overview from './pages/Overview';
 import PitchDeck from './pages/PitchDeck';
 import Documents from './pages/Documents';
@@ -87,6 +88,7 @@ function AppContent() {
         <Route path="/video-call-booking" element={<VideoCallBooking />} />
         <Route path="/wayne" element={<WayneContact />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="/overview" element={<Overview />} />
         <Route path="/investor-portal" element={<PublicInvestorPortal />} />
         <Route path="/pitch-deck" element={<PitchDeck />} />
