@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, FileText, Bell } from 'lucide-react';
+import { Menu, X, User, LogOut, FileText } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { useUnreadNotifications } from '../hooks/useUnreadNotifications';
-import NotificationModal from './NotificationModal';
+// Notifications removed for now
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  // Notifications modal removed
   const { pathname } = useLocation();
   const { user, signOut } = useAuth();
-  const { unreadCount } = useUnreadNotifications();
+  const unreadCount = 0; // Notifications disabled
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   // Close profile dropdown when clicking outside
@@ -147,21 +146,7 @@ const Navbar: React.FC = () => {
                       <FileText className="w-4 h-4" />
                       Pitch Deck
                     </Link>
-                    <button
-                      onClick={() => {
-                        setShowProfileDropdown(false);
-                        setShowNotificationModal(true);
-                      }}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors text-left"
-                    >
-                      <Bell className="w-4 h-4" />
-                      Notifications
-                      {unreadCount > 0 && (
-                        <div className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium min-w-[20px]">
-                          {unreadCount > 99 ? '99+' : unreadCount}
-                        </div>
-                      )}
-                    </button>
+                    {/* Notifications removed */}
                     <Link
                       to="/profile"
                       className="flex items-center gap-2 px-4 py-2 text-text-primary hover:bg-accent hover:text-gold transition-colors"
@@ -284,23 +269,7 @@ const Navbar: React.FC = () => {
                         <FileText className="w-5 h-5" />
                         Pitch Deck
                       </Link>
-                      <button
-                        onClick={() => {
-                          setIsOpen(false);
-                          setShowNotificationModal(true);
-                        }}
-                        className="flex items-center justify-between py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors w-full text-left border-b border-graphite/20"
-                      >
-                        <div className="flex items-center gap-4">
-                          <Bell className="w-5 h-5" />
-                          Notifications
-                        </div>
-                        {unreadCount > 0 && (
-                          <div className="bg-red-500 text-white text-sm rounded-full w-6 h-6 flex items-center justify-center font-medium">
-                            {unreadCount > 9 ? '9+' : unreadCount}
-                          </div>
-                        )}
-                      </button>
+                      {/* Notifications removed */}
                       <Link to="/profile"
                         className="flex items-center gap-4 py-4 text-lg font-medium text-text-primary hover:text-gold transition-colors border-b border-graphite/20"
                         onClick={() => setIsOpen(false)}
@@ -330,11 +299,7 @@ const Navbar: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Notification Modal */}
-      <NotificationModal
-        isOpen={showNotificationModal}
-        onClose={() => setShowNotificationModal(false)}
-      />
+      {/* Notifications removed */}
     </>
   );
 };
