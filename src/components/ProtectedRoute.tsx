@@ -17,7 +17,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     }
   }, [user, loading]);
 
-  if (loading) {
+  // Prevent infinite spinner: after 6s, stop showing the spinner and present auth prompt
+  const [loadingTimeoutReached, setLoadingTimeoutReached] = React.useState(false);
+  React.useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => setLoadingTimeoutReached(true), 6000);
+    return () => clearTimeout(t);
+  }, [loading]);
+
+  if (loading && !loadingTimeoutReached) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>

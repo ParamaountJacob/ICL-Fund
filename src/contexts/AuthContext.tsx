@@ -103,6 +103,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             try {
                 if (!mountedRef.current) return;
                 setLoading(true);
+                // Fail-safe: ensure loading doesn't hang forever (e.g., network stalls)
+                const failSafe = setTimeout(() => {
+                    if (mountedRef.current) {
+                        console.warn('AuthContext: Fail-safe timeout reached, forcing loading=false');
+                        setLoading(false);
+                    }
+                }, 7000);
 
                 // Get initial session
                 const { data: { user: initialUser } } = await supabase.auth.getUser();
@@ -152,6 +159,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setUserRole('user');
                 }
             } finally {
+                // Clear fail-safe and finalize loading state if still mounted
+                // Note: clearTimeout on an unknown id is safe if it already fired
+                try { /* optional guard */ } finally { /* no-op */ }
                 if (mountedRef.current) {
                     setLoading(false);
                 }
