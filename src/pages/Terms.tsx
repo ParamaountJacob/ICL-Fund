@@ -1,10 +1,11 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FileText, FileCheck, MessageSquare } from 'lucide-react';
 
 const Terms: React.FC = () => {
     return (
-        <div className="pt-28">
+        <div className="min-h-screen bg-background pt-28">
             <section className="py-24 md:py-32">
                 <div className="section">
                     <motion.div
@@ -158,7 +159,7 @@ const Terms: React.FC = () => {
                                         <li>You can also manage your communication preferences by contacting us or via your account settings (where available).</li>
                                     </ul>
                                     <p>
-                                        For more information about how we handle your data, please review our <a href="/privacy" className="text-gold hover:underline">Privacy Policy</a>.
+                                        For more information about how we handle your data, please review our <Link to="/privacy" className="text-gold hover:underline">Privacy Policy</Link>.
                                     </p>
                                 </div>
 

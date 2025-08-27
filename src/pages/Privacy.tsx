@@ -4,7 +4,7 @@ import { Shield, Lock, FileCheck, MessageSquare, Mail, Share2 } from 'lucide-rea
 
 const Privacy: React.FC = () => {
   return (
-    <div className="pt-28">
+    <div className="min-h-screen bg-background pt-28">
       <section className="py-24 md:py-32">
         <div className="section">
           <motion.div
