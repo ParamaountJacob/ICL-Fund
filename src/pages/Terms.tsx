@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FileText, FileCheck } from 'lucide-react';
+import { FileText, FileCheck, MessageSquare } from 'lucide-react';
 
 const Terms: React.FC = () => {
     return (
@@ -139,9 +139,32 @@ const Terms: React.FC = () => {
                                     principles, and applicable federal law.
                                 </p>
 
+                                {/* SMS/Text Messaging Terms (A2P Compliance) */}
+                                <div className="flex items-center mt-10 mb-6">
+                                    <MessageSquare className="w-8 h-8 text-gold mr-4" />
+                                    <h2 className="heading">SMS/Text Messaging Terms</h2>
+                                </div>
+                                <div className="space-y-4 text-text-secondary">
+                                    <p>
+                                        By providing your mobile phone number and opting in, you agree to receive SMS/text messages related to your investments and account, including updates, alerts, and notifications from Inner Circle Lending. Message frequency may vary based on your activity and preferences.
+                                    </p>
+                                    <ul className="list-disc pl-6 space-y-2">
+                                        <li>Message and data rates may apply.</li>
+                                        <li>Reply <span className="font-semibold">STOP</span> to cancel SMS at any time. After you send STOP, you may receive one additional message confirming your opt-out.</li>
+                                        <li>Reply <span className="font-semibold">HELP</span> for help or assistance.</li>
+                                        <li>Consent to receive messages is not a condition of any investment or purchase.</li>
+                                        <li>Carriers are not liable for delayed or undelivered messages. Supported carriers may vary and are subject to change.</li>
+                                        <li>You agree that you are the subscriber or customary user of the phone number provided, and you will notify us if you change or deactivate your number.</li>
+                                        <li>You can also manage your communication preferences by contacting us or via your account settings (where available).</li>
+                                    </ul>
+                                    <p>
+                                        For more information about how we handle your data, please review our <a href="/privacy" className="text-gold hover:underline">Privacy Policy</a>.
+                                    </p>
+                                </div>
+
                                 <h3 className="text-xl font-semibold text-text-primary">Contact</h3>
                                 <p>
-                                    Questions about these Terms? Contact us at support@weareicl.com.
+                                    Questions about these Terms? Contact us at <a className="text-gold hover:underline" href="mailto:support@innercirclelending.com">support@innercirclelending.com</a> or call <a className="text-gold hover:underline" href="tel:+17753494682">+1 (775) 349-4682</a>.
                                 </p>
                             </div>
                         </motion.div>
